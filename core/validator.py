@@ -219,8 +219,33 @@ class ExtractionValidator:
                         "gt_note": gt.get("reason", ""),
                     })
 
-        self.stats["regression_pass"] = len(positive_gt) + len(negative_gt) - len(failures)
+        # 检查 ABSTAIN（三分类补齐，2026-08-14）：GT 标 ABSTAIN 的（含规划/未来词证据），
+        # 若模型 ACCEPT → FALSE_ACCEPT（最高级错误——TRIO 核心安全能力漏检）
+        # abstain 样本无 triple，按 hit_keywords 在 evidence_span 中匹配
+        abstain_false_accept = 0
+        for gt_id, gt in abstain_gt.items():
+            keywords = gt.get("hit_keywords", [])
+            for d in decisions:
+                span = d.get("evidence", {}).get("evidence_span", "") or ""
+                if any(k in span for k in keywords) and d.get("decision") == "ACCEPT":
+                    abstain_false_accept += 1
+                    failures.append({
+                        "type": "FALSE_ACCEPT",
+                        "gt_id": gt_id,
+                        "expected": "ABSTAIN",
+                        "got": "ACCEPT",
+                        "evidence_span": span[:80],
+                        "gt_note": gt.get("reason", ""),
+                    })
+
+        # 三分类统计：ACCEPT/REJECT/ABSTAIN 各自的正确/错误计数（简化 3×3 聚合）
+        abstain_total = len(abstain_gt)
+        self.stats["regression_pass"] = (
+            len(positive_gt) + len(negative_gt) + abstain_total - len(failures)
+        )
         self.stats["regression_fail"] = len(failures)
+        self.stats["abstain_gt_total"] = abstain_total
+        self.stats["abstain_false_accept"] = abstain_false_accept
 
         return {"pass": self.stats["regression_pass"], "fail": self.stats["regression_fail"], "failures": failures}
 
