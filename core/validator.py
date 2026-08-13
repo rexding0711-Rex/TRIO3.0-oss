@@ -322,7 +322,13 @@ class ExtractionValidator:
                 else 0.0
             ),
         }
-        result["valid"] = len(result["errors"]) == 0
+        # valid 判定（2026-08-14 修复）：regression FALSE_ACCEPT 必须使 valid=false——
+        # 接受了一个 GT 判定为该拒绝的 claim 是安全失败方向，验证器不能"发现自己错了仍返回 valid=True"
+        false_accept = any(
+            f.get("type") == "FALSE_ACCEPT"
+            for f in result["regression"].get("failures", [])
+        )
+        result["valid"] = len(result["errors"]) == 0 and not false_accept
 
         return result
 
@@ -396,8 +402,14 @@ if __name__ == "__main__":
     validator.load()
 
     if dry_run:
-        # 跳过 Neo4j 实体解析（离线测试用）
-        validator.resolve_entity = lambda name, node_type: {"exists": True, "matched_name": name, "node_type": node_type}
+        # 离线测试：模拟"无 KG 不强制"——与 KG_ENABLED=False 的 resolve_entity 契约一致
+        # （2026-08-14 修复：曾缺 enforced 字段导致主流程 KeyError）
+        validator.resolve_entity = lambda name, node_type: {
+            "exists": True,
+            "enforced": False,
+            "matched_name": name,
+            "node_type": node_type,
+        }
 
     result = validator.validate(llm_output)
 

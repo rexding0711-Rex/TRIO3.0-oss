@@ -10,10 +10,20 @@ pass() { echo "  ✅ $1"; PASS=$((PASS+1)); }
 warn() { echo "  ⚠️ $1"; WARN=$((WARN+1)); }
 fail() { echo "  ❌ $1"; FAIL=$((FAIL+1)); }
 
+# OSS 模式：clone 环境无 .env/state（净化版仓库）——本机资源检查跳过，只跑引擎检查
+# 2026-08-14 外部审计吸收：全量验证器曾是"作者本机健康检查"，clone 后误报"系统坏了"
+OSS_MODE=false
+[ ! -f .env ] && OSS_MODE=true
+[ "$OSS_MODE" = "true" ] && echo "  ⚠️ OSS 模式（clone 环境无 .env/state，跳过本机资源检查）"
+
 echo "═══ 1. 安全 ═══"
-[ -f .env ] && pass ".env 存在" || fail ".env 不存在"
-grep -rq 'REDACTED' scripts/*.py 2>/dev/null && fail "密码硬编码仍存在" || pass "无密码硬编码"
-[ -f .git/hooks/pre-commit ] && pass "pre-commit hook 激活" || fail "pre-commit hook 缺失"
+if [ "$OSS_MODE" = "true" ]; then
+  pass "本机资源检查跳过（OSS 模式）"
+else
+  [ -f .env ] && pass ".env 存在" || fail ".env 不存在"
+  grep -rq 'REDACTED' scripts/*.py 2>/dev/null && fail "密码硬编码仍存在" || pass "无密码硬编码"
+  [ -f .git/hooks/pre-commit ] && pass "pre-commit hook 激活" || fail "pre-commit hook 缺失"
+fi
 
 echo "═══ 2. 代码质量 ═══"
 python3 -m pytest tests/ -q --tb=no 2>/dev/null && pass "pytest 全通过" || warn "pytest 有失败(或未安装)"
@@ -37,13 +47,16 @@ echo "═══ 5. 引擎 ═══"
 [ -f scripts/validate-engine-output.sh ] && pass "引擎验证 Hook 存在" || warn "Hook 缺失"
 
 echo "═══ 6. 运维 ═══"
-[ -f state/run-history.jsonl ] && pass "run-history 存在" || fail "run-history 缺失"
-RUN_COUNT=$(wc -l < state/run-history.jsonl)
-[ "$RUN_COUNT" -gt 50 ] && pass "Run 数: $RUN_COUNT (>50)" || warn "Run 数: $RUN_COUNT"
-[ -f state/test-results.log ] && pass "test-results.log 存在" || warn "无 test-results.log"
-grep -q "告警\|ALERTS" scripts/daily-maintenance.sh 2>/dev/null && pass "告警机制已集成" || fail "告警未集成"
-# 趋势不退化+无单次<5.0（替代旧判据"最近3run≥7.0"）
-TREND_OK=$(python3 -c "
+if [ "$OSS_MODE" = "true" ]; then
+  pass "本机账本检查跳过（OSS 模式）"
+else
+  [ -f state/run-history.jsonl ] && pass "run-history 存在" || fail "run-history 缺失"
+  RUN_COUNT=$(wc -l < state/run-history.jsonl 2>/dev/null || echo 0)
+  [ "$RUN_COUNT" -gt 50 ] && pass "Run 数: $RUN_COUNT (>50)" || warn "Run 数: $RUN_COUNT"
+  [ -f state/test-results.log ] && pass "test-results.log 存在" || warn "无 test-results.log"
+  grep -q "告警\|ALERTS" scripts/daily-maintenance.sh 2>/dev/null && pass "告警机制已集成" || fail "告警未集成"
+  # 趋势不退化+无单次<5.0（替代旧判据"最近3run≥7.0"）
+  TREND_OK=$(python3 -c "
 import json
 lines = [json.loads(l) for l in open('state/run-history.jsonl') if l.strip()]
 recent = [r.get('composite_score',0) for r in lines[-5:]]
@@ -55,9 +68,9 @@ if len(recent) >= 5:
 else:
     print('OK')
 " 2>/dev/null)
-[ "$TREND_OK" = "OK" ] && pass "评分趋势无退化+无崩溃" || warn "评分退化或有单次<5.0"
-
-[ -f state/verification-log.md ] && pass "验证日志存在" || warn "缺少验证日志"
+  [ "$TREND_OK" = "OK" ] && pass "评分趋势无退化+无崩溃" || warn "评分退化或有单次<5.0"
+  [ -f state/verification-log.md ] && pass "验证日志存在" || warn "缺少验证日志"
+fi
 [ -f scripts/signal-density-check.sh ] && pass "信号密度预检脚本" || warn "缺少信号密度预检"
 [ -f scripts/engine-gap-detector.py ] && pass "引擎缺口检测器" || warn "缺少缺口检测器"
 # state schema 漂移检测（dsh gen-persistence-catalog 吸收 2026-08-14）

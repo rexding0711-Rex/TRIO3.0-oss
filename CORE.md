@@ -56,6 +56,7 @@ TRIO 防御的不是"出错"，是**安静地出错**——让错误在系统内
 - **可证伪条件**：每个关键结论附"什么条件下这个结论会被证伪"。覆盖率 < 80% → 阻断交付。
 - **少数派保护 (E3)**：一个视角持续分歧 → 封存标注，不取平均，不杀死。历史反复证明少数派+最后被证实=创新最常见模式。
 - **ESCALATE**：仅四种情况触发（不可逆决策 / 面具间根本分歧 / 置信度崩塌 / 同一 FAIL 3 轮未 PASS）。触发后 state.status = "paused_escalate"，等用户裁决。
+- **决策提交门 (Decision Commit)**（2026-08-14 外部审计吸收）：预测/判断注册必须走 `python3 scripts/decision-commit.py <candidate.json>`——confidence ≥ 4 无 counter_evidence、prediction_contract 缺字段、未声明 verification 的候选**阻断写入**（exit 1）。禁止绕过脚本直接 append decision-log.jsonl。提交门管新决策，constitution-gate.py 管存量，两者互补。
 
 - **为什么不可丢**：没有这些 = AI 隐藏不确定性、假装自信、在死循环里硬上。
 
