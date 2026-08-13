@@ -83,21 +83,25 @@ print(st.get('step$order',{}).get('status',''))" 2>/dev/null)
     [ "$ans" = "n" ] && { python3 -c "import json; st=json.load(open('$STATE')); st['steps']['step$order']={'status':'skipped'}; json.dump(st,open('$STATE','w'))"; echo "    ⏭️  已跳过"; continue; }
   fi
   # 执行标记：in_progress → 提示模型执行
+  # 2026-08-14 修复：无效输入不默认 completed（曾 `*) STATUS="completed"` 假完成，违反 fail closed）
   echo "  ▶️  Step $order ($mask): $action"
   echo "     （DS 单模型：由当前会话面具执行此步 action，完成后确认）"
-  read -u 3 -p "     此步完成？(y=完成, n=失败, r=标记进行中继续) " ans2
-  case "${ans2:-}" in
-    y|Y) STATUS="completed" ;;
-    n|N) STATUS="failed"; FAIL=1 ;;
-    r|R) STATUS="in_progress" ;;
-    *) STATUS="completed" ;;  # 回车/未知 → 视为完成
-  esac
+  while true; do
+    read -u 3 -p "     此步完成？(y=完成, n=失败, r=标记进行中继续) " ans2
+    case "${ans2:-}" in
+      y|Y) STATUS="completed"; break ;;
+      n|N) STATUS="failed"; FAIL=1; break ;;
+      r|R) STATUS="in_progress"; break ;;
+      *) echo "     ❌ 无效输入（需 y/n/r），状态未改变，请重输" ;;
+    esac
+  done
   python3 -c "import json; st=json.load(open('$STATE')); st['steps']['step$order']={'status':'$STATUS'}; json.dump(st,open('$STATE','w'),ensure_ascii=False,indent=2)"
   echo "    → Step $order 状态: $STATUS"
 done < "$RUN_DIR/steps.tsv"
 
 # ── 收尾 ──────────────────────────────────────────────────
-DONE=$(python3 -c "import json; st=json.load(open('$STATE')); print(sum(1 for s in st['steps'].values() if s['status']=='completed'))")
+# 2026-08-14 修复：skipped 是合法终态，计入 DONE（曾只统计 completed → 含 skip 的 run 永远 paused）
+DONE=$(python3 -c "import json; st=json.load(open('$STATE')); print(sum(1 for s in st['steps'].values() if s['status'] in ('completed','skipped')))")
 TOTAL=$(wc -l < "$RUN_DIR/steps.tsv")
 echo ""
 if [ "$FAIL" -eq 0 ] && [ "$DONE" -ge "$TOTAL" ]; then

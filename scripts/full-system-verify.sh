@@ -93,7 +93,14 @@ ADR_COUNT=$(ls architecture/adr/ADR-*.md 2>/dev/null | wc -l)
 echo "════════════════════════════════════"
 echo "  总计: ✅ $PASS 通过 | ⚠️ $WARN 警告 | ❌ $FAIL 失败"
 echo "  满分条件: fail = 0 且 warn ≤ 2"
-[ $FAIL -eq 0 ] && [ $WARN -le 2 ] && echo "  🎉 TRIO 3.0 达标！" || echo "  ❌ 尚未达标"
-echo "════════════════════════════════════"
-exit $FAIL
+# exit code 表达真实结果（2026-08-14 修复：曾 `exit $FAIL` 导致 warn 超标仍返回 0=success）
+if [ "$FAIL" -eq 0 ] && [ "$WARN" -le 2 ]; then
+  echo "  🎉 TRIO 3.0 达标！"
+  echo "════════════════════════════════════"
+  exit 0
+else
+  echo "  ❌ 尚未达标（fail>0 或 warn>2）"
+  echo "════════════════════════════════════"
+  exit 1
+fi
 # 评分校准: ADR-009竞品引擎独立评分·待25+ engine runs后线性回归反校准
