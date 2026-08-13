@@ -100,6 +100,42 @@ class DecisionLedger:
         self.conn.commit()
         return mid
 
+    def append_committed(self, record) -> str:
+        """Canonical Decision Record 提交（终局改造第二道保险：拒绝非 COMMITTED）。
+
+        decision_runtime.commit_decision() 落 SQLite 的唯一入口——
+        即使有人绕过 runtime，SQLite 层自己拒绝非 COMMITTED 记录。
+        """
+        if getattr(record, "commit_status", "PENDING") != "COMMITTED":
+            raise RuntimeError(
+                f"拒绝写入非 COMMITTED 记录: commit_status={getattr(record, 'commit_status', '?')}"
+            )
+        mid = f"dec_{record.decision_id}"
+        now = datetime.now().isoformat()
+        claim = record.claim or {}
+        self.conn.execute("""INSERT INTO memories
+            (memory_id, type, topic, content, evidence, domain, impact_score,
+             confidence, lifecycle_status, outcome_status, source_session_id,
+             tags, error_tags, review_at, related_memories)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", (
+            mid, "decision",
+            json.dumps(claim, ensure_ascii=False)[:200],
+            record.to_jsonl_line(),
+            json.dumps(getattr(record, "evidence", []), ensure_ascii=False),
+            "runtime",
+            record.confidence_level,
+            record.confidence_score,
+            "committed",
+            getattr(record, "verification", None) or "pending",
+            record.system_version,
+            json.dumps([g.status for g in record.gates], ensure_ascii=False),
+            json.dumps(getattr(record, "counter_evidence", []), ensure_ascii=False),
+            now,
+            json.dumps([], ensure_ascii=False)
+        ))
+        self.conn.commit()
+        return mid
+
     def activate(self, memory_id: str) -> bool:
         """proposed → active"""
         self.conn.execute("UPDATE memories SET lifecycle_status='active' WHERE memory_id=? AND lifecycle_status='proposed'", (memory_id,))
