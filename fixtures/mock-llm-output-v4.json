@@ -1,0 +1,131 @@
+{
+  "pipeline_metadata": {
+    "pipeline_version": "trio-extract-v4",
+    "model": "deepseek-v4-pro",
+    "prompt_version": "extraction_prompt_v4",
+    "extracted_at": "2026-07-16T18:00:00+08:00",
+    "source_report_id": "TRIO-Stock-test"
+  },
+  "decisions": [
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "安集科技",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "CMP抛光液",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "安集科技是国内CMP抛光液龙头，产品已进入中芯国际供应链并实现批量供货",
+        "context_window": "根据年报披露，安集科技是国内CMP抛光液龙头，产品已进入中芯国际供应链并实现批量供货，贡献营收超5亿元",
+        "source_type": "annual_report",
+        "source_date": "2025-03-15",
+        "source_doc_id": "TRIO-Stock-066"
+      },
+      "scores": {
+        "evidence_strength": 0.95,
+        "source_authority": 0.98,
+        "resolution_certainty": 1.0
+      },
+      "temporal": {
+        "valid_from": "2025-01-01",
+        "valid_to": null,
+        "is_historical": false
+      },
+      "material_variant": {
+        "variant_name": "",
+        "application_segment": "semiconductor_frontend",
+        "tech_node": "mature"
+      }
+    },
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "雅克科技",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "光刻胶",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "雅克科技是国内光刻胶重要企业，正积极布局先进光刻胶领域",
+        "context_window": "研报指出，雅克科技是国内光刻胶重要企业，正积极布局先进光刻胶领域",
+        "source_type": "research_report",
+        "source_date": "2025-06",
+        "source_doc_id": "TRIO-Stock-半导体材料"
+      },
+      "scores": {
+        "evidence_strength": 0.45,
+        "source_authority": 0.65,
+        "resolution_certainty": 0.70
+      },
+      "temporal": {
+        "valid_from": "2025-06-01",
+        "valid_to": null,
+        "is_historical": false
+      }
+    },
+    {
+      "decision": "ABSTAIN",
+      "claim": {
+        "subject": "彤程新材",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "ArF光刻胶",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "彤程新材正积极进行高频ArF光刻胶产业规划与未来三年建设展望，期待通过认证",
+        "source_type": "research_report",
+        "source_date": "2025-12",
+        "source_doc_id": "TRIO-Stock-半导体材料"
+      },
+      "abstain_detail": {
+        "reason": "L1 硬规则命中: '规划' + '未来三年' + '期待'",
+        "trigger_layer": "L1_HARD_RULE",
+        "confidence_if_forced": 0.15
+      }
+    },
+    {
+      "decision": "REJECT",
+      "claim": {
+        "subject": "小米集团",
+        "predicate": "SUPPLIES_TO",
+        "object": "芯片",
+        "object_type": "ProductCategory"
+      },
+      "evidence": {
+        "evidence_span": "小米集团为消费电子企业提供芯片",
+        "source_type": "inference",
+        "source_date": "2025",
+        "source_doc_id": "unknown"
+      },
+      "reject_detail": {
+        "reason": "小米是芯片消费者，非供应商。角色颠倒"
+      }
+    },
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "某不存在的公司",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "光刻胶",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "某公司计划投资10亿元建设光刻胶产线，预计2027年投产",
+        "source_type": "news",
+        "source_date": "2025",
+        "source_doc_id": "unknown"
+      },
+      "scores": {
+        "evidence_strength": 0.80,
+        "source_authority": 0.50,
+        "resolution_certainty": 0.70
+      },
+      "temporal": {
+        "valid_from": "2027-01-01",
+        "valid_to": null,
+        "is_historical": false
+      }
+    }
+  ]
+}

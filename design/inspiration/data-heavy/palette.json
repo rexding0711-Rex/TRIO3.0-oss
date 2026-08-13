@@ -1,0 +1,51 @@
+{
+  "source": "Bloomberg Terminal / The Economist / Financial Times 数据报告风格",
+  "extracted": "2026-06-25",
+
+  "palettes": {
+    "bloomberg-terminal": {
+      "description": "Bloomberg 终端风 — 黑底+高饱和数据色",
+      "background": "0C0C0C",
+      "primaryText": "F0F0F0",
+      "accent": "FF8C00",
+      "positive": "00A86B",
+      "negative": "DC3545",
+      "gridLine": "333333"
+    },
+
+    "economist-chart": {
+      "description": "The Economist 图表风 — 白底+克制配色",
+      "background": "FFFFFF",
+      "primaryText": "121212",
+      "accent": "2E6F95",
+      "highlight": "D44C46",
+      "gridLine": "E5E7EB"
+    },
+
+    "fintech-dashboard": {
+      "description": "金融科技看板 — 深蓝底+亮色数据",
+      "background": "0F172A",
+      "cardBg": "1E293B",
+      "primaryText": "F8FAFC",
+      "accent": "3B82F6",
+      "positive": "10B981",
+      "alert": "F59E0B",
+      "negative": "EF4444",
+      "gridLine": "334155"
+    }
+  },
+
+  "typography": {
+    "dataLabels": ["Inter", "Roboto", "Segoe UI"],
+    "mono": ["JetBrains Mono", "Fira Code", "SF Mono"],
+    "trend": "数字特大 + 标签极小 = 看板层次感"
+  },
+
+  "rules": [
+    "数据本身是主角，设计是背景",
+    "表头深色+数据行交替色 = 最清晰",
+    "颜色只用来说明方向（涨/跌、好/坏）",
+    "网格线淡到几乎看不见，仅在需要时出现",
+    "每张表/图必须有来源标注"
+  ]
+}

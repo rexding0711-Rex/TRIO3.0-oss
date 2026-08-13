@@ -1,0 +1,110 @@
+{
+  "_layer": "infra",
+  "version": "1.1.0",
+  "description": "TRIO 3.0 禁区定义——操作系统目录内禁止出现的内容",
+  "forbidden": {
+    "extensions": [
+      ".pptx",
+      ".docx",
+      ".pdf",
+      ".xlsx",
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".gif",
+      ".mp4",
+      ".zip"
+    ],
+    "patterns": [
+      "*瑞燃*",
+      "*罗欣*",
+      "*北化新橡*",
+      "*CRX*",
+      "*Forge*",
+      "*CMOS*",
+      "*国能*",
+      "*MaineCoon*",
+      "*Palantir*",
+      "*maine*",
+      "*wuminyong*",
+      "*yuyitin*",
+      "*ruiran*",
+      "*devin*",
+      "*manus*",
+      "*spacex*",
+      "*tesla*",
+      "*王成林*",
+      "*高依文*",
+      "*汤胜男*",
+      "*詹昊麟*",
+      "*荣威*",
+      "*新疆*",
+      "*三棵树*"
+    ],
+    "dirs_patterns": [
+      "*项目*",
+      "*客户*",
+      "*交付*",
+      "*delivery*",
+      "*output*"
+    ],
+    "naming_rule": "TRIO文件名不得包含公司名/产品名/人名的具体实例。research/ideas/ 格式: YYYYMMDD-描述-编号.md",
+    "auto_pattern": "grep -rPI \"anthropic|cursor|fable|devin|manus|openai|google|microsoft|meta|tesla|spacex|palantir|amazon|netflix|apple\" --include=\"*.md\" $TRIO_ROOT/research/ $TRIO_ROOT/knowledge/ 2>/dev/null",
+    "naming_whitelist": {
+      "research/ideas/": {
+        "pattern": "^\\d{8}-[a-z0-9一-鿿]+(-\\d{3})?\\.md$",
+        "rule": "文件名格式: YYYYMMDD-中文描述-编号.md 或 YYYYMMDD-中文描述.md"
+      },
+      "principle": "白名单优于黑名单——不符合上述格式的文件视为违规，无需枚举所有公司名"
+    }
+  },
+  "allowed_exceptions": {
+    "knowledge/decision-log/": "TRIO自身架构决策（非项目决策）",
+    "knowledge/lessons-learned/": "跨项目通用模式",
+    "config/roles/": "角色文件可引用项目为案例",
+    ".claude/commands/": "命令文件可引用项目为案例"
+  },
+  "enforcement": {
+    "manual": "mgmt.sh guard",
+    "auto_suggestion": "每次/日进化Layer3自动跑guard"
+  },
+  "failure_handling": {
+    "guard_scan_fails": "标记为⚠️跳过本次扫描，写入errors.log，不阻塞日进化",
+    "false_positive": "用户确认文件归属→加入allowed_exceptions白名单→下次自动跳过",
+    "json_parse_error": "回退到内置最小规则集(仅检查扩展名)，告警",
+    "scan_timeout": "30秒超时→输出部分结果+警告"
+  },
+  "evolution": {
+    "versioning": "每次修改forbidden规则时递增版本号",
+    "pattern_growth_control": "patterns列表超50条→自动建议迁移到白名单naming_rule"
+  },
+  "compatibility": {
+    "rule": "新版本向后兼容旧版本。旧版本遇到新字段→忽略(不报错)。",
+    "breaking_change_policy": "破坏性变更需提前1个版本声明deprecated→再1个版本后移除",
+    "last_breaking_change": "无"
+  },
+  "backpressure": {
+    "_merged_from": "config/backpressure.json (2026-07-01 瘦身合并)",
+    "description": "背压控制——防止信息过载。触发条件见日进化 Layer 3",
+    "thresholds": {
+      "kimi_unread_max": 5,
+      "pending_reverse_engineering_max": 3
+    },
+    "action": "超过阈值时拒绝新输入，提示'先消化已有内容'"
+  },
+  "degradation": {
+    "_merged_from": "config/degradation.json (2026-07-01 瘦身合并)",
+    "description": "优雅降级——基于认知负载自适应输出深度。实现见 scripts/depth.sh",
+    "depth_levels": {
+      "1_summary": "一句话结论+下一步行动——认知过载时使用",
+      "2_standard": "标准报告——日常使用",
+      "3_deep": "完整分析——深度研究时使用"
+    },
+    "auto_degradation": {
+      "trigger": "背压检查：Kimi未读>5 或 待逆向>3 或 今日run>2",
+      "action": "自动降为 Level 1，只出核心结论",
+      "override": "用户说'详细'或'深入'时恢复 Level 2/3"
+    },
+    "oscillation_prevention": "连续3次深度切换→锁定当前Level 30分钟，防止频繁抖动"
+  }
+}

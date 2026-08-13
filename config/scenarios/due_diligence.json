@@ -1,0 +1,111 @@
+{
+  "id": "due_diligence",
+  "name": "尽调",
+  "version": "3.1.0",
+  "triggers": [
+    "尽调",
+    "DD",
+    "靠不靠谱",
+    "扒一下",
+    "评估",
+    "背景调查"
+  ],
+  "mode": "full",
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json",
+    "context_isolation": "config/protocols/context-isolation-protocol.json",
+    "escalate": "config/protocols/escalate-protocol.json",
+    "delivery": "config/delivery-protocol.json",
+    "knowledge_write": "config/knowledge-write-protocol.json",
+    "topology_thinking": "config/protocols/topology-thinking-protocol.json",
+    "topology_methodology": "docs/topology-thinking-methodology.md"
+  },
+  "steps": [
+    {
+      "order": 0,
+      "role": "任务编排工程师",
+      "mask": "claude",
+      "action": "（可选，复杂目标时启用）将尽调目标分解为子任务 DAG，识别可并行维度",
+      "output": "任务 DAG + 检查点计划",
+      "optional": true,
+      "enable_condition": "目标涉及 ≥2 个分析维度（如技术+融资+团队）且用户未指定固定步骤数时启用。简单查询直接跳过",
+      "acceptance_criteria": "DAG 包含 4-8 个子任务。非复杂目标时可跳过此步，直接进入 Step 1"
+    },
+    {
+      "order": 1,
+      "role": "产业情报工程师",
+      "mask": "kimi",
+      "action": "行业定位+竞品初筛+TAM估算。**同时按 topology-thinking-protocol Phase 0 构建种子图**：信息采集完成后立即画 4-7 节点 Mermaid 种子图，含 ≥1 个 ??? 未知节点和 ≥1 条虚线不确定边。Read docs/topology-thinking-methodology.md 了解种子图构建方法。图状态写入 runs/{run_id}/topology-state.json",
+      "output": "行业全景报告 + 种子拓扑图（Phase 0）",
+      "acceptance_criteria": "覆盖3+竞品对比，TAM附假设条件，所有声明有溯源链接。对照 D:\\工作\\对标库\\industry\\ 已有产业数据交叉验证。种子图：4-7节点、≥1个???未知节点（虚线边框）、≥1条虚线不确定边、≥2种不同关系类型。如目标为AI创业公司，检查 D:\\TRIO 3.0\\knowledge\\company-library\\INDEX.md 是否有已逆向的同类公司可供对标"
+    },
+    {
+      "order": 2,
+      "role": "事实核查工程师",
+      "mask": "deepseek",
+      "action": "逐条验证报告中的技术声明+团队背景+融资信息。**同时按 topology-thinking-protocol Phase 1 扩展拓扑图**：在种子图基础上新增 ≥5 个节点（每个连 ≥2 条边），识别 ≥1 个聚类（命名）和 ≥1 条桥接边。Read topology-state.json 获取当前图状态，扩展后写回",
+      "acceptance_criteria": "每条声明标注置信度[1-5]和source，无未标注声明。对照 D:\\工作\\对标库\\knowledge-benchmark\\ 已有公司数据。扩展图：新增≥5节点、每个新节点≥2条边、聚类识别≥1个（含命名和密度）、桥接边≥1条"
+    },
+    {
+      "order": 3,
+      "role": "成本拆解工程师",
+      "mask": "deepseek",
+      "action": "BOM拆解+隐性成本发现+估值合理性判断",
+      "depends_on": [
+        2
+      ],
+      "acceptance_criteria": "覆盖API/人力/基础设施三项，每项附计算过程。需要时 Read D:\\工作\\知识库\\compliance\\ 核查法务合规项"
+    },
+    {
+      "order": 4,
+      "role": "复盘工程师",
+      "mask": "deepseek",
+      "action": "系统性逻辑缺陷挖掘+PR叙事vs地面真相对照。**同时按 topology-thinking-protocol Phase 2 执行扰动推演**：移除枢纽节点（树状第1层≥3+第2层≥2分叉）+ 注入新边（重组描述）。扰动必须产生 ≥1 个操作前未预料到的发现。Read topology-state.json 获取当前图状态",
+      "depends_on": [
+        1,
+        2
+      ],
+      "acceptance_criteria": "至少发现3个逻辑缺陷或1个根本性叙事矛盾。对照 D:\\工作\\知识库\\methods\\ 尽调方法论核查清单。如步骤3已完成则一并Read做交叉分析。默认调用因果分析维度：提取3+因果声明、逐条反事实检验、标注混淆变量。Read D:\\TRIO 3.0\\knowledge\\evaluation-framework\\causal-analysis-methodology.md。扰动推演：移除≥1枢纽(树状第1层≥3+第2层≥2分叉)，注入≥1新边(重组描述)，≥1个意外发现"
+    },
+    {
+      "order": 5,
+      "role": "拓扑检查工程师",
+      "mask": "claude",
+      "action": "【v3.2 重构 · 从补图变为验证】前面各步骤已按 topology-thinking-protocol 完成了 Phase 0-2（种子图→扩展→扰动）。本步骤完成 Phase 3-4（时间化+硬化）。Phase 3：所有边标注时间方向(↑/↓/→)+时间窗口+趋势反转预警。Phase 4：结构脆弱点扫描(介数中心性/最小割/孤立聚类)+安全答案拒绝+攻击面分析+反证标注。Read topology-state.json 获取当前图状态，完成后写回。最后运行 scripts/topology-check.sh 验证",
+      "output": "时间化拓扑图（Phase 3）+ 硬化报告（Phase 4）+ topology-check.sh 验证结果",
+      "depends_on": [1, 2, 3, 4],
+      "mandatory": true,
+      "max_iterations": 3,
+      "gate_script": "scripts/topology-check.sh {analysis_file} general",
+      "acceptance_criteria": "所有边标注时间方向(↑/↓/→)。变强≥2+变弱≥2+时间窗口。≥1条趋势反转预警。脆弱点扫描非安全答案。攻击面描述完整(手段+成本+级联深度)。≥50%低置信声明有反证标注。每阶段 insights 非空。topology-check.sh 退出码=0"
+    },
+    {
+      "order": 5.5,
+      "role": "数值校验工程师",
+      "mask": "claude",
+      "action": "【S5.5 算术一致性闸门 · 2026-07-31 新增】运行确定性数值校验——不经过模型推理，纯算法验证。调用 scripts/numeric-consistency.py 对当前产出文件执行：(1)百分比求和校验 (2)单位一致性检测(USD/RMB/亿/万) (3)跨年数据混用警告 (4)数量级合理性检查。同时对照 config/source-rating.json 检查所有关键数字的信源等级——任何关键事实声明的信源追溯链终点 < B级 → 阻断",
+      "output": "数值一致性报告 + 信源等级分布",
+      "depends_on": [5],
+      "mandatory": true,
+      "gate_script": "scripts/numeric-consistency.py {analysis_file} --strict",
+      "acceptance_criteria": "numeric-consistency.py 退出码=0。无 ERROR 级不一致。关键事实信源追溯链终点 ≥ B级。WARN/INFO 级问题已标注在报告中或已修复。违反阻断规则 → FAIL → 回退到对应步骤修正数据"
+    },
+    {
+      "order": 6,
+      "role": "产品架构师",
+      "mask": "claude",
+      "action": "10维综合评分+最终判定+决策建议（必须在拓扑检查 + 算术一致性通过后执行）。Read topology-state.json 获取完整拓扑分析——评分卡必须引用拓扑发现（脆弱点、聚类、时间趋势）。Read S5.5 数值一致性报告——如发现单位混用/求和溢出，评分必须反映数据质量问题",
+      "depends_on": [2, 3, 4, 5, 5.5],
+      "acceptance_criteria": "7维度打分齐全，四档判定（🟢🟡🟠🔴），下一步行动建议明确。拓扑分析发现须在评分中体现（至少引用 2 个拓扑发现）。数值一致性问题的数据质量影响已在评分中反映。三维护出：①人 ②企业 ③方法论"
+    },
+    {
+      "order": 7,
+      "role": "全栈交付工程师",
+      "mask": "claude",
+      "action": "打包尽调报告（PDF/Word/Markdown）。交付前运行 delivery-protocol.json v2.0 双门禁（topology-check.sh + numeric-consistency.py + check-cjk-fonts.py）。拓扑图作为报告核心章节（非附件），含全部 5 个 Phase 的产出",
+      "depends_on": [6],
+      "acceptance_criteria": "PDF+MD双格式。拓扑检查+数值一致性+CJK字体检查三通过。含评分卡+核查清单+决策建议。拓扑图作为报告正文核心章节（含种子→扩展→扰动→时间化→硬化全流程）。封面标注拓扑检查状态。拓扑图不是附件——是报告的结构骨架。topology-state.json 各阶段 insights 非空"
+    }
+  ],
+  "_layer": "scenario"
+}

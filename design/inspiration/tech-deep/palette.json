@@ -1,0 +1,60 @@
+{
+  "source": "2025-2026 AI 硬件/科技 Pitch Deck 趋势 (GoodPello / Envato / GreatPPT)",
+  "extracted": "2026-06-25",
+
+  "palettes": {
+    "cyber-neon": {
+      "description": "深空黑+电光青+霓虹紫 — AI 芯片/半导体赛道首选",
+      "background": "0A0E27",
+      "cardBg": "141E3A",
+      "primaryText": "FFFFFF",
+      "secondaryText": "8E94A5",
+      "accent": "00D4FF",
+      "highlight": "7B5CFC",
+      "data": "FF6B35",
+      "positive": "00E5A0",
+      "alert": "FF3B5C"
+    },
+
+    "terminal-dark": {
+      "description": "终端暗色风 — AI 基础设施/开发者工具",
+      "background": "0D1117",
+      "cardBg": "161B22",
+      "primaryText": "E6EDF3",
+      "accent": "58A6FF",
+      "highlight": "7B5CFC",
+      "mono": "JetBrains Mono"
+    },
+
+    "sci-fi-tech": {
+      "description": "科幻科技风 — 硬件/IoT/航天",
+      "background": "080C1A",
+      "cardBg": "1A2744",
+      "accent": "00F0FF",
+      "highlight": "8B5CF6",
+      "warn": "FF6B35"
+    }
+  },
+
+  "typography": {
+    "headlines": ["Inter", "SF Pro Display"],
+    "body": ["Segoe UI", "Source Sans Pro"],
+    "mono": ["JetBrains Mono", "Cascadia Code", "Fira Code"],
+    "trend": "等宽字体用于代码/数据标签 + HUD 风格元素"
+  },
+
+  "visualMotifs": [
+    "HUD/头部显示器元素",
+    "电路板/六边形网格图案",
+    "3D 芯片渲染/全息影像",
+    "霓虹节点连接线",
+    "菱形 KPI 展示"
+  ],
+
+  "rules": [
+    "深色背景 + 霓虹强调色，绝不用白色文字背景",
+    "科技感来自「克制」— 不要过度装饰",
+    "关键数字用霓虹色，其余文字保持次级亮度",
+    "等宽字体仅用于技术标签，正文仍用 sans-serif"
+  ]
+}

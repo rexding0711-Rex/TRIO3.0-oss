@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>TRIO FE Kit 测试</title>
+<style>
+:root { --font-sans: system-ui, sans-serif; --font-mono: monospace; --font-serif: Georgia, serif; }
+body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+.tk-chart { border: 1px solid #dbe2ea; border-radius: 8px; padding: 16px; margin: 16px 0; }
+.tk-chart-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.tk-chart-sub { color: #8595a6; font-size: 13px; margin-bottom: 12px; }
+.tk-chart-src { color: #b07a10; font-size: 11px; margin-top: 8px; }
+.tk-param-row { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.tk-param-val { font-family: monospace; font-size: 12px; width: 60px; }
+canvas { border: 1px solid #eee; border-radius: 4px; width: 100%; height: 200px; }
+.pass { color: #008a6d; } .fail { color: #c22f4e; }
+</style></head>
+<body>
+<h1>TRIO FE Kit v1.0 自检</h1>
+<div id="results"></div>
+<div id="chart-host"></div>
+<div id="params-host"></div>
+<canvas id="test-canvas"></canvas>
+<script src="trio-fe-kit.js"></script>
+<script>
+const R = document.getElementById("results");
+function check(name, ok) {
+  R.innerHTML += `<p><span class="${ok ? 'pass' : 'fail'}">${ok ? '✅' : '❌'}</span> ${name}</p>`;
+}
+
+// 1. 全局挂载
+check("window.TK 存在", typeof window.TK === "object");
+
+// 2. 数学基元
+check("TK.clamp(5,0,10)=5", TK.clamp(5,0,10) === 5);
+check("TK.lerp(0,10,0.5)=5", Math.abs(TK.lerp(0,10,0.5) - 5) < 0.01);
+check("TK.smooth(1)=1", Math.abs(TK.smooth(1) - 1) < 0.01);
+
+// 3. RNG
+const rng = TK.makeRng(42);
+const a = rng(), b = rng();
+check("TK.makeRng 种子可复现", Math.abs(a - 0.601) < 0.01 && Math.abs(b - 0.448) < 0.01);
+
+// 4. 调色板
+check("TK.PAL.ink 存在", typeof TK.PAL.ink === "string");
+check("TK.PAL.neg 存在", typeof TK.PAL.neg === "string");
+
+// 5. HiDPI Canvas
+const canvas = document.getElementById("test-canvas");
+const { fit, ctx } = TK.bindCanvas(canvas);
+const view = fit();
+check("bindCanvas 返回 fit+ctx", typeof fit === "function" && ctx);
+check("fit 返回 {w,h,cx,cy}", view.w > 0 && view.h > 0);
+
+// 6. 图表外框
+const host = document.getElementById("chart-host");
+const body = TK.frameChart(host, {
+  title: "测试图表",
+  sub: "副标题说明",
+  src: ["company", "broker"],
+});
+check("frameChart 创建外框", body && host.querySelector(".tk-chart-title"));
+check("frameChart 来源格式化", host.querySelector(".tk-chart-src").textContent.includes("公司披露"));
+
+// 7. 来源格式化
+check("fmtSrc 数组", TK.fmtSrc(["company", "research"]).includes("自主研究"));
+
+// 8. 参数系统
+const params = TK.paramSystem([
+  { key: "test", label: "测试参数", min: 0, max: 100, step: 1, def: 50 },
+]);
+check("paramSystem.get", params.get("test") === 50);
+params.set("test", 75);
+check("paramSystem.set+get", params.get("test") === 75);
+params.reset();
+check("paramSystem.reset·恢复默认值", params.get("test") === 50);
+
+// 9. safeGet
+check("TK.safeGet", TK.safeGet({a:{b:1}}, "a.b", null) === 1);
+check("TK.safeGet fallback", TK.safeGet({}, "a.b", "x") === "x");
+
+// 10. debounce
+check("TK.debounce 返回函数", typeof TK.debounce(()=>{}, 100) === "function");
+
+console.log("✅ TRIO FE Kit 自检完成");
+</script>
+</body>
+</html>

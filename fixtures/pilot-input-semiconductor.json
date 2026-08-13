@@ -1,0 +1,274 @@
+{
+  "pipeline_metadata": {
+    "pipeline_version": "trio-extract-v4",
+    "model": "claude-opus-4-8",
+    "prompt_version": "extraction_prompt_v4",
+    "extracted_at": "2026-07-16T19:00:00+08:00",
+    "source_report_id": "TRIO-pilot-semiconductor"
+  },
+  "decisions": [
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "安集科技",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "CMP抛光液",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "安集科技是国内CMP抛光液龙头，产品已进入中芯国际、华虹等国内主要晶圆厂供应链，2025年相关业务营收超5亿元",
+        "context_window": "根据年报和多家研报交叉验证，安集科技是国内CMP抛光液龙头，产品已进入中芯国际、华虹等国内主要晶圆厂供应链，2025年相关业务营收超5亿元，铜/铜阻挡层抛光液份额国内第一",
+        "source_type": "annual_report",
+        "source_date": "2025-03-15",
+        "source_doc_id": "TRIO-pilot-001"
+      },
+      "scores": {
+        "evidence_strength": 0.95,
+        "source_authority": 0.98,
+        "resolution_certainty": 1.0
+      },
+      "temporal": {
+        "valid_from": "2025-01-01",
+        "valid_to": null,
+        "is_historical": false
+      },
+      "material_variant": {
+        "variant_name": "铜/铜阻挡层/氧化铈",
+        "application_segment": "semiconductor_frontend",
+        "tech_node": "mature"
+      }
+    },
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "鼎龙股份",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "CMP抛光垫",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "鼎龙股份CMP抛光垫稳居国产龙头，单月销量突破4万片，市占率38.5%，已通过中芯国际验证并批量供货",
+        "context_window": "根据年报和产业链调研，鼎龙股份CMP抛光垫稳居国产龙头，单月销量突破4万片，市占率38.5%，已通过中芯国际验证并批量供货，2025年相关营收约3亿元",
+        "source_type": "annual_report",
+        "source_date": "2025-03-20",
+        "source_doc_id": "TRIO-pilot-002"
+      },
+      "scores": {
+        "evidence_strength": 0.95,
+        "source_authority": 0.98,
+        "resolution_certainty": 1.0
+      },
+      "temporal": {
+        "valid_from": "2025-01-01",
+        "valid_to": null,
+        "is_historical": false
+      },
+      "material_variant": {
+        "variant_name": "聚氨酯抛光垫",
+        "application_segment": "semiconductor_frontend",
+        "tech_node": "mature"
+      }
+    },
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "南大光电",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "ArF光刻胶",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "南大光电先进ArF光刻胶已通过头部晶圆厂流片测试并批量供应，贡献营收1200万元，是国内唯一实现ArF光刻胶量产的企业",
+        "context_window": "年报披露，南大光电先进ArF光刻胶已通过头部晶圆厂流片测试并批量供应，贡献营收1200万元，是国内唯一实现ArF光刻胶量产的企业，产品通过中芯国际认证",
+        "source_type": "annual_report",
+        "source_date": "2025-04-01",
+        "source_doc_id": "TRIO-pilot-003"
+      },
+      "scores": {
+        "evidence_strength": 0.95,
+        "source_authority": 0.98,
+        "resolution_certainty": 0.95
+      },
+      "temporal": {
+        "valid_from": "2025-01-01",
+        "valid_to": null,
+        "is_historical": false
+      },
+      "material_variant": {
+        "variant_name": "ArF",
+        "application_segment": "semiconductor_frontend",
+        "tech_node": "28nm-14nm"
+      }
+    },
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "华特气体",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "电子特气",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "华特气体光刻气通过ASML认证，是国内唯一获此认证的特气公司",
+        "context_window": "华特气体光刻气通过ASML认证，是国内唯一获此认证的特气公司，产品包括高纯氟碳类气体、光刻气等半导体制造关键气体",
+        "source_type": "company_website",
+        "source_date": "2025",
+        "source_doc_id": "TRIO-pilot-004"
+      },
+      "scores": {
+        "evidence_strength": 0.90,
+        "source_authority": 0.85,
+        "resolution_certainty": 1.0
+      },
+      "temporal": {
+        "valid_from": "2025-01-01",
+        "valid_to": null,
+        "is_historical": false
+      },
+      "material_variant": {
+        "variant_name": "光刻气/氟碳类/高纯气体",
+        "application_segment": "semiconductor_frontend",
+        "tech_node": "mature"
+      }
+    },
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "雅克科技",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "前驱体",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "雅克科技通过收购UP Chemical成为全球前驱体主要供应商，前驱体收入占比超60%",
+        "context_window": "年报显示，雅克科技通过收购UP Chemical成为全球前驱体主要供应商，前驱体收入占比超60%，High-K前驱体和SOD产品进入三星、SK海力士、中芯国际等供应链",
+        "source_type": "annual_report",
+        "source_date": "2025",
+        "source_doc_id": "TRIO-pilot-005"
+      },
+      "scores": {
+        "evidence_strength": 0.95,
+        "source_authority": 0.98,
+        "resolution_certainty": 1.0
+      },
+      "temporal": {
+        "valid_from": "2025-01-01",
+        "valid_to": null,
+        "is_historical": false
+      }
+    },
+    {
+      "decision": "ACCEPT",
+      "claim": {
+        "subject": "中微公司",
+        "predicate": "CAN_PERFORM",
+        "object": "刻蚀",
+        "object_type": "Process"
+      },
+      "evidence": {
+        "evidence_span": "中微公司CCP刻蚀机进入台积电5nm产线，是国内唯一进入台积电先进制程的国产半导体设备",
+        "context_window": "根据年报和行业验证，中微公司CCP刻蚀机进入台积电5nm产线，是国内唯一进入台积电先进制程的国产半导体设备，ICP刻蚀进入国内主要晶圆厂14nm产线",
+        "source_type": "annual_report",
+        "source_date": "2025",
+        "source_doc_id": "TRIO-pilot-006"
+      },
+      "scores": {
+        "evidence_strength": 0.95,
+        "source_authority": 0.98,
+        "resolution_certainty": 1.0
+      },
+      "temporal": {
+        "valid_from": "2025-01-01",
+        "valid_to": null,
+        "is_historical": false
+      }
+    },
+    {
+      "decision": "ABSTAIN",
+      "claim": {
+        "subject": "彤程新材",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "ArF光刻胶",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "彤程新材正积极进行高频ArF光刻胶产业规划与未来三年建设展望，期待通过认证",
+        "context_window": "研报指出，彤程新材正积极进行高频ArF光刻胶产业规划与未来三年建设展望，期待通过认证，上海基地预计2027年投产",
+        "source_type": "research_report",
+        "source_date": "2025-12",
+        "source_doc_id": "TRIO-pilot-007"
+      },
+      "abstain_detail": {
+        "reason": "L1 硬规则命中: '规划' + '未来三年' + '期待'。全文是未来时态",
+        "trigger_layer": "L1_HARD_RULE",
+        "confidence_if_forced": 0.15
+      }
+    },
+    {
+      "decision": "ABSTAIN",
+      "claim": {
+        "subject": "雅克科技",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "光刻胶",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "雅克科技是国内光刻胶重要企业，正积极布局先进光刻胶领域，在客户端开展测试",
+        "context_window": "某研报表示，雅克科技是国内光刻胶重要企业，正积极布局先进光刻胶领域，在客户端开展测试。但公司年报显示前驱体收入占比超60%，光刻胶占比<5%",
+        "source_type": "research_report",
+        "source_date": "2025-06",
+        "source_doc_id": "TRIO-pilot-008"
+      },
+      "abstain_detail": {
+        "reason": "L1 硬规则命中: '布局'。且与年报披露的主营结构矛盾——此为负面测试案例 (GT-N-001)",
+        "trigger_layer": "L1_HARD_RULE",
+        "confidence_if_forced": 0.20
+      },
+      "scores": {
+        "evidence_strength": 0.30,
+        "source_authority": 0.65,
+        "resolution_certainty": 0.70
+      }
+    },
+    {
+      "decision": "ABSTAIN",
+      "claim": {
+        "subject": "江丰电子",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "靶材",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "公司持续推进半导体靶材验证工作，部分产品已送样",
+        "context_window": "研报提到，公司持续推进半导体靶材验证工作，部分产品已送样。尚未有明确的规模化供货证据",
+        "source_type": "research_report",
+        "source_date": "2025",
+        "source_doc_id": "TRIO-pilot-009"
+      },
+      "abstain_detail": {
+        "reason": "L2 信号过弱: '送样'≠量产。evidence_strength 不足以支撑 SUPPLIES_MATERIAL",
+        "trigger_layer": "L2_LLM_JUDGMENT",
+        "confidence_if_forced": 0.40
+      }
+    },
+    {
+      "decision": "REJECT",
+      "claim": {
+        "subject": "容大感光",
+        "predicate": "SUPPLIES_MATERIAL",
+        "object": "ArF光刻胶",
+        "object_type": "Material"
+      },
+      "evidence": {
+        "evidence_span": "容大感光是国内光刻胶龙头企业，产品广泛应用于半导体制造",
+        "context_window": "某媒体文章称，容大感光是国内光刻胶龙头企业，产品广泛应用于半导体制造",
+        "source_type": "news",
+        "source_date": "2025",
+        "source_doc_id": "TRIO-pilot-010"
+      },
+      "reject_detail": {
+        "reason": "容大感光主营PCB光刻胶（市占率50%），半导体光刻胶仅I线量产、KrF认证中，非ArF供应商。此为粗粒度陷阱 (GT-N-002)"
+      }
+    }
+  ]
+}

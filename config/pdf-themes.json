@@ -1,0 +1,44 @@
+{
+  "A": {
+    "name": "极简黑",
+    "titlepage-color": "1A1A1A",
+    "titlepage-text-color": "FFFFFF",
+    "titlepage-rule-color": "888888",
+    "titlepage-rule-height": 2
+  },
+  "B": {
+    "name": "深蓝学术",
+    "titlepage-color": "1E3A5F",
+    "titlepage-text-color": "FFFFFF",
+    "titlepage-rule-color": "4A90D9",
+    "titlepage-rule-height": 3
+  },
+  "C": {
+    "name": "白底极简",
+    "titlepage-color": "FFFFFF",
+    "titlepage-text-color": "1A1A1A",
+    "titlepage-rule-color": "CCCCCC",
+    "titlepage-rule-height": 1
+  },
+  "D": {
+    "name": "军旅暗绿",
+    "titlepage-color": "2D5016",
+    "titlepage-text-color": "FFFFFF",
+    "titlepage-rule-color": "5A8F2A",
+    "titlepage-rule-height": 3
+  },
+  "E": {
+    "name": "中国红",
+    "titlepage-color": "8B0000",
+    "titlepage-text-color": "FFFFFF",
+    "titlepage-rule-color": "CC3333",
+    "titlepage-rule-height": 3
+  },
+  "F": {
+    "name": "石板灰",
+    "titlepage-color": "4A4A4A",
+    "titlepage-text-color": "FFFFFF",
+    "titlepage-rule-color": "999999",
+    "titlepage-rule-height": 2
+  }
+}

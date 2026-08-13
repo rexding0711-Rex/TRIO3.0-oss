@@ -1,0 +1,54 @@
+{
+  "_layer": "infra",
+  "id": "pipe-protocol",
+  "name": "TRIO 管道协议",
+  "version": "2.0.0",
+  "description": "TRIO 的 CUDA API——三权分立的标准接口。任何人遵守此协议即可向 TRIO 插件新面具/新场景/新数据源。灵感：CUDA 并行计算原语→TRIO 认知协作原语",
+  "why_now": "v1.0于2026-06-26因过早抽象被删。v2.0在62篇Kimi蒸馏+12步场景SOP+6层架构硬化后重建——底座已够厚。",
+
+  "core_primitives": {
+    "发散": {"role": "kimi", "desc": "多源搜索+创意发散+跨域联想——输出带溯源URL的Markdown报告"},
+    "批判": {"role": "deepseek", "desc": "事实核查+逻辑审计+技术路线审查——输出PASS/FAIL+置信度+反证"},
+    "行动": {"role": "claude", "desc": "综合判定+工程交付+架构设计——输出评分卡+ADR+交付包"}
+  },
+
+  "pipe_format": {
+    "_meta": {
+      "from": "kimi|deepseek|claude|自定义面具名",
+      "to": "kemi|deepseek|claude|自定义面具名|*",
+      "verdict": "PASS|FAIL|WARN|INFO",
+      "confidence": "1-5",
+      "timestamp": "ISO8601"
+    },
+    "content": "Markdown格式——任何面具输出的正文"
+  },
+
+  "pipelines": {
+    "标准尽调": "kimi → deepseek → claude",
+    "快速验证": "kimi → deepseek",
+    "创意发散": "kimi → claude",
+    "安全审计": "deepseek → claude",
+    "反向质控": "claude → deepseek",
+    "自定义": "任何面具组合——声明即可"
+  },
+
+  "extension_points": {
+    "新面具": "声明role+pipe_format→注册到config/roles/→pipe协议自动路由",
+    "新场景": "声明steps+mask分配→注册到config/scenarios/→TRIO自动编排",
+    "新数据源": "声明output格式→接入knowledge-benchmark/→三面具可引用"
+  },
+
+  "compatibility": {
+    "backward": "v2.0兼容所有已有场景JSON——新增_meta字段为可选",
+    "breaking_change_policy": "破坏性变更提前1版本声明deprecated→1版本后移除"
+  },
+
+  "real_example": {
+    "pipeline": "kimi → deepseek → claude",
+    "steps": [
+      {"from": "kimi", "to": "deepseek", "verdict": "INFO", "confidence": 4, "content": "## NVIDIA情报收集\n\n- Q1 FY27收入$816亿(+85%)\n- Blackwell占计算收入~70%\n- Vera Rubin Q3量产\n- CUDA生态15年锁定..."},
+      {"from": "deepseek", "to": "claude", "verdict": "PASS", "confidence": 5, "content": "## NVIDIA事实核查\n\n- $816亿✅ Q1财报\n- 85%YoY✅ 连续10季度加速\n- CUDA护城河✅ 15年+开发者生态\n\n审计:5/5 PASS"},
+      {"from": "claude", "to": "*", "verdict": "PASS", "confidence": 5, "content": "## NVIDIA综合判定\n\n评分:9.2/10 🟢\n核心护城河:CUDA+全栈集成+TSMC产能锁定\nTRIO启示:标准接口=平台生态——NVIDIA做了CUDA,TRIO要做管道协议"}
+    ]
+  }
+}

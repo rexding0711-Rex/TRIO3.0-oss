@@ -1,0 +1,78 @@
+{
+  "_version": "v1.0",
+  "_date": "2026-07-14",
+  "_desc": "TRIO 会话记忆协议 — 解决跨会话上下文断裂问题。定义什么自动存、什么自动加载、什么需要人工确认。",
+
+  "auto_save": {
+    "_desc": "PreCompact / SessionEnd 时自动保存，无需人工干预",
+
+    "session_state": {
+      "file": ".claude/memory/session-state.json",
+      "fields": {
+        "sessionId": "会话 ID",
+        "lastCompactAt": "最后压缩时间",
+        "activeTask": "当前任务描述（从 TaskCreate 提取）",
+        "modifiedFiles": ["本会话修改的文件列表（从 git diff 提取）"],
+        "decisions": ["本会话中做出的关键决策（从 decision-log.jsonl 提取最近 5 条）"],
+        "contextSummary": "一句话总结当前上下文——下一个会话启动时自动注入",
+        "pendingActions": ["未完成的待办项"],
+        "openQuestions": ["尚未解决的关键问题"]
+      }
+    },
+
+    "decision_log": {
+      "file": "TRIO-Stock/config/decision-log.jsonl",
+      "format": "每行一条 JSON: { timestamp, type, summary, files, confidence }",
+      "triggers": [
+        "配置文件修改（STOCK-ANALYSIS-STANDARD.json / CORE.md / CLAUDE.md）",
+        "门禁规则新增/修改",
+        "协议文件新建/版本升级",
+        "用户明确说「记住这个决策」"
+      ]
+    },
+
+    "working_memory": {
+      "file": ".claude/memory/working-memory.json",
+      "fields": {
+        "lastAnalysisTarget": "上一个分析目标",
+        "lastReportPath": "上一份报告路径",
+        "activeSkillStack": ["当前会话使用的技能栈"],
+        "unresolvedConflicts": ["三视角分析中未解决的矛盾"]
+      }
+    }
+  },
+
+  "auto_load": {
+    "_desc": "SessionStart 时自动加载，注入到 Claude 上下文",
+
+    "inject_on_startup": [
+      "session-state.json → 注入 activeTask + contextSummary + pendingActions",
+      "working-memory.json → 注入 lastAnalysisTarget + unresolvedConflicts",
+      "decision-log.jsonl → 最近 3 条决策摘要"
+    ],
+
+    "display_format": {
+      "active_task": "📌 上次在做: {task}",
+      "pending_actions": "⏳ 待完成: {actions}",
+      "open_questions": "❓ 未解决: {questions}",
+      "context_summary": "💬 上下文: {summary}"
+    }
+  },
+
+  "manual_confirm": {
+    "_desc": "以下操作需要用户确认后才执行",
+
+    "memory_overwrite": "覆写已有记忆文件 → 先展示 diff → 等用户确认",
+    "protocol_upgrade": "升级协议版本号 → 先说明变更 → 等用户确认",
+    "gate_rule_change": "修改门禁规则 → 先展示影响范围 → 等用户确认",
+    "large_context_injection": "session-state.json > 2KB → 先展示摘要 → 等用户确认是否全量加载"
+  },
+
+  "compaction_rules": {
+    "_desc": "防止记忆膨胀——phistory 教训：40-50% 冗余率",
+    "max_session_state_size": "5KB",
+    "max_decision_log_entries": 200,
+    "max_working_memory_size": "2KB",
+    "prune_trigger": "季度 /自检 时检查，超过阈值 → 压缩旧条目为摘要"
+  }
+}

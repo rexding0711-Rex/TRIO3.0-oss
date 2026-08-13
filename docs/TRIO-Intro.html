@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.10" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>TRIO — 引入多视角博弈，让 AI 决策具备批判性思维</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+    body { max-width: 960px; margin: 0 auto; padding: 40px 20px; font-family: system-ui, -apple-system, sans-serif; line-height: 1.8; color: #1a1a1a; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+    th, td { border: 1px solid #ddd; padding: 10px 14px; text-align: left; }
+    th { background: #f5f5f5; font-weight: 600; }
+    blockquote { border-left: 4px solid #1a1a2e; margin: 16px 0; padding: 8px 20px; background: #f9f9f9; }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+    pre { background: #1a1a2e; color: #e0e0e0; padding: 20px; border-radius: 8px; overflow-x: auto; }
+    pre code { background: none; color: inherit; padding: 0; }
+    .mermaid { text-align: center; margin: 30px 0; }
+    h1 { border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-top: 40px; }
+    @media print { body { max-width: 100%; } }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad:true, theme:'default', securityLevel:'loose'});</script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">TRIO — 引入多视角博弈，让 AI 决策具备批判性思维</h1>
+</header>
+<h1 id="trio-引入多视角博弈让-ai-决策具备批判性思维">TRIO —
+引入多视角博弈，让 AI 决策具备批判性思维</h1>
+<blockquote>
+<p>“兼听则明，偏信则暗。”
+同一个议题，以三种截然不同的视角独立审视、交叉验证。以分布式智能，对抗
+AI 的系统性偏见。</p>
+<p>2026-07-14 | Founder: Rex</p>
+</blockquote>
+<hr />
+<h2 id="为什么我们需要-trio">1. 为什么我们需要 TRIO？</h2>
+<p>当前大语言模型（LLM）在商业应用中存在一个致命的隐患：<strong>极具欺骗性的自信</strong>。</p>
+<p>具体表现为：</p>
+<ul>
+<li><strong>幻觉粉饰</strong>：用极为流畅、专业的文本，隐瞒关键信息的缺失。</li>
+<li><strong>顺从偏见</strong>：倾向于迎合用户的初始假设，缺乏主动质疑前提的能力。</li>
+<li><strong>prompt
+依赖</strong>：输出质量高度取决于输入水平，无法自主完善思考框架。</li>
+<li><strong>孤立盲区</strong>：单智能体（Single
+Agent）的认知偏差无法在内部被自发察觉。</li>
+</ul>
+<p>TRIO 重新定义了”AI
+结论的可信度”。其核心逻辑极其纯粹：<strong>将单一议题分发给三个性格迥异、各司其职的
+AI 角色进行独立推演与交叉辩证，在冲突与共识中提炼最终决策。</strong></p>
+<hr />
+<h2 id="核心工作机制多视角博弈系统">2. 核心工作机制：多视角博弈系统</h2>
+<p>TRIO
+内部构建了一个动态的认知三角，每个角色代表一种独特的思维范式：</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 27%" />
+<col style="width: 27%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th>视角角色</th>
+<th>认知模式</th>
+<th>核心追问</th>
+<th>潜在盲区</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>探索者</strong> (Explorer)</td>
+<td>机会导向，横向发散</td>
+<td>“是否还存在隐藏的范式转变与潜在红利？”</td>
+<td>容易被宏大叙事与乐观预期所误导</td>
+</tr>
+<tr>
+<td><strong>审计者</strong> (Auditor)</td>
+<td>风险导向，纵向穿透</td>
+<td>“该论断的底层数据支撑和逻辑链条是什么？”</td>
+<td>容易陷入局部悲观，错失高风险机会</td>
+</tr>
+<tr>
+<td><strong>交付者</strong> (Deliverer)</td>
+<td>结果导向，收敛落地</td>
+<td>“核心结论是什么？可执行的下一步路径为何？”</td>
+<td>倾向于选择风险对冲后的中庸方案</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="独创的四项协同原则procedures">独创的四项协同原则（Procedures）</h3>
+<ol type="1">
+<li><strong>绝对隔离推演（Blind
+Review）</strong>：各角色基于原始材料独立作业，运行期彼此盲审，防止认知污染与从众效应。</li>
+<li><strong>冲突可视化比对（Divergence
+Mapping）</strong>：完成推演后并排对齐，自动锚定共识点、冲突点与盲区。</li>
+<li><strong>保留少数派报告（Minority
+Report）</strong>：不强行对齐结论。被推翻的少数派意见将被完整保留，并注明”在何种边界条件改变时，该隐性结论将转化为显性事实”。</li>
+<li><strong>置信度自检（Falsification
+Check）</strong>：每个核心结论必须强制输出”证伪条件”——即”在何种情况下，本判断将宣告失效”，否则系统拒绝交付。</li>
+</ol>
+<hr />
+<h2 id="核心应用场景与指令集">3. 核心应用场景与指令集</h2>
+<h3 id="深度尽调-due-diligence">3.1 深度尽调 (Due Diligence)</h3>
+<p><code>/尽调 &lt;标的名称&gt;</code> 可选参数:
+<code>--depth quick|standard|deep</code></p>
+<p><strong>评级框架</strong>：从盈利模型、财务健康度、竞争壁垒、管理层图谱、上下游博弈、估值模型、证伪边界等
+7 个维度全面穿透。</p>
+<p><strong>技术支撑</strong>：内置 30 种风险信号探针，自动触发 18
+轮深度全网搜索，区分”高确信度事实”与”信息缺失噪音”。</p>
+<h3 id="竞品解构-competitive-intelligence">3.2 竞品解构 (Competitive
+Intelligence)</h3>
+<p><code>/竞品 &lt;企业/产品名称&gt;</code></p>
+<p><strong>多维对齐</strong>：将竞争对手置于同一坐标系，拆解定价策略、核心客群、付费转化、护城河效率与资本烧钱率。</p>
+<p><strong>逆向审视</strong>：打破”分析师视角”，完全基于客户第一性原理，推演”对方的绝对优势在何种场景下会转化为致命阿喀琉斯之踵”。</p>
+<h3 id="企业逆向工程-reverse-engineering">3.3 企业逆向工程 (Reverse
+Engineering)</h3>
+<p><code>/逆向工程 &lt;企业名称&gt;</code></p>
+<p><strong>商业重建</strong>：基于公开及泛化数据，逆向还原企业的商业闭环、技术路线图、供应链网络与组织进化逻辑（标准
+10 步法）。</p>
+<p><strong>真伪隔离</strong>：严格界定”官方叙事”与”第三方独立穿透数据”，对不确定性作留白处理。</p>
+<h3 id="股票全量分析-equity-research">3.4 股票全量分析 (Equity
+Research)</h3>
+<p><code>/股票全量分析 &lt;代码/简称&gt;</code></p>
+<p><strong>行业覆盖</strong>：当前深度聚焦光模块、液冷技术、半导体等硬科技赛道，覆盖
+33+ 核心标的。</p>
+<p><strong>量化支撑</strong>：7 层分析架构 × 18 轮交叉搜索 × 30
+项风险指引，附带 100 位头部基金经理的动态投资风格档案。</p>
+<h3 id="敏捷速判-agile-assessment">3.5 敏捷速判 (Agile Assessment)</h3>
+<p><code>/速判 &lt;评估目标&gt;</code></p>
+<p><strong>双轨轻量运行</strong>：由”探索者”与”审计者”在 10-15
+分钟内完成快速双轨博弈，输出高含金量的”机会-风险”双轴画布与信息已知度。</p>
+<h3 id="衍生工具集">3.6 衍生工具集</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>指令</th>
+<th>功能定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/内容 &lt;主题&gt;</code></td>
+<td>自动生成排版优雅的 Markdown / PDF / HTML 报告与多终端演说文稿</td>
+</tr>
+<tr>
+<td><code>/复盘 &lt;项目&gt;</code></td>
+<td>复盘”决策假设”与”实际结果”的偏离度，沉淀可复用的方法论组件</td>
+</tr>
+<tr>
+<td><code>/赛道洞察</code></td>
+<td>全景扫描行业宏观规模、竞争格局、生态位分布与技术奇点</td>
+</tr>
+<tr>
+<td><code>/决策</code></td>
+<td>针对多方案进行矩阵式权衡，并量化设计”阶段性里程碑验证标准”</td>
+</tr>
+<tr>
+<td><code>/反向思考</code></td>
+<td>强制触发第一性原理，对现有共识进行颠覆性逆向推演</td>
+</tr>
+<tr>
+<td><code>/自检</code></td>
+<td>系统冗余度审计，自动识别并精简低效的工作流规则</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="全链路标准化工作流-workflow">4. 全链路标准化工作流
+(Workflow)</h2>
+<pre><code>[输入议题]
+   │
+   ▼
+1. 缺口检索 ─── 追问：&quot;若要完成此项分析，最核心的未知变量是什么？&quot;（待用户确认后推进）
+   │
+   ▼
+2. 前提审计 ─── 验证用户输入事实的真伪，避免系统构建于错误的前提之上。
+   │
+   ▼
+3. 动态搜索 ─── 遵循&quot;先搜反面证伪证据，再搜正面证实数据&quot;原则，对证据进行置信度分级。
+   │
+   ▼
+4. 熔断机制 ─── 触发&quot;矛盾即停&quot;：一旦发现与预期基准严重相左的证据，立刻熔断并交由人工介入。
+   │
+   ▼
+5. 异步推演 ─── 三角色独立评估，各自输出：结论 + 置信度权重 + 核心证据链 + 盲区自述。
+   │
+   ▼
+6. 共识冲突 ─── 矩阵式对齐，提炼共识，保留并标注少数派意见的触发边界。
+   │
+   ▼
+7. 综合交付 ─── 拒绝中庸的平衡，给出品质深刻的洞察、隐藏关联及未来行动导向（Next Actions）。
+   │
+   ▼
+8. 终审闭环 ─── 质检：审查是否存在单一角色过载、视角缺失，并校验每个断言的证伪条件。</code></pre>
+<blockquote>
+<p>注：系统支持 <strong>“快答（Single-Agent）”</strong> 与
+<strong>“完整（Multi-Agent 博弈）”</strong>
+双模式，快答模式下若触发信息矛盾，系统会自动平滑升级为完整博弈模式。</p>
+</blockquote>
+<hr />
+<h2 id="产品矩阵与版本矩阵">5. 产品矩阵与版本矩阵</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>版本</th>
+<th>定位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TRIO 3.0</strong> (Full Stack)</td>
+<td>全功能私有化部署版本。包含 11 个专业级 Agent 角色、9
+种复合场景工作流、50+ 自动化脚本。内置 56 家大厂商业库、38
+位核心决策者档案及 5 套顶层评估框架。</td>
+</tr>
+<tr>
+<td><strong>TRIO-Stock</strong> (Alpha)</td>
+<td>专注于二级市场投资的垂直版本，集成 7×18×30
+穿透框架与公募基金经理风格图谱。</td>
+</tr>
+<tr>
+<td><strong>TRIO-Pro</strong> (Prompt Engine)</td>
+<td>封装于 360
+行高效元提示词（Meta-Prompt）中的轻量级命令行工具，自带”缺口”与”矛盾”双重熔断刹车。</td>
+</tr>
+<tr>
+<td><strong>TRIO-Base</strong> (Open Source)</td>
+<td>开源入门版本。由三角色极简驱动，具备使用习惯自适应演进能力，支持
+GitHub 两键部署。</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="技术栈-technology-stack">6. 技术栈 (Technology Stack)</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>层级</th>
+<th>技术选型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>编排与调度层</td>
+<td>Claude Code（依托 Hooks + Agent + Skill + MCP
+协议构建的多智能体协同）</td>
+</tr>
+<tr>
+<td>底层大模型</td>
+<td>DeepSeek V4 Pro（高性价比、强推理逻辑深度内核）</td>
+</tr>
+<tr>
+<td>知识图谱引擎</td>
+<td>Neo4j（用于实体关联、商业模式网络拓扑重建）</td>
+</tr>
+<tr>
+<td>数据中枢</td>
+<td>Supabase + 高性能本地文件系统</td>
+</tr>
+<tr>
+<td>自动化与脚本</td>
+<td>50+ 生产级 Shell &amp; Python 混合脚本</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="竞争壁垒与生态资产">7. 竞争壁垒与生态资产</h2>
+<h3 id="动态认知平衡无法被精简的三角稳定">1.
+动态认知平衡（无法被精简的三角稳定）</h3>
+<p>任何单一维度的缺失都会导致系统性崩溃：</p>
+<ul>
+<li>失去<strong>探索者</strong>，系统将沦为平庸的资料汇编器，失去想象力；</li>
+<li>失去<strong>审计者</strong>，系统将对伪实事失去免疫力，坠入幻想；</li>
+<li>失去<strong>交付者</strong>，分析将无限陷入”分析瘫痪（Analysis
+Paralysis）“，无法转化为行动力。</li>
+</ul>
+<h3 id="沉淀的数字资产-data-assets">2. 沉淀的数字资产 (Data Assets)</h3>
+<ul>
+<li><strong>结构化案例库</strong>：56 家全球标杆企业的深度解构，172
+个商业模式的拓扑图谱。</li>
+<li><strong>决策特征档案</strong>：38 位行业领袖及 100
+位基金经理的决策偏好与盲区模型。</li>
+<li><strong>自我进化闭环</strong>：历史决策的离线回溯与误差校准系统。</li>
+</ul>
+<hr />
+<h2 id="发展路线图-roadmap">8. 发展路线图 (Roadmap)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>当前阶段</th>
+<th>TRIO 4.0</th>
+<th>TRIO 5.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>11 个专业角色与 9 大工作流</td>
+<td>全链路无监督自主推进运行流</td>
+<td>垂直赛道动态异动主动预警机制</td>
+</tr>
+<tr>
+<td>56 家企业知识图谱资产沉淀</td>
+<td>跨项目分析实体自动关联复用</td>
+<td>跨项目全域关联透视与网状分析</td>
+</tr>
+<tr>
+<td>交付前自动化修正循环验证闭环</td>
+<td>分析方法论的自动化沉淀与微调进化</td>
+<td>基于用户历史决策偏好的精细化私域适配</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="创始团队">9. 创始团队</h2>
+<p><strong>Rex</strong></p>
+<p>TRIO 独立架构师与全栈开发者。独力完成了核心博弈引擎、Stock
+垂直版、Pro
+版及开源版的架构设计与代码实现；主导构建了系统底层的企业库、决策者档案及评估框架体系。</p>
+<p>Focus: AI Agents · Document Automation · Knowledge Graph · Front-End
+Architecture</p>
+<hr />
+<blockquote>
+<p>TRIO — 引入多维辩证，重塑 AI 决策的信任边界。</p>
+</blockquote>
+</body>
+</html>

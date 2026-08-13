@@ -1,0 +1,226 @@
+{
+  "id": "deconstruct",
+  "name": "逆向工程",
+  "version": "2.1.0",
+  "triggers": [
+    "逆向工程", "扒一下架构", "拆解", "deconstruct", "reverse engineer"
+  ],
+  "mode": "full",
+  "description": "对 AI 创业公司进行系统性逆向工程——拆解其叙事架构、技术栈、融资逻辑和因果链路",
+  "inspiration": "用户需求 + DIA反幻觉合约(pssah4) + JSReverser-MCP观察优先(NoOne-hub, 849★) + ai-reverse-toolkit工具/大脑分离(zhizhuodemao, 347★) + ExplainThisRepo信号优先 + UnBuild多轮LLM管道",
+  "whats_new_v2": "反幻觉合约 · 信号优先提取 · 证据状态标记 · 深度分级 · V模型溯源方向 · 观察→重建→验证闭环",
+  "whats_new_v2_1": "Artifact Triage四分类(FINDING/GAP/PATTERN/DEBT) · 阶段落地契约 · 领域知识手册(business-reverse-playbook.md) · 信号可信度分级(L1-L5)",
+  "domain_knowledge": "docs/business-reverse-playbook.md",
+
+  "anti_hallucination_contract": {
+    "description": "【v2.0 核心新增 · 灵感：DIA】逆向工程的每一句声明必须服从三条铁律。违反任一条 = 分析无效。",
+    "rule_1_source_per_claim": "每条非占位句必须携带 Source: 行——指向具体证据。代码→文件路径+行号。文档→章节。配置→文件名+字段。网页→URL+段落。",
+    "rule_2_no_source_means_placeholder": "找不到证据 → 标注 [NEEDS USER INPUT, no evidence found]。禁止写'合理推测''大概率''应该是'作为事实陈述。推测允许，但必须标注 [Inferred, low confidence]。",
+    "rule_3_status_markers_everywhere": "每份产出物 frontmatter 标注状态: [Snapshot] 直接观察 / [Inferred from evidence] 间接推断 / [Observed, not validated] 观察但未验证 / [Draft, reverse-engineered] 逆向草稿。没有静默文档。",
+    "public_info_is_not_user_research": "【灵感：DIA 'Code is not user research'】从官网提取的产品描述 ≠ 用户真实需求。从招聘信息提取的薪资 ≠ 公司文化。从融资新闻提取的估值 ≠ 实际价值。每个结论必须区分'公开声称的'和'独立验证的'。"
+  },
+
+  "v_model_direction": {
+    "description": "【v2.0 新增 · 灵感：DIA 'Walk the V backwards'】逆向工程沿 V 模型反向行走——从可验证的事实逐层上溯到需要推断的意图。每一层只填入能从下层证据推导的内容。",
+    "layers": [
+      {"level": 1, "name": "公开信息 (Public Signals)", "what": "官网、GitHub、招聘、新闻、财报——可独立验证的事实", "status": "[Snapshot]"},
+      {"level": 2, "name": "产品与架构 (Product & Architecture)", "what": "产品形态、技术栈、定价模型、组织设计——从公开信号推断", "status": "[Inferred from evidence]"},
+      {"level": 3, "name": "战略与逻辑 (Strategy & Logic)", "what": "商业模式、竞争策略、增长逻辑——从产品与架构推断", "status": "[Inferred, needs validation]"},
+      {"level": 4, "name": "叙事与意图 (Narrative & Intent)", "what": "为什么存在、解决了什么问题、创始人的真实动机——草稿，等待验证", "status": "[Draft, reverse-engineered]"}
+    ],
+    "rule": "上层可以引用下层，下层禁止引用上层。第4层的内容如果在第1-2层找不到支撑 → 标记 [NEEDS USER INPUT]。"
+  },
+
+  "depth_tiers": {
+    "description": "【v2.0 新增 · 灵感：DIA 三层深度】根据目标复杂度和可用时间选择逆向深度",
+    "simple": {"name": "快速扫描", "duration": "30-60分钟", "scope": "官网+GitHub+3篇报道 → 5-8个信号 → 基本判定", "output": "overview.md + 种子图"},
+    "standard": {"name": "标准逆向", "duration": "2-4小时", "scope": "多源交叉验证+技术栈拆解+因果分析+竞品对标 → 15-25个信号", "output": "全部4文件 + 扩展图 + 扰动推演", "default": true},
+    "deep": {"name": "深度解剖", "duration": "4-8小时", "scope": "源码级分析+财务建模+叙事四层解剖+能力提取 → 30+信号", "output": "全部4文件 + 完整拓扑五阶段 + 技能记忆提取 + 自增强建议"}
+  },
+
+  "artifact_triage": {
+    "description": "【v2.1 新增 · 灵感：DIA Artifact Triage】每个产出物必须先分类再写入。分类决定默认状态和后续处理方式。",
+    "categories": {
+      "FINDING": {"name": "发现", "definition": "从信号中直接观察或推断的事实——可验证或已标注推断状态", "status": "[Snapshot] 或 [Inferred]", "example": "公司 A 使用 React 18 + Next.js 14"},
+      "GAP": {"name": "信息缺口", "definition": "预期存在但当前无法获取的信号——需要用户输入或进一步搜索", "status": "[NEEDS USER INPUT]", "example": "公司 A 的付费客户数量——官网未提及、第三方无数据"},
+      "PATTERN": {"name": "可复用模式", "definition": "跨公司重复出现的方法论模式——可提取为 skill", "status": "[Draft, pending validation]", "example": "PR叙事模式2(大厂光环型)——该公司符合此模式的3/4特征"},
+      "DEBT": {"name": "技术/组织债务", "definition": "从信号中识别的问题、风险、不一致——需要标记但非核心发现", "status": "[Observed, not validated]", "example": "package.json 中 3 个依赖已 deprecated——技术栈有维护风险"}
+    },
+    "rule": "Step 1-5 的每个产出物必须在文件顶部标注 triage 分类。Step 8 审计检查分类是否正确。"
+  },
+
+  "stage_delivery_contract": {
+    "description": "【v2.1 新增 · 灵感：JSReverser-MCP '阶段落地契约'】每个 Step 的完成 = 指定文件全部落盘。只对话不落盘 = Step 未完成。",
+    "step_1_deliverables": ["runs/{run_id}/signals-extracted.json", "runs/{run_id}/signals-missing.md", "runs/{run_id}/topology-state.json"],
+    "step_2_deliverables": ["runs/{run_id}/audit-anti-hallucination.md", "runs/{run_id}/causal-dag.md", "runs/{run_id}/topology-state.json (updated)"],
+    "step_4_deliverables": ["runs/{run_id}/v-model-consistency.md", "runs/{run_id}/narrative-anatomy.md", "runs/{run_id}/topology-state.json (updated)"],
+    "step_5_deliverables": ["runs/{run_id}/topology-state.json (final)", "runs/{run_id}/scoring.md", "runs/{run_id}/extracted-patterns.md", "runs/{run_id}/assumption-review.md"],
+    "iron_rule": "Step 6（资产入库）执行前，上述全部文件必须存在且非空。缺失任何文件 → 回到对应 Step 补全，不继续。Step 8 审计验证文件完整性。"
+  },
+
+  "signals_first_principle": {
+    "description": "【v2.0 核心新增 · 灵感：ExplainThisRepo 'Signals first, LLM second' + UnBuild 多轮管道】AI 分析前，先做确定性信号提取。信号是客观存在的——URL、API响应、GitHub commit、招聘岗位。AI 推理在这些信号之上，而不是替代信号。",
+    "extraction_before_reasoning": "先用工具提取 → 再用 AI 分析。禁止 AI 在没看过源码的情况下'推测技术栈'——先 fetch，再判断。",
+    "multi_pass": "信号提取(第1轮) → AI分析+种子图(第2轮) → 交叉验证+扩展(第3轮)。每轮基于上一轮的结构化产出。"
+  },
+
+  "steps": [
+    {
+      "order": 0,
+      "name": "深度分级 + 信号清单",
+      "role": "任务编排工程师",
+      "mask": "claude",
+      "action": "（1）根据目标复杂度选择深度（simple/standard/deep），声明选择理由。（2）列出本次逆向的「信号源清单」——哪些 URL、哪些 GitHub 仓库、哪些数据源将被提取。信号源 ≥ 目标深度的最低数量。（3）记录 3 个核心假设到 assumption-log（按 config/templates/assumption-log.md 模板）。本步骤不涉及 AI 推理——纯编排",
+      "output": "深度声明 + 信号源清单（≥5个URL/源）+ 核心假设（3条）",
+      "evidence_status": "[Snapshot] — 编排决策，无推理内容",
+      "acceptance_criteria": "深度选择有明确理由。信号源清单≥5个且每个标注预期提取内容。假设清单按模板格式。simple模式≥5源、standard≥8源、deep≥12源"
+    },
+    {
+      "order": 1,
+      "name": "信号提取（Signals First） + 种子图",
+      "role": "产业情报工程师",
+      "mask": "kimi",
+      "action": "【v2.0 重构 · 两轮结构】第1轮（确定性提取）：按信号源清单逐项提取——WebSearch ≥3次多角度搜索、WebFetch 抓取官网/GitHub/文档、检查 company-library INDEX 同类公司。将提取结果填入 structured_output_schema JSON——此阶段只填可验证的事实（URL、数字、日期、产品名），不填推断性字段。第2轮（AI分析+种子图）：在确定性信号基础上做 AI 增强分析——补充推断性字段（技术栈推断、竞争定位、产品策略）。同时按 topology-thinking-protocol Phase 0 构建种子图：4-7节点 Mermaid 图，含 ≥1 个 ??? 未知节点和 ≥1 条虚线不确定边。图状态写入 runs/{run_id}/topology-state.json",
+      "output": "信号提取 JSON（事实部分 [Snapshot] + 推断部分 [Inferred]）+ 种子拓扑图（Phase 0）",
+      "structured_output_schema": {
+        "_evidence_status": "每个字段标注 [Snapshot] 或 [Inferred]",
+        "company_name": "string",
+        "founded": "string",
+        "founders": ["string"],
+        "product": {"description": "string", "evidence": "[Snapshot] 官网首页提取 或 [Inferred] 综合推断"},
+        "funding": [{"round": "string", "amount": "string", "valuation": "string", "date": "string", "source_url": "string"}],
+        "tech_stack": [{"layer": "string", "choice": "string", "evidence": "[Snapshot] GitHub package.json 或 [Inferred] 技术博客推断"}],
+        "key_claims": [{"claim": "string", "source_url": "string", "confidence": "integer", "evidence_status": "[Snapshot] 或 [Inferred]"}],
+        "competitor_references": ["string"],
+        "signals_summary": {"total_signals": "integer", "snapshot_count": "integer", "inferred_count": "integer", "missing_signals": ["预期但没有找到的信号"]}
+      },
+      "depends_on": [0],
+      "acceptance_criteria": "覆盖 5+ 来源，每项声明附溯源 URL 和 evidence_status。区分 [Snapshot] 事实和 [Inferred] 推断——两个计数都要 >0。种子图：4-7节点、≥1个???未知节点（虚线边框）、≥1条虚线不确定边、≥2种不同关系类型。missing_signals 非空——你必须承认有什么是你想找但没找到的"
+    },
+    {
+      "order": 2,
+      "name": "因果链路 + 拓扑扩展",
+      "role": "因果分析工程师",
+      "mask": "deepseek",
+      "action": "【v2.0 重构】消费 Step 1 的结构化 JSON 作为输入（灵感：Manus Structured Output）。分两层：第1层（反幻觉审计）——逐条检查 Step 1 的 key_claims，Source 是否有效？[Inferred] 声明是否已标注？missing_signals 是否有关键遗漏？标注审计结果。第2层（因果DAG + 扩展图）——从已验证的声明中提取因果链，构建因果 DAG，反事实检验核心叙事。同时按 topology-thinking-protocol Phase 1 扩展拓扑图：Read topology-state.json，新增 ≥5 个节点（每个连 ≥2 条边），识别聚类和桥接边，写回图状态",
+      "output": "反幻觉审计报告 + 因果 DAG（Mermaid）+ 扩展拓扑图（Phase 1）",
+      "depends_on": [1],
+      "acceptance_criteria": "反幻觉审计：逐条标注 PASS/FAIL/UNCERTAIN。发现 ≥1 个 Source 缺失的声明。发现 ≥1 个 [Inferred] 未标注但实为推断的声明。因果 DAG：5+ 因果声明、逐条反事实检验、标注混淆变量。扩展图：新增≥5节点、聚类≥1个（命名+密度）、桥接边≥1条。Step 1 的 missing_signals 中如有本步骤填补的，标注"
+    },
+    {
+      "order": 3,
+      "name": "成本拆解 + 信号补全",
+      "role": "成本拆解工程师",
+      "mask": "deepseek",
+      "action": "【v2.0 保留 + 增强】如果目标有公开融资/定价信息，拆解成本结构和单位经济模型。新增：对照 Step 1 的 missing_signals——成本拆解过程中是否发现了新的信号源？如有，补充到信号清单并标注。成本数据中哪些是可以独立验证的（薪资范围、云服务定价）？哪些是推断的（人员规模、毛利率）？区分标注",
+      "output": "成本结构分析（含 evidence_status 标注）+ 信号补全清单",
+      "depends_on": [1],
+      "acceptance_criteria": "覆盖人力/基础设施/获客三大成本项，每项附计算过程和 evidence_status。可验证成本项标注 [Snapshot] + Source。推断成本项标注 [Inferred] + 假设条件。如有信号补全，标注来源"
+    },
+    {
+      "order": 4,
+      "name": "叙事解剖 + 扰动推演",
+      "role": "复盘工程师",
+      "mask": "deepseek",
+      "action": "【v2.0 重构 · 三层结构】第1层（V模型验证）：对照 v_model_direction 的四层——检查 Step 1-3 的产出中，第4层(叙事/意图)的结论是否在第1-2层(公开信号/产品)有支撑？无支撑的标记 [NEEDS USER INPUT]。第2层（叙事解剖）：PR 叙事 vs 地面真相、四层叙事架构解剖（学术锚点→技术底座→媒体叙事→资本叙事）。第3层（扰动推演）：按 topology-thinking-protocol Phase 2 执行——移除枢纽节点（树状推演） + 注入新边（重组描述）。扰动必须产生 ≥1 个意外发现。Read topology-state.json",
+      "output": "V模型一致性报告 + 叙事架构解剖 + 扰动推演（Phase 2）",
+      "depends_on": [2, 3],
+      "acceptance_criteria": "V模型验证：逐层检查无支撑声明，≥1 处标记 [NEEDS USER INPUT]。叙事解剖：发现 ≥3 个逻辑缺陷或 1 个根本性叙事矛盾。四层构造（学术锚点→技术底座→媒体叙事→资本叙事）逐层分析。扰动推演：移除≥1枢纽(树状第1层≥3+第2层≥2分叉)，注入≥1新边(重组描述)，≥1个意外发现"
+    },
+    {
+      "order": 5,
+      "name": "综合判定 + 能力提取 + 拓扑硬化",
+      "role": "产品架构师",
+      "mask": "claude",
+      "action": "【v2.0 整合 Phase 3-4】三步合一：（1）拓扑硬化——完成 topology-thinking-protocol Phase 3（时间化所有边↑/↓/→+时间窗口+趋势反转）+ Phase 4（脆弱点扫描+安全答案拒绝+攻击面+反证标注）。Read topology-state.json。（2）综合评分——10维评分+三面具独立打分+分歧度分析+自动拉伸区间+频率锚定。评分必须引用拓扑发现（脆弱点、聚类、时间趋势）。（3）能力提取——按 extracted-patterns 模板提取可复用模式。回顾 Step 0 假设清单——逐条标记成立/不成立/部分成立",
+      "output": "综合判定（10维+三面具+分歧度）+ 能力提取报告 + 时间化图（Phase 3）+ 硬化报告（Phase 4）",
+      "depends_on": [2, 3, 4],
+      "acceptance_criteria": "拓扑硬化：所有边标注时间方向+时间窗口，变强≥2+变弱≥2，≥1条趋势反转预警，脆弱点非安全答案(基于结构扫描)，攻击面描述完整(手段+成本+级联深度)，≥50%低置信声明有反证标注。综合评分：三面具独立分数保留，分歧度标注，奈特不确定性用情景范围，置信度≥4附'可能出错条件'，频率锚定标注，自动拉伸区间标注。能力提取：≥1个可复用模式（名称/来源/TRIO适用性/置信度/反例）。假设回顾：逐条标注+偏误模式识别。topology-state.json 各阶段 insights 非空"
+    },
+    {
+      "order": "5b",
+      "name": "决策冷却期",
+      "role": "复盘工程师",
+      "mask": "deepseek",
+      "action": "【v2.0 保留】强制冷却检查：确认 run 启动时间距现在 ≥12 小时。如不足 12 小时，标记 run state = pending_cooling。冷却期内重新审阅 assumption-log 和 V模型一致性报告——情绪高点时的判断需要冷眼再看。灵感：《认知偏误大全》§15.2",
+      "output": "冷却审查结论",
+      "depends_on": [5],
+      "acceptance_criteria": "Run 启动 ≥12 小时后才能通过。冷却期结束→重新审阅 Step 5 判定→同意则继续 Step 6 入库。有异议→回 Step 5 修正"
+    },
+    {
+      "order": 6,
+      "name": "资产入库",
+      "role": "资产盘点工程师",
+      "mask": "claude",
+      "action": "将逆向工程全部产出写入 D:\\工作\\对标库\\company-benchmark\\{公司名}\\：（1）overview.md——公司概述+深度+证据状态摘要 （2）narrative-analysis.md——叙事架构解剖+反幻觉审计结果 （3）causal-dag.md——因果 DAG+扰动推演+拓扑图 （4）extracted-patterns.md——可复用模式+反例。更新 INDEX.md。如有跨公司模式关联，添加交叉引用。Read D:\\工作\\对标库\\company-benchmark\\ 已有案例获取模板参考",
+      "output": "公司库条目（4文件 + INDEX更新）",
+      "depends_on": [5, "5b"],
+      "acceptance_criteria": "4 个文件全部按模板格式写入。每个文件 frontmatter 含 evidence_status 摘要（Snapshot/Inferred/Draft-RE 计数）。INDEX.md 更新（新增一行，含标签分类+逆向深度）。如有跨公司关联，相关公司文件已添加交叉引用。如 extracted-patterns 标注了 TRIO 增强建议（🔴），在 D:\\TRIO 3.0\\research\\ideas\\ 生成自增强建议文件"
+    },
+    {
+      "order": 7,
+      "name": "交付打包",
+      "role": "全栈交付工程师",
+      "mask": "claude",
+      "action": "将公司库 4 个 Markdown 文件 + topology-state.json（拓扑五阶段全记录）合并打包为 PDF + HTML。使用 TRIO 品牌风格。拓扑图作为报告核心章节（非附件）——不重复 topology-check-layer 的检查清单，而是展示 topology-state.json 中每个 Phase 的关键发现和 insights。PDF/HTML 存入 D:\\工作\\对标库\\company-benchmark\\{公司名}\\deliverables\\",
+      "output": "交付包（PDF + HTML + 合并 Markdown）",
+      "depends_on": [6],
+      "acceptance_criteria": "PDF 格式正确（含目录+所有表格+Mermaid 图+evidence_status 摘要）。HTML 可浏览器打开。单个 MD 合并文件含全部维度。拓扑图作为报告正文核心章节——含种子→扩展→扰动→时间化→硬化全流程 insights。封面标注逆向深度+证据状态分布。运行 topology-check.sh 一次通过"
+    },
+    {
+      "order": 8,
+      "name": "全面审计",
+      "role": "复盘工程师",
+      "mask": "deepseek",
+      "action": "【v2.0 新增检查项】自动审计本次逆向工程全部产出。除原有检查项外新增：（1）反幻觉合约检查——逐条抽查 Step 1-5 的声明，是否每条非占位句都有 Source？[Inferred] 声明是否已标注？（2）V模型一致性检查——第4层(叙事/意图)结论是否在第1-2层有证据支撑？无支撑的被标记了吗？（3）信号完整性检查——missing_signals 是否在后续步骤中得到了补全或确认无法获取？",
+      "output": "审计报告（含反幻觉合约+ V模型+信号完整性专项）",
+      "depends_on": [7],
+      "acceptance_criteria": "逐条 PASS/FAIL。FAIL 项附带具体修复指引。全部 PASS → ✅ 审计通过。有 FAIL → 标记 🔴 + Step 9。新增专项：（a）≥1 处 Source 缺失被检出 （b）≥1 处 [Inferred] 未标注被检出 （c）V模型各层结论有下层支撑——无支撑的已标记 （d）missing_signals 有最终状态（已补全/已确认无法获取/仍需用户输入）"
+    },
+    {
+      "order": 9,
+      "name": "修复闭环",
+      "role": "全栈交付工程师",
+      "mask": "claude",
+      "action": "根据 Step 8 审计报告 FAIL 项逐条修复。修复后重新验证。最多 3 轮。3 轮后仍有 FAIL → ESCALATE。全部 PASS → run state = completed",
+      "output": "修复报告",
+      "depends_on": [8],
+      "acceptance_criteria": "所有 Step 8 FAIL 项已修复。重新审计全部 PASS。run state = completed"
+    },
+    {
+      "order": 10,
+      "name": "技能记忆提取",
+      "role": "资产盘点工程师",
+      "mask": "claude",
+      "action": "【v2.0 增强 · 灵感：ai-reverse-toolkit 'Tools=hands, Skills=brain'】从 Step 5 综合判定中提取可复用模式 → 按 skills/.template.md 格式写入 D:\\TRIO 3.0\\knowledge\\skills\\deconstruct-{skill_name}.md。技能文件区分：tools（怎么做——具体步骤、MCP工具调用序列）和 skills（做什么——判断标准、识别模式、踩坑记录）。灵感：ai-reverse-toolkit 的 find-crypto-entry/env-patch/ast-deobfuscate 的 skill/rules 分离设计",
+      "output": "SKILL.md + INDEX 更新",
+      "depends_on": [9],
+      "acceptance_criteria": "≥1 个可复用技能。技能文件含 tools（具体步骤+工具序列）和 skills（判断标准+识别模式+踩坑记录）两部分。INDEX 已更新"
+    }
+  ],
+
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json",
+    "context_isolation": "config/protocols/context-isolation-protocol.json",
+    "escalate": "config/protocols/escalate-protocol.json",
+    "delivery": "config/delivery-protocol.json",
+    "knowledge_write": "config/knowledge-write-protocol.json",
+    "topology_gate": "bash scripts/topology-check.sh <output> <domain>",
+    "topology_doc": "docs/topology-check-layer.md",
+    "topology_thinking": "config/protocols/topology-thinking-protocol.json",
+    "topology_methodology": "docs/topology-thinking-methodology.md"
+  },
+
+  "methodology_attribution": {
+    "anti_hallucination_contract": "Digital Innovation Agents (pssah4, MIT) — Source per claim + Status markers + 'Code is not user research'",
+    "v_model_direction": "Digital Innovation Agents (pssah4, MIT) — Walk the V backwards: Code→Architecture→Requirements→BA",
+    "signals_first": "ExplainThisRepo + UnBuild — Deterministic extraction before LLM analysis; multi-pass pipepine",
+    "observe_first_flow": "JSReverser-MCP (NoOne-hub, Apache 2.0) — Observe-first→Hook-preferred→Breakpoint-past→Rebuild-oriented→Evidence-first",
+    "task_artifacts": "JSReverser-MCP (NoOne-hub, Apache 2.0) — Structured artifacts per phase, recommendedStrategy/agentGuidance/falpackPlan",
+    "tools_hands_split": "ai-reverse-toolkit (zhizhuodemao, MIT) — Tools=hands (what to execute), Skills=brain (what to judge)",
+    "depth_tiers": "Digital Innovation Agents (pssah4, MIT) — Simple Test/PoC/MVP three-tier scoping",
+    "structured_output_schema": "Manus Structured Output + DIA artifact schema — Phase artifacts as JSON for downstream consumption"
+  },
+
+  "_layer": "scenario"
+}

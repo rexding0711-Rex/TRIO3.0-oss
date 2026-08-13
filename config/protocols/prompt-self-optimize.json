@@ -1,0 +1,23 @@
+{
+  "name": "prompt-self-optimize",
+  "version": "1.0.0",
+  "type": "harness",
+  "trigger": {
+    "condition": "runs_since_last_evo >= 10 OR weekday == monday OR manual --force",
+    "check_file": "state/evolution/.last-evo-run-count"
+  },
+  "phases": [
+    {"id": "collect", "action": "读取最近10个 run 的 manifest.json", "output": "state/evolution/.evo-N-input.json"},
+    {"id": "analyze", "action": "对比高分run(≥7)与低分run(<5)的执行差异", "output": "evo-N-prompt.md"},
+    {"id": "propose", "action": "Claude 产出最多3条原子修改提案", "constraints": ["每条<20行","指定target_file+before+after","附rollback_condition","不新增文件不新增依赖"], "output": "evo-N.json"},
+    {"id": "apply", "action": "预览diff→人工确认→perl替换→git commit", "rollback": "git revert HEAD"},
+    {"id": "validate", "action": "下10个run后对比同类任务评分变化", "output": "evo-N.json更新validation_result"}
+  ],
+  "guardrails": {
+    "max_proposals_per_cycle": 3,
+    "min_data_points": 5,
+    "forbidden_targets": ["CLAUDE.md L0硬约束区", "validate-engine-output.sh"],
+    "auto_rollback_threshold": -0.5,
+    "cooldown_after_rollback": "20 runs"
+  }
+}

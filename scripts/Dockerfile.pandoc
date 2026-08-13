@@ -1,0 +1,25 @@
+# TRIO Pandoc + LaTeX 固化环境
+# 用法:
+#   docker build -t trio-pandoc -f scripts/Dockerfile.pandoc .
+#   docker run --rm -v $(pwd):/data trio-pandoc report.md -o report.pdf --template=eisvogel ...
+FROM pandoc/latex:latest
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-noto-cjk \
+    fonts-noto-cjk-extra \
+    fontconfig \
+    poppler-utils \
+    && fc-cache -fv \
+    && rm -rf /var/lib/apt/lists/*
+
+# 验证 Noto CJK 在构建时可用
+RUN fc-list :lang=zh | grep -qi "noto" || (echo "CJK 字体安装失败" && exit 1)
+
+# 安装 Eisvogel 模板
+RUN mkdir -p /root/.pandoc/templates
+# 下载最新 Eisvogel（如果构建时网络可用）
+# RUN wget -O /root/.pandoc/templates/eisvogel.latex \
+#     https://github.com/Wandmalfarbe/pandoc-latex-template/raw/master/eisvogel.tex
+
+WORKDIR /data
+ENTRYPOINT ["pandoc"]

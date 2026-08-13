@@ -1,0 +1,22 @@
+{
+  "_format": "compact — Agent 90秒内可完成填写",
+  "_rule": "每个Phase完成后立即追加字段，不要等到最后一次性填",
+  "run": "deconstruct-目标-YYYYMMDD",
+  "dom": "competitive|general|supply_chain|tech_benchmark",
+  "n": [
+    "ID|标签文本|类型|首次出现的Phase",
+    "?ID|描述性标签|unknown|0"
+  ],
+  "n_types": {"founder":"创始人", "core":"核心实体", "risk":"风险源", "growth":"增长引擎", "rival":"竞争对手", "dead":"已搁置/失败", "unknown":"未知(???节点)", "future":"未来/假设"},
+  "e": [
+    "FROM>TO:关系描述:置信度1-5[:d]:首次出现的Phase",
+    "FROM>TO:关系:2:d:1  ← 置信度≤2+虚线标记d = Mermaid虚线边"
+  ],
+  "ph": {
+    "0": {"et": 0, "u": 0, "d": 0, "rf": "发现了什么之前不知道的事？"},
+    "1": {"c": [["聚类名","节点1","节点2"]], "b": "桥接边ID", "rf": ""},
+    "2": {"pn": "被移除的枢纽节点ID", "l1": 0, "l2": 0, "inj": ["FROM","TO","发现描述"], "rf": ""},
+    "3": {"up": 0, "dn": 0, "rv": "反转预警描述", "tw": "时间窗口如6-18个月", "rf": ""},
+    "4": {"mb": "最高介数节点ID", "mc": "最小割边ID", "ni": "非直觉脆弱点", "atk": "攻击面描述", "rf": ""}
+  }
+}

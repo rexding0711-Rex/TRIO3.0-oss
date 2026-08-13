@@ -1,0 +1,46 @@
+{
+  "id": "quick_assessment",
+  "name": "快速评估",
+  "version": "3.0.0",
+  "triggers": [
+    "速判",
+    "快评",
+    "看一眼",
+    "快速评估"
+  ],
+  "mode": "express",
+  "description": "两步直出快速评估。KB优先——先Read知识库已有数据，只在必要时空档WebSearch补齐。10-15分钟。",
+  "steps": [
+    {
+      "order": 1,
+      "role": "产业情报工程师",
+      "mask": "kimi",
+      "action": "快速扫描知识库+人物/公司初筛（≤5次WebSearch，只搜关键缺口）",
+      "output": "快速评估简报（≤3页）",
+      "acceptance_criteria": "必含：人物核心履历、3+竞品、初步风险信号。先Read D:\\工作\\对标库\\knowledge-benchmark\\ 已有数据，WebSearch限5次以内，只补关键缺口。不要求完整TAM。"
+    },
+    {
+      "order": 2,
+      "role": "产品架构师",
+      "mask": "claude",
+      "action": "快速评分+判定+下一步建议",
+      "depends_on": [
+        1
+      ],
+      "acceptance_criteria": "7维度打分齐全，四档判定明确。一句话告诉Rex该不该继续。不要求长篇报告。"
+    }
+  ],
+  "constraints": {
+    "max_websearch_per_step": 5,
+    "kb_first": true,
+    "skip_if_kb_has": [
+      "benchmarks",
+      "industry"
+    ],
+    "output_max_lines": 150
+  },
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json"
+  },
+  "_layer": "scenario"
+}

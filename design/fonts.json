@@ -1,0 +1,57 @@
+{
+  "version": "1.0",
+  "description": "TRIO 3.0 全格式统一字体配置 — 所有输出格式（PPTX/Word/PDF/Markdown）共用",
+
+  "platforms": {
+    "windows": {
+      "zh": "Microsoft YaHei",
+      "zhBold": "Microsoft YaHei Bold",
+      "en": "Segoe UI",
+      "enBold": "Segoe UI Bold",
+      "mono": "Cascadia Code"
+    },
+    "linux": {
+      "zh": "Noto Sans CJK SC",
+      "zhBold": "Noto Sans CJK SC",
+      "en": "DejaVu Sans",
+      "enBold": "DejaVu Sans",
+      "mono": "DejaVu Sans Mono"
+    }
+  },
+
+  "forbidden": [
+    "Arial", "Calibri", "Helvetica", "Times New Roman",
+    "Cambria", "Liberation Sans", "Liberation Serif"
+  ],
+
+  "rules": {
+    "pptx": {
+      "generator": "pptxgenjs",
+      "fontSource": "platforms.windows",
+      "check": "check-cjk-fonts.py"
+    },
+    "docx": {
+      "generator": "python-docx",
+      "fontSource": "platforms.windows",
+      "check": "check-cjk-fonts.py"
+    },
+    "pdf": {
+      "generator": "reportlab / fpdf2 / weasyprint",
+      "fontSource": "platforms.linux",
+      "check": "check-cjk-fonts.py"
+    },
+    "markdown": {
+      "generator": "pandoc / marked",
+      "note": "Markdown 本身无字体，但转 PDF/HTML 时需指定"
+    },
+    "html": {
+      "css": "font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif"
+    }
+  },
+
+  "pipeline": {
+    "pptx→pdf": "Windows PowerPoint COM (最佳) > LibreOffice headless (备选)",
+    "docx→pdf": "Windows Word COM (最佳) > LibreOffice headless (备选)",
+    "md→pdf": "pandoc + weasyprint (推荐) > Chrome headless print"
+  }
+}

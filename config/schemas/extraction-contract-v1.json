@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trio3.0/schemas/extraction-contract-v1",
+  "title": "TRIO 3.0 知识抽取 Fact Contract v1.0",
+  "description": "LLM 抽取输出必须符合此 Schema，经 Python Validator 校验通过后才能进入 Neo4j Writer。LLM 绝不直接写 Neo4j。",
+  "version": "1.0.0",
+  "frozen_at": "2026-07-16",
+
+  "pipeline": {
+    "description": "知识生产线五阶段",
+    "stages": [
+      "1. LLM Extract → JSON (本 Schema 校验)",
+      "2. Entity Resolver → 对齐已有 Company/Material/Process 节点",
+      "3. Rule Validator → ABSTAIN 三层门",
+      "4. Regression Test → Ground Truth v1 回归",
+      "5. Neo4j Writer → Cypher MERGE"
+    ]
+  },
+
+  "extractionOutput": {
+    "type": "object",
+    "required": ["pipeline_metadata", "decisions"],
+    "properties": {
+      "pipeline_metadata": {
+        "type": "object",
+        "required": ["pipeline_version", "model", "prompt_version", "extracted_at"],
+        "properties": {
+          "pipeline_version": {
+            "type": "string",
+            "description": "管线版本，用于回滚时精准 DELETE 某版本的关系",
+            "examples": ["trio-extract-v4"]
+          },
+          "model": {
+            "type": "string",
+            "description": "抽取使用的 LLM 模型",
+            "examples": ["deepseek-v4-pro", "claude-sonnet-4-6"]
+          },
+          "prompt_version": {
+            "type": "string",
+            "description": "Prompt 模板版本",
+            "examples": ["extraction_prompt_v4"]
+          },
+          "prompt_hash": {
+            "type": "string",
+            "description": "Prompt 文件的 SHA256，用于验证 Prompt 未漂移"
+          },
+          "extracted_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "抽取时间戳 ISO 8601"
+          },
+          "source_report_id": {
+            "type": "string",
+            "description": "源报告 ID",
+            "examples": ["TRIO-Stock-042"]
+          }
+        }
+      },
+
+      "decisions": {
+        "type": "array",
+        "description": "每条 Claim 的判定结果",
+        "items": {
+          "type": "object",
+          "required": ["decision", "claim"],
+          "properties": {
+            "decision": {
+              "type": "string",
+              "enum": ["ACCEPT", "ABSTAIN", "REJECT"],
+              "description": "判定。ACCEPT=可直接入库 | ABSTAIN=证据不足以确定 | REJECT=明确不相关或错误"
+            },
+
+            "claim": {
+              "type": "object",
+              "required": ["subject", "predicate", "object"],
+              "properties": {
+                "subject": {
+                  "type": "string",
+                  "description": "主体，通常为公司名"
+                },
+                "predicate": {
+                  "type": "string",
+                  "enum": ["SUPPLIES_MATERIAL", "CAN_PERFORM", "MAKES", "SUPPLIES_TO", "COMPETES_WITH", "HAS_CAPABILITY", "REQUIRES_MATERIAL", "USES_TECH"],
+                  "description": "标准化谓词。LLM 不可自创谓词类型"
+                },
+                "object": {
+                  "type": "string",
+                  "description": "客体——Material 名 / Process 名 / ProductCategory 名"
+                },
+                "object_type": {
+                  "type": "string",
+                  "enum": ["Material", "Process", "ProductCategory", "Capability", "Technology", "Company"],
+                  "description": "object 对应的节点类型，供 Entity Resolver 使用"
+                }
+              }
+            },
+
+            "evidence": {
+              "type": "object",
+              "required": ["evidence_span", "source_type", "source_date"],
+              "properties": {
+                "evidence_span": {
+                  "type": "string",
+                  "description": "原文引用片段，精确到句"
+                },
+                "context_window": {
+                  "type": "string",
+                  "description": "evidence_span 前后各 50 字，防断章取义"
+                },
+                "source_type": {
+                  "type": "string",
+                  "enum": ["annual_report", "research_report", "news", "company_website", "patent", "industry_standard", "inference", "manual_seed"],
+                  "description": "数据来源类型"
+                },
+                "source_date": {
+                  "type": "string",
+                  "description": "来源日期，YYYY-MM-DD 或 YYYY"
+                },
+                "source_doc_id": {
+                  "type": "string",
+                  "description": "源文档 ID，关联 TRIO-Stock 报告编号"
+                }
+              }
+            },
+
+            "scores": {
+              "type": "object",
+              "description": "三个子维度评分。LLM 只输出这三个分，confidence 由 Python 计算 = min(E, S, R)",
+              "required": ["evidence_strength", "source_authority", "resolution_certainty"],
+              "properties": {
+                "evidence_strength": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "description": "原文陈述的确定性。批量出货=1.0，送样=0.8，实验室阶段=0.5，布局/规划类被 ABSTAIN 拦截不应到这里"
+                },
+                "source_authority": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "description": "信源权威度。年报=0.98，头部研报=0.65，自媒体/网文=0.30"
+                },
+                "resolution_certainty": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "description": "实体对齐确凿度。object 精确匹配 ProductCategory=1.0，模糊匹配=0.70，未解析=0"
+                }
+              }
+            },
+
+            "abstain_detail": {
+              "type": "object",
+              "description": "仅 decision=ABSTAIN 时填写",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "description": "ABSTAIN 原因：KEYWORD_HIT / WEAK_SIGNAL / AMBIGUOUS_ENTITY / FUTURE_TENSE"
+                },
+                "trigger_layer": {
+                  "type": "string",
+                  "enum": ["L1_HARD_RULE", "L2_LLM_JUDGMENT", "L3_POST_RULE"],
+                  "description": "哪一层触发了 ABSTAIN"
+                },
+                "confidence_if_forced": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "description": "如果强行入库，置信度是多少。用于后续人工 review 优先级排序"
+                }
+              }
+            },
+
+            "reject_detail": {
+              "type": "object",
+              "description": "仅 decision=REJECT 时填写",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "description": "REJECT 原因"
+                }
+              }
+            },
+
+            "temporal": {
+              "type": "object",
+              "description": "时间有效性。仅 decision=ACCEPT 时必填",
+              "required": ["valid_from"],
+              "properties": {
+                "valid_from": {
+                  "type": "string",
+                  "description": "关系生效时间，YYYY-MM-DD 或 YYYY。默认取 source_date"
+                },
+                "valid_to": {
+                  "type": ["string", "null"],
+                  "description": "关系终止时间。null 表示至今有效"
+                },
+                "is_historical": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "是否为已终止的历史关系（如'曾供应但已停产'）"
+                }
+              }
+            },
+
+            "material_variant": {
+              "type": "object",
+              "description": "粗粒度 Material 的细分。如 Material=光刻胶，variant=ArF。可选但建议填",
+              "properties": {
+                "variant_name": {
+                  "type": "string",
+                  "examples": ["ArF", "KrF", "PCB"]
+                },
+                "application_segment": {
+                  "type": "string",
+                  "examples": ["semiconductor_frontend", "semiconductor_backend", "PCB", "display"]
+                },
+                "tech_node": {
+                  "type": "string",
+                  "examples": ["7nm", "14nm", "28nm", "mature"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "confidenceFormula": {
+    "description": "Python 端计算，LLM 不直接输出 confidence",
+    "formula": "confidence = min(evidence_strength, source_authority, resolution_certainty)",
+    "rationale": "木桶短板算子——供应链关系可靠性取决于最弱一环，而非平均值",
+    "recency_factor": {
+      "description": "recency_factor 独立存储，不混入 confidence。查询时组合使用",
+      "formula": "recency_factor = max(0.3, 1.0 - 0.15 * (current_year - source_year))",
+      "note": "5 年前的报告最低衰减到 0.3，不会归零"
+    },
+    "thresholds": {
+      "auto_verify": 0.85,
+      "description_auto_verify": "confidence ≥ 0.85 且 source=annual_report 且无冲突 → 自动入库，无需人工",
+      "human_review": 0.70,
+      "description_human_review": "0.70 ≤ confidence < 0.85 → 入库但标记 candidate，SPOF 查询降权使用",
+      "reject": 0.60,
+      "description_reject": "confidence < 0.60 → 拒绝入库（不应出现——LLM 不应输出 confidence < 0.60 的 ACCEPT）"
+    }
+  },
+
+  "abstainRules": {
+    "description": "ABSTAIN 三层门——在 Python Rule Validator 中执行",
+    "L1_hard_keywords": {
+      "description": "前置硬规则——触发即 ABSTAIN，LLM 判断不可覆盖",
+      "keywords": ["布局", "规划", "计划", "拟建", "拟投资", "有望", "预计", "预期", "研发阶段", "正在研发", "中试阶段", "参股", "代理", "经销", "合作开发", "探索", "筹备", "蓝图", "战略合作", "签署备忘录", "意向协议"],
+      "action": "直接 ABSTAIN，reason=KEYWORD_HIT"
+    },
+    "L2_llm_judgment": {
+      "description": "LLM 自行三分类。未命中 L1 的 Claim 进入此层",
+      "output": "ACCEPT / ABSTAIN / REJECT + scores"
+    },
+    "L3_post_hard_rules": {
+      "description": "后置硬规则——即使 LLM 输出 ACCEPT，如果原文含以下词也强制 ABSTAIN",
+      "keywords": ["计划", "有望", "布局", "研发中", "拟投产", "规划建设", "未来将"],
+      "action": "覆盖 LLM 判定，强制 ABSTAIN。reason=LLM_OVERRIDE_BY_L3",
+      "rationale": "LLM 容易把未来时态错误转成当前事实（已验证案例：'计划投资10亿建产线' → LLM 输出 SUPPLIES_MATERIAL conf=0.87）"
+    }
+  },
+
+  "regressionTest": {
+    "description": "每次 Schema/Prompt 变更后跑回归测试",
+    "ground_truth_path": "D:\\TRIO 3.0\\fixtures\\ground-truth-v1.json",
+    "seed_count": 23,
+    "categories": ["positive", "negative", "abstain"],
+    "success_criteria": {
+      "accept_precision": "≥ 95%",
+      "abstain_precision": "≥ 90%",
+      "false_fact_rate": "≤ 3%",
+      "entity_resolution": "≥ 95%",
+      "json_schema_validity": "100%"
+    }
+  }
+}

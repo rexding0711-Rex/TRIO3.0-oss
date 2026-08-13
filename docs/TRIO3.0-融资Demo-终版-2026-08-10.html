@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRIO 3.0 · 越用越准的判断系统 · 融资 Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ═══════ 黑 + 深蓝 主题 ═══════ */
+    --ink:#060910;
+    --ink-rgb:6,9,16;
+    --paper:#dce3ee;
+    --paper-rgb:220,227,238;
+    --paper-tint:#c8d2e2;
+    --ink-tint:#0f1629;
+    /* 高级深蓝主 KV — 钴蓝/午夜蓝 */
+    --accent:#1a3b7c;
+    --accent-rgb:26,59,124;
+    --accent-deep:#0d1f42;
+    --accent-bright:#2e60b8;
+    --accent-light:#5b8cd4;
+    --accent-glow:rgba(26,59,124,.3);
+
+    /* 字体（跨主题固定） */
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
+    --serif-body-en:"Source Serif 4",Georgia,serif;
+    --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
+    --sans-zh:"Noto Sans SC",source-han-sans-sc,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--ink);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+  /* ═══════ WebGL 双背景 ═══════ */
+  canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;transition:opacity 1.2s ease}
+  canvas#bg-light{opacity:0}
+  canvas#bg-dark{opacity:1}
+  body.light-bg canvas#bg-light{opacity:1}
+  body.light-bg canvas#bg-dark{opacity:0}
+  body.low-power canvas.bg{display:none!important}
+
+  /* ═══════ Deck 容器 + 翻页 ═══════ */
+  #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
+  .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6vh 6vw 10vh 6vw;display:flex;flex-direction:column;overflow:hidden}
+  .slide.light{color:var(--ink);background:var(--paper)}
+  .slide.dark{color:var(--paper);background:var(--ink)}
+  .slide.accent-bg{color:var(--paper);background:var(--accent-deep)}
+
+  /* 遮罩减淡，确保文字可读 */
+  .slide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;transition:background .7s ease}
+  .slide.light::before{background:rgba(var(--paper-rgb),.65);backdrop-filter:blur(2px)}
+  .slide.dark::before{background:rgba(var(--ink-rgb),.55);backdrop-filter:blur(2px)}
+  /* Hero 页：遮罩大幅降低，让 WebGL 背景明显透出 */
+  .slide.hero.light::before{background:rgba(var(--paper-rgb),.2);backdrop-filter:none}
+  .slide.hero.dark::before{background:rgba(var(--ink-rgb),.18);backdrop-filter:none}
+  .slide.hero.dark::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(var(--ink-rgb),.38) 0%,rgba(var(--ink-rgb),0) 14%,rgba(var(--ink-rgb),0) 86%,rgba(var(--ink-rgb),.44) 100%)}
+
+  /* ═══════ Magazine chrome ═══════ */
+  .chrome{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.2em;text-transform:uppercase;opacity:.8}
+  .chrome .left,.chrome .right{display:flex;gap:2.4em;align-items:center}
+  .chrome .sep{width:40px;height:1px;background:currentColor;opacity:.85}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+  .foot .title{font-family:var(--serif-zh);font-weight:400;letter-spacing:.05em;text-transform:none;opacity:.7;font-size:13px}
+
+  /* ═══════ 排版 ═══════ */
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;opacity:.7;margin-bottom:2.6vh}
+  .display-zh{font-family:var(--serif-zh);font-weight:700;font-size:7.8vw;line-height:1.04;letter-spacing:-.005em}
+  .h1-zh{font-family:var(--serif-zh);font-weight:700;font-size:4.6vw;line-height:1.12;letter-spacing:-.005em}
+  .h2-zh{font-family:var(--serif-zh);font-weight:600;font-size:3.2vw;line-height:1.2;letter-spacing:0}
+  .h3-zh{font-family:var(--serif-zh);font-weight:500;font-size:1.9vw;line-height:1.35}
+  .body-zh{font-family:var(--sans-zh);font-weight:400;font-size:max(15px,1.22vw);line-height:1.75;opacity:.9;letter-spacing:.01em}
+  .lead{font-family:var(--serif-zh);font-weight:400;font-size:1.9vw;line-height:1.4;opacity:.92}
+  .meta{font-family:var(--mono);font-size:max(11px,.88vw);letter-spacing:.16em;text-transform:uppercase;opacity:.7}
+  .big-num{font-family:var(--serif-en);font-weight:800;font-size:10vw;line-height:.85;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .mid-num{font-family:var(--serif-en);font-weight:700;font-size:5.5vw;line-height:.88;letter-spacing:-.02em;font-feature-settings:"tnum"}
+  .ghost{font-family:var(--serif-en);font-weight:900;font-size:34vw;line-height:.8;opacity:.04;letter-spacing:-.04em;position:absolute;font-feature-settings:"tnum"}
+  .rule{width:100%;height:1px;background:currentColor;opacity:.2;margin:3vh 0}
+
+  /* ═══════ 布局 ═══════ */
+  .col{display:flex;flex-direction:column;gap:2.4vh}
+  .row{display:flex;align-items:center;gap:3vw}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:4vh 3vw;flex:1;align-content:center}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:3vh 2vw;flex:1;align-content:center}
+  .grid-3x2{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:3vh 2.5vw;flex:1;align-content:center}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:2.5vh 2vw;flex:1;align-content:center}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:center}
+  .split-6-4{display:grid;grid-template-columns:6fr 4fr;gap:3vw;flex:1;align-items:center}
+  .fill{flex:1}
+  .center{align-items:center;justify-content:center;text-align:center}
+
+  /* ═══════ 强调 ═══════ */
+  .accent{color:var(--accent)}
+  .slide.dark .accent{color:var(--accent-light)}
+  .accent-glow{text-shadow:0 0 40px var(--accent-glow)}
+  .hi{position:relative;display:inline}
+  .hi::after{content:"";position:absolute;left:-.1em;right:-.1em;bottom:-.05em;height:.28em;background:rgba(var(--accent-rgb),.18);z-index:-1}
+  em{font-style:italic;font-family:var(--serif-en)}
+
+  /* ═══════ Stat 数字 ═══════ */
+  .stat-card{display:flex;flex-direction:column;gap:.8vh;padding-top:1.6vh;border-top:1px solid rgba(var(--accent-rgb),.35)}
+  .stat-card .l{font-family:var(--mono);font-size:max(10px,.78vw);letter-spacing:.24em;text-transform:uppercase;opacity:.7}
+  .stat-card .n{font-family:var(--serif-en);font-weight:800;font-size:5.8vw;line-height:.9;letter-spacing:-.03em;font-feature-settings:"tnum";margin-top:.4vh;color:var(--accent)}
+  .stat-card .d{font-family:var(--sans-zh);font-size:max(13px,1.05vw);line-height:1.5;opacity:.82;margin-top:.6vh}
+  /* light slide 上 stat-card 边框加深 */
+  .slide.light .stat-card{border-top-color:rgba(var(--accent-rgb),.28)}
+
+  /* ═══════ 里程碑行 ═══════ */
+  .ms-row{display:grid;grid-template-columns:auto 1fr;gap:2vw;padding:1.8vh 0;border-top:1px solid rgba(255,255,255,.08);align-items:start}
+  .ms-row:last-child{border-bottom:1px solid rgba(255,255,255,.08)}
+  .ms-compact .ms-row{padding:1.3vh 0}
+  .ms-era{font-family:var(--mono);font-size:max(12px,.9vw);font-weight:600;color:var(--accent-bright);letter-spacing:.08em;white-space:nowrap;padding-top:2px}
+  .ms-era.done{color:rgba(46,95,212,.35)}.ms-era.now{color:var(--accent-bright)}
+  .ms-body h4{font-family:var(--serif-zh);font-weight:600;font-size:max(15px,1.25vw);margin-bottom:.4vh}
+  .ms-body p{font-family:var(--sans-zh);font-size:max(13px,1vw);opacity:.82;line-height:1.6}
+
+  /* ═══════ 能力条 ═══════ */
+  .cap-bar{margin:1vh 0}
+  .cap-bar .cap-head{display:flex;justify-content:space-between;font-family:var(--mono);font-size:max(9px,.7vw);letter-spacing:.1em;margin-bottom:.3vh;opacity:.7}
+  .cap-bar .cap-track{height:4px;border-radius:2px;position:relative}
+  .slide.dark .cap-bar .cap-track{background:rgba(255,255,255,.06)}
+  .slide.light .cap-bar .cap-track{background:rgba(0,0,0,.06)}
+  .cap-bar .cap-fill{height:100%;border-radius:2px;position:absolute;left:0;top:0;transition:width .6s ease}
+  .cap-bar .cap-fill.cur{background:var(--accent);opacity:.9}
+  .cap-bar .cap-fill.tgt{background:var(--accent);opacity:.15}
+
+  /* ═══════ 亮色页组件修复 ═══════ */
+  .slide.light .ms-row{border-top-color:rgba(0,0,0,.08)}
+  .slide.light .ms-row:last-child{border-bottom-color:rgba(0,0,0,.08)}
+  .slide.light .ms-era{color:var(--accent)}
+  .slide.light .ms-body p{opacity:.85}
+  .slide.light .ally-node{border-color:rgba(0,0,0,.12)}
+  .slide.light .ally-node.core{border-color:var(--accent);background:rgba(var(--accent-rgb),.06)}
+  .slide.light .ally-arrow{color:rgba(0,0,0,.2)}
+  .slide.light .tag-f{background:rgba(220,38,38,.12)}.slide.light .tag-h{background:rgba(217,119,6,.1)}.slide.light .tag-m{background:rgba(59,130,246,.1)}
+  .slide.light .cap-bar .cap-track{background:rgba(0,0,0,.06)}
+
+  /* ═══════ 风险标签 ═══════ */
+  .tag{display:inline-block;font-family:var(--mono);font-size:max(9px,.65vw);letter-spacing:.12em;padding:2px 8px;border-radius:2px;margin-right:4px}
+  .tag-f{background:rgba(220,38,38,.2);color:#ef4444}.tag-h{background:rgba(217,119,6,.15);color:#f59e0b}.tag-m{background:rgba(59,130,246,.15);color:#3b82f6}.tag-ok{background:rgba(34,197,94,.15);color:#22c55e}
+
+  /* ═══════ 联盟节点 ═══════ */
+  .ally-grid{display:flex;flex-wrap:wrap;gap:1.2vw;justify-content:center}
+  .ally-node{font-family:var(--sans-zh);font-size:max(12px,.9vw);padding:1.2vh 1.5vw;border:1px solid rgba(255,255,255,.18);border-radius:4px;text-align:center;transition:all .2s}
+  .ally-node.core{border-color:var(--accent);border-width:1.5px;background:rgba(var(--accent-rgb),.12)}
+  .ally-node .sub{display:block;font-size:.65em;opacity:.7;margin-top:2px;font-family:var(--mono)}
+  .ally-arrow{color:rgba(255,255,255,.35);font-size:1.5vw;text-align:center;padding:.5vh 0}
+
+  /* ═══════ 八层架构 ═══════ */
+  .arch{display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.1);border-radius:6px;overflow:hidden}
+  .arch-row{display:grid;grid-template-columns:7.5em 1fr auto auto;gap:1.4vw;align-items:center;padding:1.4vh 1.5vw;border-top:1px solid rgba(255,255,255,.07)}
+  .arch-row:first-child{border-top:0}
+  .arch-lv{font-family:var(--mono);font-size:max(11px,.8vw);font-weight:600;color:var(--accent-bright);letter-spacing:.05em;white-space:nowrap}
+  .arch-name{font-family:var(--serif-zh);font-weight:600;font-size:max(14px,1.12vw);white-space:nowrap}
+  .arch-name .star{color:var(--accent-light)}
+  .arch-desc{font-family:var(--sans-zh);font-size:max(12px,.9vw);opacity:.8;line-height:1.5}
+  .slide.light .arch{border-color:rgba(0,0,0,.14)}
+  .slide.light .arch-row{border-top-color:rgba(0,0,0,.07)}
+  .slide.light .arch-lv{color:var(--accent)}
+  .slide.light .arch-name .star{color:var(--accent)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:max(9px,.6vw);letter-spacing:.08em;padding:2px 9px;border-radius:999px;white-space:nowrap}
+  .pill.done{background:rgba(34,197,94,.14);color:#22c55e}
+  .pill.wip{background:rgba(245,158,11,.14);color:#f59e0b}
+  .pill.build{background:rgba(59,130,246,.14);color:#3b82f6}
+
+  /* ═══════ 枢纽卡 ═══════ */
+  .hub-card{border:1px solid rgba(var(--accent-rgb),.35);padding:1.8vw;display:flex;flex-direction:column;gap:1vh;height:100%}
+  .hub-card .hub-k{font-family:var(--mono);font-size:.66vw;letter-spacing:.2em;opacity:.85;text-transform:uppercase}
+  .hub-card .hub-t{font-family:var(--serif-zh);font-weight:700;font-size:1.55vw;color:var(--accent-light)}
+  .hub-card .hub-e{font-family:var(--serif-en);font-style:italic;font-size:.85vw;opacity:.6}
+  .hub-card .hub-b{font-size:.82vw;line-height:1.7;opacity:.86}
+  .slide.light .hub-card .hub-t{color:var(--accent)}
+
+  /* ═══════ 护城河卡 ═══════ */
+  .moat-card{border-top:1px solid rgba(var(--accent-rgb),.35);padding-top:1.6vh;display:flex;flex-direction:column;gap:.7vh}
+  .moat-card .moat-n{font-family:var(--serif-en);font-weight:800;font-size:2.6vw;line-height:.9;color:var(--accent);font-feature-settings:"tnum"}
+  .moat-card .moat-t{font-family:var(--serif-zh);font-weight:600;font-size:1.15vw}
+  .moat-card .moat-b{font-size:.8vw;opacity:.8;line-height:1.62}
+
+  /* ═══════ 双轮卡 ═══════ */
+  .wheel-card{border:1px solid rgba(var(--accent-rgb),.35);padding:1.6vw;display:flex;flex-direction:column;gap:1.1vh}
+  .wheel-card .wheel-k{font-family:var(--mono);font-size:.62vw;letter-spacing:.2em;opacity:.85;text-transform:uppercase}
+  .wheel-card .wheel-t{font-family:var(--serif-zh);font-weight:700;font-size:1.3vw}
+  .wheel-card .wheel-b{font-size:.82vw;line-height:1.62;opacity:.84}
+  .wheel-card ul{list-style:none;margin-top:.3vh}
+  .wheel-card li{font-size:.78vw;line-height:1.6;opacity:.86;padding-left:1em;position:relative}
+  .wheel-card li::before{content:"·";position:absolute;left:.1em;color:var(--accent-light)}
+
+  /* ═══════ 数据流管道 ═══════ */
+  .flow{display:flex;align-items:center;justify-content:center;gap:.8vw;flex-wrap:wrap;font-family:var(--mono);font-size:max(11px,.8vw);letter-spacing:.08em}
+  .flow .node{border:1px solid rgba(var(--accent-rgb),.35);padding:.7vh 1.1vw;border-radius:4px;background:rgba(var(--accent-rgb),.08)}
+  .flow .arr{color:var(--accent-bright);opacity:.75;font-size:1.1vw}
+
+  /* ═══════ 动效 ═══════ */
+  [data-anim]{opacity:1}
+  body.motion-ready [data-anim]{opacity:0}
+  body.motion-ready [data-anim="line"]{opacity:0;transform:translateY(10px)}
+  body.low-power #deck{transition:none!important}
+  body.low-power *{animation:none!important;transition:none!important}
+  body.low-power.motion-ready [data-anim]{opacity:1!important;transform:none!important}
+
+  /* ═══════ 导航 ═══════ */
+  #nav{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:30;display:flex;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(10,14,26,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .3s ease;border:0;padding:0}
+  #nav .dot:hover{background:var(--accent-bright);transform:scale(1.15)}
+  #nav .dot.active{background:var(--accent-bright);width:22px;border-radius:999px;box-shadow:0 0 12px var(--accent-glow)}
+  #hint{position:fixed;bottom:3vh;right:3vw;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.35;mix-blend-mode:difference;color:#aaa}
+
+  @media(max-width:900px){
+    .display-zh{font-size:12vw}.h1-zh{font-size:7vw}.h2-zh{font-size:5vw}
+    .split,.split-6-4,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+    .big-num{font-size:14vw}.mid-num{font-size:8vw}
+    .arch-row{grid-template-columns:1fr;gap:.6vh}.arch-row>span.pill{justify-self:start}
+  }
+</style>
+
+<body class="dark-bg">
+<canvas class="bg" id="bg-dark"></canvas>
+<canvas class="bg" id="bg-light"></canvas>
+
+<!-- ═══════════ DECK ═══════════ -->
+<main id="deck">
+
+<section class="slide dark hero" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>2026·08</span></div><div class="right"><span>TRIO 3.0 · Funding Deck</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">Decision Infrastructure · Data Loop · 2026 → 2028</div>
+    <div class="display-zh" style="font-size:6.2vw;margin-bottom:1.5vh">从数据到决策，<br><span class="accent accent-glow">我们跑通闭环</span></div>
+    <div style="font-family:var(--serif-body-en);font-size:1.5vw;line-height:1.55;max-width:62%;opacity:.86;margin-top:2vh">
+      数据丰度时代，壁垒不在数据获取，在把多源信号变成判断、再把判断变成校准依据的闭环。
+    </div>
+    <div style="display:flex;gap:3vw;margin-top:4vh;font-family:var(--mono);font-size:13px;letter-spacing:.16em;opacity:.86">
+      <span>Seed Round · ¥500-1000 万</span><span>18 个月发育周期</span><span>九大多源经营数据</span><span>金融 + 专业服务先行</span>
+    </div>
+    <div style="margin-top:3vh;font-family:var(--mono);font-size:12px;letter-spacing:.14em;opacity:.72">
+      <span class="accent">运行中</span> · 200+ 机构用户 · 律所 / 会计事务所 / 量化在谈 · 本周启动付费转化
+    </div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Cover · 01/17</span></div>
+</section>
+
+<section class="slide light" data-theme="light">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Core Judgment</span></div><div class="right"><span>02/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:90%">
+    <div class="kicker">Executive Summary · 2026.08</div>
+    <div class="h1-zh" style="margin-bottom:1.2vh">数据丰度时代，<br><span style="color:var(--accent)">壁垒在闭环</span></div>
+    <div style="font-family:var(--serif-zh);font-size:1.02vw;line-height:1.8;opacity:.86;margin-top:1vh">
+      数据已经不稀缺了——为什么决策质量没有跟着涨？数据丰度时代，竞争壁垒不在「谁拿到更多数据」，而在「谁能把多源信号变成判断、再把判断变成校准依据的闭环」。金融是这套闭环第一个跑通的垂直场景——但同一套系统不挑客户大小：大企业决策系统已被重实施厂商占据，TRIO 面向它们让出来的市场——中小企业与专业服务机构。
+    </div>
+    <div style="font-family:var(--serif-zh);font-size:.95vw;line-height:1.75;opacity:.78;margin-top:1.2vh">
+      种子轮验证三件事：需求是否真实、付费群体是否具备粘性、收入能否持续稳定。三样都已具备初步证据——200 个用户在真实使用（部分刚刚安装旗舰产品 TRIO 3.0），其中约一半是律所会所在谈内测，会员与数据形态已在市场运行。本轮聚焦关键一步：把高价值判断能力放上付费墙，跑出真实付费率。
+    </div>
+    <div style="font-family:var(--serif-zh);font-size:.95vw;line-height:1.75;opacity:.78;margin-top:.8vh">
+      产品主轮 + 获客轮：B 端数据 feed 是主轮（产生收入），C 端决策工具是获客轮（承接规模，收入贡献预期 &lt;20%）。真正的壁垒是自研组合——采集、管道、判断压缩、验证校准，四环闭合。
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1.2vw;margin-top:3vh">
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.4);padding-top:1vh"><div style="font-family:var(--mono);font-size:.6vw;opacity:.6">内测用户</div><div style="font-family:var(--serif-zh);font-weight:900;font-size:1.7vw">200+</div><div style="font-size:.7vw;opacity:.66">约一半律所会所在谈</div></div>
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.4);padding-top:1vh"><div style="font-family:var(--mono);font-size:.6vw;opacity:.6">架构</div><div style="font-family:var(--serif-zh);font-weight:900;font-size:1.7vw">三层</div><div style="font-size:.7vw;opacity:.66">数据 → 推理 → 判断</div></div>
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.4);padding-top:1vh"><div style="font-family:var(--mono);font-size:.6vw;opacity:.6">另类数据源</div><div style="font-family:var(--serif-zh);font-weight:900;font-size:1.7vw">9</div><div style="font-size:.7vw;opacity:.66">卫星到工商司法</div></div>
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.4);padding-top:1vh"><div style="font-family:var(--mono);font-size:.6vw;opacity:.6">已验证</div><div style="font-family:var(--serif-zh);font-weight:900;font-size:1.3vw">金融+专业服务</div><div style="font-size:.7vw;opacity:.66">量化/审计/律所已入场</div></div>
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.4);padding-top:1vh"><div style="font-family:var(--mono);font-size:.6vw;opacity:.6">拓展方向</div><div style="font-family:var(--serif-zh);font-weight:900;font-size:1.3vw">中小企业</div><div style="font-size:.7vw;opacity:.66">律所/量化/制造中小</div></div>
+    </div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Core Judgment · 02/17</span></div>
+</section>
+
+<section class="slide light" data-theme="light">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Investment Highlights</span></div><div class="right"><span>03/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">为什么是现在 · 六个买入理由</div>
+    <div class="h1-zh" style="margin-bottom:3vh">投资亮点</div>
+    <div class="grid-3x2" style="gap:2vw">
+      <div class="hub-card"><div class="hub-k">01 · 护城河</div><div class="hub-t">数据闭环，复利结构</div><div class="hub-e">The Loop</div><div class="hub-b">判断被验证、验证反哺系统——越用越准，不是一次性报告，是无法被购买的使用壁垒。</div></div>
+      <div class="hub-card"><div class="hub-k">02 · 市场</div><div class="hub-t">中小企业可复制</div><div class="hub-e">Scalable Market</div><div class="hub-b">金融已验证打底，同一管道向专业服务 / 制造中小企业横向复制——避开重实施厂商的大企业主场。</div></div>
+      <div class="hub-card"><div class="hub-k">03 · 技术</div><div class="hub-t">三引擎独立权重</div><div class="hub-e">True Isolation</div><div class="hub-b">DeepSeek V4 Pro · Kimi K3 · GLM-5.2 并行，真正的认知隔离——分歧即信号，模型换代判断标准不换。</div></div>
+      <div class="hub-card"><div class="hub-k">04 · 数据</div><div class="hub-t">九大多源经营数据</div><div class="hub-e">Data Matrix</div><div class="hub-b">从卫星到工商司法，现实世界经营活动的结构化镜像——数据是泛行业资产，金融只是第一个买家。</div></div>
+      <div class="hub-card"><div class="hub-k">05 · 验证</div><div class="hub-t">需求已初步验证</div><div class="hub-e">Traction</div><div class="hub-b">200 用户真实使用 · 律所会所约一半在谈 · 量化期货已完成需求对接——运行中的产品。</div></div>
+      <div class="hub-card"><div class="hub-k">06 · 交付</div><div class="hub-t">本地化独家交付</div><div class="hub-e">Local Delivery</div><div class="hub-b">NAS 数据不出内网——数据主权合规，机构与涉密企业的刚需，海外 SaaS 无法触及。</div></div>
+    </div>
+    <div class="rule" style="margin:2.6vh 0 0"></div>
+    <div style="font-size:.98vw;line-height:1.7;opacity:.9;margin-top:1.7vh">
+      Palantir 证明了企业决策系统是真市场，但重实施、慢、贵——<span class="accent">我们以已验证金融场景 + 本地化交付 + 数据闭环，做可规模化交付的通用决策系统</span>。
+    </div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Investment Highlights · 03/17</span></div>
+</section>
+
+<section class="slide dark" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Validation</span></div><div class="right"><span>04/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">Validation · 不是 PPT，是运行中的系统</div>
+    <div class="h1-zh" style="margin-bottom:2.4vh">有人正在用，有人愿意付费</div>
+    <div class="grid-2" style="gap:2vw">
+      <div class="hub-card"><div class="hub-t">真实使用</div><div class="hub-k">200+ 内测用户</div><div class="hub-b">覆盖金融研究 / 专业服务等高价值决策场景，会员与数据形态已在市场运行。</div></div>
+      <div class="hub-card"><div class="hub-t">付费意愿 · 客户 A</div><div class="hub-k">硬科技初创</div><div class="hub-b">"如果判断包能帮助自己校准技术研发方向并判断竞品技术发展趋势，年付 5-10 万没问题"</div></div>
+      <div class="hub-card"><div class="hub-t">付费意愿 · 客户 B</div><div class="hub-k">教授团队</div><div class="hub-b">已完成需求对接，进入 PoC 阶段，预期客单价 2-5 万——主要为了补齐自己校企科研强而营销弱的短板。</div></div>
+      <div class="hub-card"><div class="hub-t">替代品对比</div><div class="hub-k">为什么换 TRIO</div><div class="hub-b">"之前用 XX 方案每月花 XX 元，TRIO 判断包的可校准能力是它们给不了的"</div></div>
+    </div>
+    <div class="rule" style="margin:2.6vh 0 0"></div>
+    <div style="font-size:.98vw;line-height:1.7;opacity:.9;margin-top:1.7vh">种子轮需要的是「有人已经在用 + 有人表达过愿意付钱」的证据组合。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Validation · 04/17</span></div>
+</section>
+
+<section class="slide dark" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Market Opportunity</span></div><div class="right"><span>05/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">顶刊背书 · 数据丰度时代 · 数据重构一切决策</div>
+    <div class="h1-zh" style="margin-bottom:3vh">数据丰度时代，重构一切决策</div>
+    <div class="grid-3" style="gap:2vw">
+      <div class="hub-card"><div class="hub-t">学术共识</div><div class="hub-k">数据丰度已成定论</div><div class="hub-b">数据丰度扩大信息池、拉大决策质量分化、提升价格信息含量——决策的价值正从经验与直觉向数据处理与判断能力迁移。<br><span style="font-family:var(--mono);font-size:.6vw;opacity:.6">Dugast &amp; Foucault · J. Finance 2025</span></div></div>
+      <div class="hub-card"><div class="hub-t">核心矛盾</div><div class="hub-k">数据不稀缺，理解才稀缺</div><div class="hub-b">短期高频数据会挤出长期基本面研究（周期效应）；单一数据源有行业偏误、成本合规门槛、多模态处理效率三大约束——谁能系统解决，谁站在价值高地。</div></div>
+      <div class="hub-card"><div class="hub-t">我们的位置</div><div class="hub-k">不做数据批发商</div><div class="hub-b">做把九大战场的数据变成决策框架的管道——从单一信号走向全景认知。</div></div>
+    </div>
+    <div class="rule" style="margin:2.4vh 0 0"></div>
+    <div style="font-size:.95vw;line-height:1.65;opacity:.85;margin-top:1.6vh">全球另类数据市场规模持续扩张，「数据 → 判断」这一层（企业决策智能）是增速最快的细分——TRIO 切入的正是这个中间层。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Market Opportunity · 05/17</span></div>
+</section>
+
+<section class="slide light" data-theme="light">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Data Matrix</span></div><div class="right"><span>06/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">九大另类数据源 · 多源聚合 · 卫星只是其中之一</div>
+    <div class="h1-zh" style="margin-bottom:1vh">从卫星图像到工商司法</div>
+    <div style="font-family:var(--serif-zh);font-size:1vw;line-height:1.4;opacity:.72;margin-bottom:1.4vh">金融读价格，企业读经营——信号是同一批，问题不同。状态列 = 当前接入进度。</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2vw;flex:1;align-content:center">
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.45);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">地理空间 · 天基 · <span style="opacity:.95">已接入</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">卫星图像</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">停车场填充率 · 工厂热辐射 · 固定资产进度<br><span style="opacity:.6;font-size:.64vw">企业读：景气度/产能/里程碑</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">JFQA 2024/25</span></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.45);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">舆情 · 情绪 · <span style="opacity:.6">待接入</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">社交媒体情绪</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">关注度与情绪<br><span style="opacity:.6;font-size:.64vw">企业读：品牌舆情 / 新品反响</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">JFE 2024</span></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.2);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">工商 · 登记 · <span style="opacity:.95">已接入</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">企业注册信息</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">成立时间 · 股权结构 · 变更记录<br><span style="opacity:.6;font-size:.64vw">企业读：尽调画像 / 股权穿透</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">官方公开数据</span></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.45);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">司法 · 诉讼 · <span style="opacity:.6">待接入</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">裁判文书 / 立案信息</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">涉诉情况 · 执行记录<br><span style="opacity:.6;font-size:.64vw">企业读：供应商尽调 / 信用风险</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">官方公开数据</span></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.45);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">专利 · 研发 · <span style="opacity:.6">待接入</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">专利授权 / 研发投入</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">技术布局 · 创新能力<br><span style="opacity:.6;font-size:.64vw">企业读：技术路线 / 创新追踪</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">官方公开数据</span></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.2);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">ESG · 责任 · <span style="opacity:.95">采购中</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">评级分歧</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">评级分歧<br><span style="opacity:.6;font-size:.64vw">企业读：合规压力 / 声誉风险</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">JFE 2022</span></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.2);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">供应链 · 能耗 + 贸易</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">工业用电 · 公开贸易数据</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">工厂开工率 · 贸易活跃度（公开源，无支付流水）<br><span style="opacity:.6;font-size:.64vw">企业读：制造业产能 / 供应链健康</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">JFQA 2017 · 官方公开数据</span></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.45);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">公开 · 信息 · <span style="opacity:.95">已接入</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">在线价格</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">高频价格<br><span style="opacity:.6;font-size:.64vw">企业读：成本传导 / 竞品定价</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">JPM 2023</span></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.2);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.56vw;letter-spacing:.12em;opacity:.6;margin-bottom:.35vh">专家 · 调研 · <span style="opacity:.95">规划中</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.3vh">分析师调研</div>
+      <div style="font-size:.7vw;opacity:.84;line-height:1.5">实地调研 → 预测精度<br><span style="opacity:.6;font-size:.64vw">企业读：行业尽调 / 技术验证</span><br><span style="font-family:var(--mono);font-size:.54vw;opacity:.5">CAR 2018</span></div>
+    </div>
+    </div>
+    <div class="rule" style="margin:2vh 0 0"></div>
+    <div style="font-size:.95vw;line-height:1.65;opacity:.86;margin-top:1.4vh"><span class="accent">合规声明</span>：TRIO 不拥有数据，拥有「数据 → 判断」的转换能力与校准飞轮。数据源均通过合规商业采购 / API 对接——数据聚合与分析层，非数据囤积者。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Data Matrix · 06/17</span></div>
+</section>
+
+<section class="slide dark" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>The Loop</span></div><div class="right"><span>07/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">数据闭环 · 核心机制 · 越用越准</div>
+    <div class="h1-zh" style="margin-bottom:2.2vh">数据闭环，才是护城河</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.4vw;flex:1;align-content:center">
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.58vw;letter-spacing:.12em;opacity:.6;margin-bottom:.3vh">01 · 采集 · <span style="opacity:.95">5 源已接入</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw;margin-bottom:.3vh">九大另类数据源 + 公开数据</div>
+      <div style="font-size:.72vw;opacity:.84;line-height:1.5">多源异构信号</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.58vw;letter-spacing:.12em;opacity:.6;margin-bottom:.3vh">02 · 管道 · <span style="opacity:.95">搭建中</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw;margin-bottom:.3vh">ETL + 数据治理 + 语义解析</div>
+      <div style="font-size:.72vw;opacity:.84;line-height:1.5">结构化因子</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.58vw;letter-spacing:.12em;opacity:.6;margin-bottom:.3vh">03 · 决策 · <span style="opacity:.95">已可用</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw;margin-bottom:.3vh">E01-E15 分析协议 + 三引擎并行</div>
+      <div style="font-size:.72vw;opacity:.84;line-height:1.5">判断包（结论/推理链/来源/置信度/反证）</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.58vw;letter-spacing:.12em;opacity:.6;margin-bottom:.3vh">04 · 注册 · <span style="opacity:.95">已可用</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw;margin-bottom:.3vh">判断包写入预测注册表</div>
+      <div style="font-size:.72vw;opacity:.84;line-height:1.5">可验证的时间戳预测</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.58vw;letter-spacing:.12em;opacity:.6;margin-bottom:.3vh">05 · 验证 · <span style="opacity:.95">部分上线</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw;margin-bottom:.3vh">到期核对预测对错</div>
+      <div style="font-size:.72vw;opacity:.84;line-height:1.5">校准记录</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:.9vh">
+      <div style="font-family:var(--mono);font-size:.58vw;letter-spacing:.12em;opacity:.6;margin-bottom:.3vh">06 · 反哺 · <span style="opacity:.95">架构就绪</span></div>
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw;margin-bottom:.3vh">校准结果回灌模型与知识图谱</div>
+      <div style="font-size:.72vw;opacity:.84;line-height:1.5">更强的下一次判断</div>
+    </div>
+    </div>
+    <div class="rule" style="margin:2vh 0 0"></div>
+    <div style="font-size:.95vw;line-height:1.65;opacity:.86;margin-top:1.4vh">每一次决策都长进系统里——决策 → 数据 → 校准 → 更强的下一次。这是复利结构，不是流水线结构。<span class="accent">反事实</span>：如果闭环断开（判断不被验证），系统退化为一次性报告生成器——那就是竞品。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">The Loop · 07/17</span></div>
+</section>
+
+<section class="slide light" data-theme="light">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Decision Stack</span></div><div class="right"><span>08/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">Decision Stack · 数据 → 推理 → 判断 · 为持续改进设计</div>
+    <div class="h1-zh" style="margin-bottom:2.4vh">TRIO Decision Stack</div>
+    <div style="display:flex;flex-direction:column;gap:1.8vh;flex:1;justify-content:center">
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:1.2vh;display:grid;grid-template-columns:1.4fr 3fr;gap:2vw;align-items:start">
+      <div><div style="font-family:var(--serif-zh);font-weight:900;font-size:1.2vw">判断层 ★</div><div style="font-family:var(--mono);font-size:.6vw;opacity:.6;margin-top:.4vh">已可用</div></div>
+      <div><div style="font-family:var(--serif-zh);font-weight:700;font-size:.96vw;margin-bottom:.4vh">判断包 + 预测注册 + 校准</div><div style="font-size:.76vw;opacity:.84;line-height:1.6">输出带推理链/来源/置信度/反证的判断包；每次判断注册、到期验证、校准回弹</div></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:1.2vh;display:grid;grid-template-columns:1.4fr 3fr;gap:2vw;align-items:start">
+      <div><div style="font-family:var(--serif-zh);font-weight:900;font-size:1.2vw">推理层</div><div style="font-family:var(--mono);font-size:.6vw;opacity:.6;margin-top:.4vh">已可用</div></div>
+      <div><div style="font-family:var(--serif-zh);font-weight:700;font-size:.96vw;margin-bottom:.4vh">三引擎互证 + E01-E15 分析协议</div><div style="font-size:.76vw;opacity:.84;line-height:1.6">DeepSeek V4 Pro / Kimi K3 / GLM-5.2 独立推理，分歧即信号</div></div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:1.2vh;display:grid;grid-template-columns:1.4fr 3fr;gap:2vw;align-items:start">
+      <div><div style="font-family:var(--serif-zh);font-weight:900;font-size:1.2vw">数据层</div><div style="font-family:var(--mono);font-size:.6vw;opacity:.6;margin-top:.4vh">搭建中（5 源已通）</div></div>
+      <div><div style="font-family:var(--serif-zh);font-weight:700;font-size:.96vw;margin-bottom:.4vh">九大多源经营数据 + 本地化底座</div><div style="font-size:.76vw;opacity:.84;line-height:1.6">九源接入 · NAS 数据不出内网 · 云端脱敏推理</div></div>
+    </div>
+    </div>
+    <div class="rule" style="margin:2vh 0 0"></div>
+    <div style="margin-top:1.6vh;font-size:.88vw;line-height:1.65;opacity:.86"><span class="accent">工程证据</span>：知识图谱 26,846 关系 · 三引擎判断包已产出 · 预测注册表架构就绪——闭环不是 PPT，是已运行的系统。</div>
+    <div style="font-size:.92vw;line-height:1.6;opacity:.82;margin-top:1.2vh">判断层与推理层逻辑已完成，数据层核心源已通——上付费墙前先打通数据管道剩余源，避免「底层未通、上层先收费」。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Decision Stack · 08/17</span></div>
+</section>
+
+<section class="slide dark" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Three-Engine System</span></div><div class="right"><span>09/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">三个世界级模型 · 独立权重 · 认知隔离落地</div>
+    <div class="h1-zh" style="margin-bottom:2.4vh">三个世界级模型，一套判断系统</div>
+    <div class="grid-3" style="gap:2vw">
+      <div class="hub-card"><div class="hub-t">01 · 推理引擎</div><div class="hub-k">DeepSeek V4 Pro</div><div class="hub-b">通用 · 高性价比。承担通用推理、知识广度与交叉校验的底噪。</div></div>
+      <div class="hub-card"><div class="hub-t">02 · 审计引擎</div><div class="hub-k">Kimi K3</div><div class="hub-b">长程 · 多模态。原生视觉理解，1M 上下文——承担长程任务、多模态解析与独立反证。</div></div>
+      <div class="hub-card"><div class="hub-t">03 · 交付引擎</div><div class="hub-k">GLM-5.2</div><div class="hub-b">长上下文 · 规范。1M 上下文真实可用——承担长上下文分析、工程交付与规范保持。</div></div>
+    </div>
+    <div style="margin-top:2vh;font-size:.9vw;line-height:1.6;opacity:.82"><span class="accent">为什么是三个</span>：单模型多 prompt 只是"一个人的三种措辞"。三个前沿模型独立权重，才是真正的认知隔离——分歧本身就是信息。为什么不用 GPT/Claude：数据合规（可部署 NAS 本地）+ 成本可控 + 供应商独立互证。</div>
+    <div class="rule" style="margin:2vh 0 0"></div>
+    <div style="font-size:.92vw;line-height:1.6;opacity:.82;margin-top:1.4vh">判断包五要素：结论 · 推理链 · 数据来源 · 置信度 · 反证。三引擎是壁垒的当前配置，隔离性来自供应商独立与互证机制，而非引擎数量。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Three-Engine · 09/17</span></div>
+</section>
+
+<section class="slide light" data-theme="light">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Competitive Map</span></div><div class="right"><span>10/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">Competitive Map · 为什么我们不同</div>
+    <div class="h1-zh" style="margin-bottom:2vh">数据不缺，判断闭环缺</div>
+    <div style="border-top:2px solid rgba(var(--accent-rgb),.5)">
+      <div style="display:grid;grid-template-columns:1.5fr 1fr 1.7fr 1.2fr 1.2fr 1.2fr;gap:.8vw;padding:.8vh 1vw;font-family:var(--mono);font-size:.56vw;letter-spacing:.1em;opacity:.6"><span>玩家</span><span>数据广度</span><span>判断闭环</span><span>本地化</span><span>部署</span><span>价格带</span></div>
+      <div style="display:grid;grid-template-columns:1.5fr 1fr 1.7fr 1.2fr 1.2fr 1.2fr;gap:.8vw;padding:.8vh 1vw;border-bottom:1px solid rgba(var(--accent-rgb),.18);background:rgba(var(--accent-rgb),.1)">
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">TRIO 3.0</div><div style="font-size:.75vw;opacity:.85">九大多源</div><div style="font-size:.75vw;opacity:.85">✅ 预测注册+校准</div><div style="font-size:.75vw;opacity:.85">✅ NAS 不出内网</div><div style="font-size:.75vw;opacity:.85">轻量交付</div><div style="font-size:.75vw;opacity:.85">5-150 万/年</div>
+    </div><div style="display:grid;grid-template-columns:1.5fr 1fr 1.7fr 1.2fr 1.2fr 1.2fr;gap:.8vw;padding:.8vh 1vw;border-bottom:1px solid rgba(var(--accent-rgb),.18);">
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">明略 DeepMiner</div><div style="font-size:.75vw;opacity:.85">80+ 数据源</div><div style="font-size:.75vw;opacity:.85">⚠️ 可信但重</div><div style="font-size:.75vw;opacity:.85">私有云</div><div style="font-size:.75vw;opacity:.85">重实施 · FDE</div><div style="font-size:.75vw;opacity:.85">大客户定制</div>
+<div style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">Palantir Foundry</div><div style="font-size:.75vw;opacity:.85">客户自带</div><div style="font-size:.75vw;opacity:.85">⚠️ 定制报告</div><div style="font-size:.75vw;opacity:.85">私有化</div><div style="font-size:.75vw;opacity:.85">重实施</div><div style="font-size:.75vw;opacity:.85">500 万+/年</div>
+    </div><div style="display:grid;grid-template-columns:1.5fr 1fr 1.7fr 1.2fr 1.2fr 1.2fr;gap:.8vw;padding:.8vh 1vw;border-bottom:1px solid rgba(var(--accent-rgb),.18);">
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">Bloomberg</div><div style="font-size:.75vw;opacity:.85">金融终端</div><div style="font-size:.75vw;opacity:.85">❌ 只给数据</div><div style="font-size:.75vw;opacity:.85">❌ 云端</div><div style="font-size:.75vw;opacity:.85">席位制</div><div style="font-size:.75vw;opacity:.85">20 万+/席</div>
+    </div><div style="display:grid;grid-template-columns:1.5fr 1fr 1.7fr 1.2fr 1.2fr 1.2fr;gap:.8vw;padding:.8vh 1vw;border-bottom:1px solid rgba(var(--accent-rgb),.18);">
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">月狐 / 四象</div><div style="font-size:.75vw;opacity:.85">单一源</div><div style="font-size:.75vw;opacity:.85">❌ 原始数据</div><div style="font-size:.75vw;opacity:.85">❌</div><div style="font-size:.75vw;opacity:.85">API</div><div style="font-size:.75vw;opacity:.85">5-50 万/年</div>
+    </div><div style="display:grid;grid-template-columns:1.5fr 1fr 1.7fr 1.2fr 1.2fr 1.2fr;gap:.8vw;padding:.8vh 1vw;border-bottom:1px solid rgba(var(--accent-rgb),.18);">
+      <div style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">直接调大模型</div><div style="font-size:.75vw;opacity:.85">无</div><div style="font-size:.75vw;opacity:.85">❌ 通用回答</div><div style="font-size:.75vw;opacity:.85">❌</div><div style="font-size:.75vw;opacity:.85">API</div><div style="font-size:.75vw;opacity:.85">按 token</div>
+    </div>
+    </div>
+    <div class="rule" style="margin:2vh 0 0"></div>
+    <div style="font-size:.92vw;line-height:1.6;opacity:.84;margin-top:1.4vh">大模型厂商握着推理，不生产可信输入；数据商握着数据，不做校准判断；明略 / Palantir 做了闭环但重实施、大客户导向。我们站在中间——中小企业 + 判断层 + 合规 + NAS，这是它们让出来的位置。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Competitive Map · 10/17</span></div>
+</section>
+
+<section class="slide dark" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Verification</span></div><div class="right"><span>11/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">长短期平衡 · 对抗周期效应 · 判断可以被验证</div>
+    <div class="h1-zh" style="margin-bottom:2.6vh">判断可以被验证，系统才能变准</div>
+    <div class="grid-2" style="gap:2vw">
+      <div class="hub-card"><div class="hub-t">痛点 · 周期效应</div><div class="hub-k">Horizon Effect</div><div class="hub-b">短期高频另类数据诱导决策者把认知资源全部投向眼前脉冲，长期判断精度持续下滑。所有短期高频数据都有这个内在缺陷。</div></div>
+      <div class="hub-card"><div class="hub-t">解法一 · 预测注册</div><div class="hub-k">长短期分层管理</div><div class="hub-b">每个附带时间维度的结论写入预测注册表，标记可验证日期与验证方法——不被短期脉冲绑架。</div></div>
+      <div class="hub-card"><div class="hub-t">解法二 · 决策日志</div><div class="hub-k">校准依据可追溯</div><div class="hub-b">每次判断留下完整推理链与数据来源——校准依据可追溯，判断不是一次性消耗品。</div></div>
+      <div class="hub-card"><div class="hub-t">解法三 · 校准回测</div><div class="hub-k">让系统学会不写权威感的错话</div><div class="hub-b">到期核对预测对错，错误项季度汇总，识别系统性偏差模式。</div></div>
+    </div>
+    <div class="rule" style="margin:2vh 0 0"></div>
+    <div style="font-size:.95vw;line-height:1.65;opacity:.86;margin-top:1.4vh"><span class="accent">AI 最大的风险不是生成错误，而是不知道自己错过了什么</span>——预测注册就是为了对抗这种沉默失败。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Verification · 11/17</span></div>
+</section>
+
+<section class="slide light" data-theme="light">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Moat</span></div><div class="right"><span>12/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">四条护城河 · 每一条都在使用中变深</div>
+    <div class="h1-zh" style="margin-bottom:2.4vh">护城河</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.6vw 2.4vw;flex:1;align-content:center">
+      <div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:1vh">
+      <div style="display:flex;align-items:baseline;gap:1vw;margin-bottom:.4vh"><span style="font-family:var(--mono);font-size:1.4vw;font-weight:600;color:var(--accent)">01</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:1.1vw">分析管道</span></div>
+      <div style="font-size:.8vw;opacity:.84;line-height:1.6">把九大另类数据源转化为结构化输入，从卫星信号、工商司法、专利招投标到可分析因子。</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:1vh">
+      <div style="display:flex;align-items:baseline;gap:1vw;margin-bottom:.4vh"><span style="font-family:var(--mono);font-size:1.4vw;font-weight:600;color:var(--accent)">02</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:1.1vw">决策压缩</span></div>
+      <div style="font-size:.8vw;opacity:.84;line-height:1.6">把百万级信息压缩成一个可执行判断，交付的是判断包而非原始数据。</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:1vh">
+      <div style="display:flex;align-items:baseline;gap:1vw;margin-bottom:.4vh"><span style="font-family:var(--mono);font-size:1.4vw;font-weight:600;color:var(--accent)">03</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:1.1vw">决策方法论体系</span></div>
+      <div style="font-size:.8vw;opacity:.84;line-height:1.6">模型会换代，判断标准不会。E01-E15 分析协议是 LLM 之上的方法论层。</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.35);padding-top:1vh">
+      <div style="display:flex;align-items:baseline;gap:1vw;margin-bottom:.4vh"><span style="font-family:var(--mono);font-size:1.4vw;font-weight:600;color:var(--accent)">04</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:1.1vw">数据闭环</span></div>
+      <div style="font-size:.8vw;opacity:.84;line-height:1.6">积累的不是数据，是判断经验——每一个用户的每次校准，都在为所有用户贡献更强的基础判断。</div>
+    </div>
+    </div>
+    <div class="rule" style="margin:2vh 0 0"></div>
+    <div style="display:flex;gap:3vw;margin-top:1.6vh;font-size:.85vw;opacity:.78">
+      <span><span class="accent">不竞争</span> · 数据存储（存储是管道一环）</span><span>不竞争 · 普通聊天机器人（TRIO 交付判断）</span><span>不竞争 · 单次报告生成（每次判断都在加固系统）</span>
+    </div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Moat · 12/17</span></div>
+</section>
+
+<section class="slide dark" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Go-to-Market</span></div><div class="right"><span>13/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">B 端主轮造血 · C 端获客承接</div>
+    <div class="h1-zh" style="margin-bottom:1.4vh">主轮 + 获客轮</div>
+    <div style="font-family:var(--serif-zh);font-size:.95vw;line-height:1.65;opacity:.8;margin-bottom:1.6vh">双增长曲线：B 端数据 feed 主攻机构与企业收入，C 端决策工具承接规模——两条增长曲线，一个引擎。</div>
+    <div style="display:grid;grid-template-columns:1.3fr 2.2fr 1fr 1.5fr;gap:1vw;border-top:2px solid rgba(var(--accent-rgb),.5);padding-top:1vh;font-family:var(--mono);font-size:.56vw;letter-spacing:.1em;opacity:.6"><span>产品</span><span>定位</span><span>定价</span><span>交付物</span></div>
+    <div>
+      <div style="display:grid;grid-template-columns:1.3fr 2.2fr 1fr 1.5fr;gap:1vw;padding:.9vh 0;align-items:center;border-bottom:1px solid rgba(var(--accent-rgb),.18)"><span style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw">TRIO Insight</span><span style="font-size:.78vw;opacity:.86">大型机构 · 金融 + 专业服务</span><span style="font-family:var(--mono);font-size:.8vw">50-150万/年</span><span style="font-size:.78vw;opacity:.86">API / 周报 / 判断包</span></div>
+      <div style="display:grid;grid-template-columns:1.3fr 2.2fr 1fr 1.5fr;gap:1vw;padding:.9vh 0;align-items:center;border-bottom:1px solid rgba(var(--accent-rgb),.18)"><span style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw">TRIO Enterprise</span><span style="font-size:.78vw;opacity:.86">中小企业 · 行业模板</span><span style="font-family:var(--mono);font-size:.8vw">5-20万/年</span><span style="font-size:.78vw;opacity:.86">看板 / 季度报告 / 判断包</span></div>
+      <div style="display:grid;grid-template-columns:1.3fr 2.2fr 1fr 1.5fr;gap:1vw;padding:.9vh 0;align-items:center;border-bottom:1px solid rgba(var(--accent-rgb),.18)"><span style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw">TRIO Lite</span><span style="font-size:.78vw;opacity:.86">C 端获客轮（收入 &lt;20%）</span><span style="font-family:var(--mono);font-size:.8vw">¥199/499/999</span><span style="font-size:.78vw;opacity:.86">可视化 + 行业观察 + 判断体检</span></div>
+    </div>
+    <div style="margin-top:1.6vh;font-size:.9vw;line-height:1.7;opacity:.9;font-family:var(--serif-zh)"><span class="accent">同一镜像，多行业问题</span>：量化读营收，贸易商读库存，保险读风险，律所读尽调，制造企业读信用——一个引擎，多种决策。</div>
+    <div style="margin-top:1vh;font-size:.82vw;line-height:1.65;opacity:.86"><span class="accent">第一梯队 · 已验证 / 最短路径</span>：量化基金 · 期货公司 · 大宗商品贸易商（含国企） · 保险公司 · 律所 / 会所</div>
+    <div style="margin-top:.6vh;font-size:.76vw;line-height:1.6;opacity:.72">→ 营收预测 · 供需缺口 · 采购套保时点 · 灾害估损与反欺诈 · 尽调取证</div>
+    <div style="margin-top:1vh;font-size:.82vw;line-height:1.65;opacity:.86"><span class="accent">扩展梯队 · 灯塔复制</span>：制造中小企业 · 消费零售 · 物流供应链 · 政府园区</div>
+    <div style="margin-top:.4vh;font-size:.76vw;line-height:1.6;opacity:.72">→ 客户信用预警 · 渠道动销 · 选品备货 · 招商画像</div>
+    <div style="margin-top:.8vh;font-size:.82vw;line-height:1.65;opacity:.86"><span class="accent">长尾订阅</span>：中小企业主 · 职业决策者 · 分析师 / 自媒体</div>
+    <div style="margin-top:1.4vh;font-size:.82vw;line-height:1.65;opacity:.82"><span class="accent">单位经济</span>：机构客单价 80 万/年 · 数据成本 &lt;20% · 毛利 &gt;60% · LTV/CAC &gt;3×。单次判断包成本 &lt;¥0.5。</div>
+    <div style="margin-top:1vh;font-size:.82vw;line-height:1.65;opacity:.82"><span class="accent">终端</span>：云端 API ｜ NAS 本地化——数据不出本地的独家交付形态。NAS 是真实付费点。</div>
+    <div class="rule" style="margin:1.6vh 0 0"></div>
+    <div style="font-size:.9vw;line-height:1.6;opacity:.84;margin-top:1.2vh"><span class="accent">本周付费验证计划</span>：向 20 家高意向内测用户发送付费邀请，首批 3 种套餐限量 15 席。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Go-to-Market · 13/17</span></div>
+</section>
+
+<section class="slide light ms-compact" data-theme="light">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Milestones</span></div><div class="right"><span>14/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">Milestones · 本周 → 2028 · 每阶段一个可验证突破</div>
+    <div class="h1-zh" style="margin-bottom:1.6vh">里程碑路线</div>
+    <div style="display:grid;grid-template-columns:1.1fr 1.5fr 3fr 1.8fr;gap:1vw;border-top:2px solid rgba(var(--accent-rgb),.5);padding-top:.8vh;font-family:var(--mono);font-size:.56vw;letter-spacing:.1em;opacity:.6"><span>时间</span><span>里程碑</span><span>关键动作</span><span>前置条件</span></div>
+    <div style="display:grid;grid-template-columns:1.1fr 1.5fr 3fr 1.8fr;gap:1vw;padding:1vh 0;border-bottom:1px solid rgba(var(--accent-rgb),.15);align-items:start">
+      <span style="font-family:var(--mono);font-size:.8vw;opacity:.85">本周</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">付费验证启动</span><span style="font-size:.76vw;opacity:.82;line-height:1.55">200 用户跑付费转化 → 金融 3-5 家发邀请 → 律所/会所首批转付费</span><span style="font-size:.7vw;opacity:.6;line-height:1.5">前置：剩余数据源采购到位</span>
+    </div><div style="display:grid;grid-template-columns:1.1fr 1.5fr 3fr 1.8fr;gap:1vw;padding:1vh 0;border-bottom:1px solid rgba(var(--accent-rgb),.15);align-items:start">
+      <span style="font-family:var(--mono);font-size:.8vw;opacity:.85">90 天</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">付费转化率证据</span><span style="font-size:.76vw;opacity:.82;line-height:1.55">付费转化率 ≥10% → 金融 1 家量化付费 → 首个非金融付费合同</span><span style="font-size:.7vw;opacity:.6;line-height:1.5">前置：数据管道最小可用版打通</span>
+    </div><div style="display:grid;grid-template-columns:1.1fr 1.5fr 3fr 1.8fr;gap:1vw;padding:1vh 0;border-bottom:1px solid rgba(var(--accent-rgb),.15);align-items:start">
+      <span style="font-family:var(--mono);font-size:.8vw;opacity:.85">12 个月</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">ARR 起步</span><span style="font-size:.76vw;opacity:.82;line-height:1.55">金融 1-2 家签约 → 2-3 家非金融付费 → C 端上线 → ARR ¥100-300 万</span><span style="font-size:.7vw;opacity:.6;line-height:1.5">前置：预测注册表上线</span>
+    </div><div style="display:grid;grid-template-columns:1.1fr 1.5fr 3fr 1.8fr;gap:1vw;padding:1vh 0;border-bottom:1px solid rgba(var(--accent-rgb),.15);align-items:start">
+      <span style="font-family:var(--mono);font-size:.8vw;opacity:.85">2026.H2</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">多星座数据接入</span><span style="font-size:.76vw;opacity:.82;line-height:1.55">接入国内星座数据（纯数据合作）→ 金融 10 只标的回测 → 场景模板</span><span style="font-size:.7vw;opacity:.6;line-height:1.5">前置：数据管道全通</span>
+    </div><div style="display:grid;grid-template-columns:1.1fr 1.5fr 3fr 1.8fr;gap:1vw;padding:1vh 0;border-bottom:1px solid rgba(var(--accent-rgb),.15);align-items:start">
+      <span style="font-family:var(--mono);font-size:.8vw;opacity:.85">2027</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">双轨收入</span><span style="font-size:.76vw;opacity:.82;line-height:1.55">金融 2-3 家私募 + 保险首单 → 3 个非金融付费 → 付费 10+</span><span style="font-size:.7vw;opacity:.6;line-height:1.5">前置：场景模板验证</span>
+    </div><div style="display:grid;grid-template-columns:1.1fr 1.5fr 3fr 1.8fr;gap:1vw;padding:1vh 0;border-bottom:1px solid rgba(var(--accent-rgb),.15);align-items:start">
+      <span style="font-family:var(--mono);font-size:.8vw;opacity:.85">2028</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.9vw">A 轮</span><span style="font-size:.76vw;opacity:.82;line-height:1.55">美股 6,000+ 覆盖 → 场景模板 8+ · 数据源 30+ → 年营收 ¥1,500-2,500 万</span><span style="font-size:.7vw;opacity:.6;line-height:1.5">前置：双轨收入稳定</span>
+    </div>
+    <div style="font-size:.82vw;line-height:1.6;opacity:.78;margin-top:1.2vh">推导链：¥2,000 万营收 ≈ 大型机构 15 家（均价 100 万）+ 中小企业 40 家（均价 10 万）+ C 端 2,000 人（¥500）。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Milestones · 14/17</span></div>
+</section>
+
+<section class="slide dark" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Risk Map</span></div><div class="right"><span>15/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">风险与应对 · 竞品与结构性风险</div>
+    <div class="h1-zh" style="margin-bottom:2vh">风险与应对</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.6vw 2.4vw;flex:1;align-content:center">
+      <div><div style="border-top:2px solid rgba(var(--accent-rgb),.3);padding-top:.8vh;margin-bottom:1.4vh">
+      <div style="display:flex;gap:1vw;align-items:baseline;margin-bottom:.3vh"><span style="font-family:var(--mono);font-size:.7vw;color:var(--accent)">F</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw">月狐另类数据先发</span></div>
+      <div style="font-size:.78vw;opacity:.82;line-height:1.5">→ 判断深度 + 多场景矩阵差异化</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.3);padding-top:.8vh;margin-bottom:1.4vh">
+      <div style="display:flex;gap:1vw;align-items:baseline;margin-bottom:.3vh"><span style="font-family:var(--mono);font-size:.7vw;color:var(--accent)">F</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw">四象跑通机构付费</span></div>
+      <div style="font-size:.78vw;opacity:.82;line-height:1.5">→ 九大数据源 + 双端布局，不押单一卫星叙事</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.3);padding-top:.8vh;margin-bottom:1.4vh">
+      <div style="display:flex;gap:1vw;align-items:baseline;margin-bottom:.3vh"><span style="font-family:var(--mono);font-size:.7vw;color:var(--accent)">F</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw">Orbital Insight 陨落</span></div>
+      <div style="font-size:.78vw;opacity:.82;line-height:1.5">→ 已有 200 用户验证非卫星交付能力，闭环不依赖单一数据源</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.3);padding-top:.8vh;margin-bottom:1.4vh">
+      <div style="display:flex;gap:1vw;align-items:baseline;margin-bottom:.3vh"><span style="font-family:var(--mono);font-size:.7vw;color:var(--accent)">F</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw">信号价值衰减不可逆</span></div>
+      <div style="font-size:.78vw;opacity:.82;line-height:1.5">→ 卖分析框架与工具 · 判断包五要素方法论</div>
+    </div><div style="border-top:2px solid rgba(var(--accent-rgb),.3);padding-top:.8vh;margin-bottom:1.4vh">
+      <div style="display:flex;gap:1vw;align-items:baseline;margin-bottom:.3vh"><span style="font-family:var(--mono);font-size:.7vw;color:var(--accent)">H</span><span style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw">垂直场景打不通，收入过度依赖金融</span></div>
+      <div style="font-size:.78vw;opacity:.82;line-height:1.5">→ 金融现金流造血，同一管道横向复制场景；只做场景模板</div>
+    </div></div>
+      <div>
+        <div style="border-top:2px solid rgba(var(--accent-rgb),.3);padding-top:.8vh;margin-bottom:1.4vh"><div style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw;margin-bottom:.3vh">主要对标：Palantir Foundry</div><div style="font-size:.78vw;opacity:.82;line-height:1.5">证明了企业决策系统是真市场——但重实施、慢、贵、定制项目制；我们以已验证金融场景 + 本地化交付 + 数据闭环，做可规模化交付的通用决策系统。</div></div>
+        <div style="border-top:2px solid rgba(var(--accent-rgb),.3);padding-top:.8vh"><div style="font-family:var(--serif-zh);font-weight:700;font-size:.95vw;margin-bottom:.3vh">结构性风险</div><div style="font-size:.76vw;opacity:.82;line-height:1.6">另类数据成本合规 → 多源对冲 + 合规优先（只整合不荐股）<br>周期效应 → 预测注册长短期分层 · 校准回测<br>数据噪声 → 九大矩阵互补 + AI 融合降噪<br>C 端合规边界 → 信息发布备案 + 只整合不荐股<br>供应商断供 → 多源对冲 3+ 数据源</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Risk Map · 15/17</span></div>
+</section>
+
+<section class="slide dark accent-bg" data-theme="dark">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Team · The Ask</span></div><div class="right"><span>16/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">Team · 种子轮看人 ｜ The Ask · Seed Round</div>
+    <div class="h1-zh" style="margin-bottom:2.2vh">本轮融资</div>
+    <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:2.4vw;flex:1;align-content:center">
+      <div>
+        <div style="font-family:var(--serif-zh);font-weight:700;font-size:1.05vw;margin-bottom:1vh">团队</div>
+        <div style="font-size:.8vw;opacity:.88;line-height:1.75">
+          <span class="accent">创始人</span>：[待填] 姓名 · 背景<br>
+          <span style="opacity:.72">行业经验 / 技术能力 / 赛道理解——为什么是 TA</span><br>
+          <span class="accent">核心成员</span>：[待填] 技术 / 数据 / 销售<br>
+          <span style="opacity:.72">各一句话介绍 · 覆盖技术 / 数据 / 市场三支柱</span><br>
+          <span class="accent">专家顾问</span>：[待填] 领域带头人<br>
+          <span style="opacity:.72">技术路线背书 · 空间信息 / 数据领域专家</span><br>
+          <span style="opacity:.6">本轮拟招：技术 + BD + 数据</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--serif-zh);font-weight:700;font-size:1.05vw;margin-bottom:1vh">融资条款</div>
+        <div style="font-size:.8vw;opacity:.86;line-height:1.7">Seed Round · 把验证变成证据<br>¥500-1000 万 · 覆盖 18 个月发育周期<br>资金用途：产品 &amp; 数据 40% · 团队 35% · 销售 &amp; PoC 25%</div>
+      </div>
+    </div>
+    <div class="rule" style="margin:2vh 0 0"></div>
+    <div style="margin-top:1.6vh;font-size:.9vw;line-height:1.6;opacity:.88">种子轮看验证，不看闭环。200 用户和律所会所意向已证明「有人想要」——金融场景第一个跑通，这轮把它签成 3-5 份付费合同，并验证同一套管道向专业服务复制的路径。</div>
+    <div style="margin-top:1.2vh;font-family:var(--serif-zh);font-size:1.05vw;line-height:1.7;opacity:.95">Palantir 重、Bloomberg 窄。我们做可规模化的判断闭环——金融起步，赋能产业。</div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">The Ask · 16/17</span></div>
+</section>
+
+
+<section class="slide light" data-theme="light">
+  <div class="chrome"><div class="left"><span>TRIO 3.0</span><span class="sep"></span><span>Appendix</span></div><div class="right"><span>17/17</span></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">Appendix · 技术支撑 · 八层架构全貌 + 引擎跑分 + 学术引用</div>
+    <div class="h1-zh" style="margin-bottom:2vh">技术附录</div>
+    <div style="display:grid;grid-template-columns:1.2fr 1.2fr;gap:2vw;flex:1;align-content:center">
+      <div>
+        <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.8vh">八层架构全貌</div>
+        <div style="font-size:.76vw;line-height:1.9;opacity:.85">
+          L7 体验层 · 终端入口（AI 终端 · 手机/PWA · 桌面 · NAS 接口）<br>
+          L6 应用层 · 经营分析 / 职业决策 / Knowledge OS<br>
+          L5 决策核心 ★ · L0-L14 分析引擎 · 判断包 · 预测注册<br>
+          L4 AI 运行时 · 三引擎路由 · Agent 编排 · RAG<br>
+          L3 上下文编排 ★ · MCP 协议 · 事件总线<br>
+          L2 认知记忆 ★ · Neo4j 图谱 26,846 关系 · 向量语义<br>
+          L1 数据接入 ★ · 九大合规源 · ETL · 数据治理<br>
+          L0 物理底座 · Linux · Docker · NAS 本地化
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.8vh">三引擎跑分（截至 2026.08）</div>
+        <div style="font-size:.76vw;line-height:1.9;opacity:.85">
+          DeepSeek V4 Pro · LiveCodeBench 93.5%（发布时全球第一）<br>
+          Kimi K3 · 六项基准全球第一（SWE Marathon / 前端 Code Arena）<br>
+          GLM-5.2 · 编码分类盲测全球第一<br>
+          <span style="opacity:.6">跑分有时效，正文只留分工逻辑</span>
+        </div>
+        <div style="margin-top:1.4vh;font-family:var(--serif-zh);font-weight:700;font-size:1vw;margin-bottom:.5vh">核心学术锚点</div>
+        <div style="font-size:.76vw;line-height:1.9;opacity:.85">
+          Dugast &amp; Foucault, "Equilibrium Data Mining and Data Abundance", J. Finance 2025, Vol.80(1) pp.211-258<br>
+          <span style="opacity:.6">另类数据 → 判断价值的顶刊背书</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>TRIO 3.0</span><span class="title">Appendix · 17/17</span></div>
+</section>
+
+
+<nav id="nav"></nav>
+<div id="hint">← → 翻页</div>
+
+<script>
+// ═══════════ WebGL 背景 ═══════════
+(function(){
+  var dark=document.getElementById("bg-dark"),light=document.getElementById("bg-light");
+  function initCanvas(canvas){
+    var ctx=canvas.getContext("2d");
+    function fit(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+    fit();window.addEventListener("resize",fit);
+    var W=window.innerWidth,H=window.innerHeight;
+    var stars=[];for(var i=0;i<300;i++)stars.push({x:Math.random()*2000,y:Math.random()*2000,r:.3+Math.random()*1.2,a:.2+Math.random()*.4});
+    function draw(ts){
+      if(document.body.classList.contains("low-power")){requestAnimationFrame(draw);return}
+      canvas.width=W;canvas.height=H;
+      ctx.clearRect(0,0,W,H);
+      var t=ts/10000;
+      stars.forEach(function(s){
+        ctx.beginPath();ctx.arc(s.x%W,(s.y+t*8)%H,s.r,0,Math.PI*2);
+        ctx.fillStyle="rgba(26,59,124,"+(s.a*.3)+")";ctx.fill();
+      });
+      ctx.strokeStyle="rgba(26,59,124,.04)";ctx.lineWidth=.5;
+      for(var x=0;x<W;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+      for(var y=0;y<H;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  }
+  initCanvas(dark);initCanvas(light);
+})();
+
+// ═══════════ Deck 导航 ═══════════
+(function(){
+  var deck=document.getElementById("deck"),slides=deck.querySelectorAll(".slide"),N=slides.length;
+  var idx=0,nav=document.getElementById("nav");
+  deck.style.width=N*100+"vw";
+  for(var i=0;i<N;i++){var d=document.createElement("button");d.className="dot";d.onclick=(function(j){return function(){go(j)}})(i);nav.appendChild(d)}
+  var dots=nav.querySelectorAll(".dot");
+  function go(i){
+    idx=Math.max(0,Math.min(N-1,i));
+    deck.style.transform="translateX(-"+idx+"00vw)";
+    dots.forEach(function(d,j){d.classList.toggle("active",j===idx)});
+    document.body.className=slides[idx].dataset.theme==="dark"?"dark-bg":"light-bg";
+  }
+  window.addEventListener("keydown",function(e){
+    if(e.key==="ArrowRight"||e.key==="ArrowDown"||e.key===" "){e.preventDefault();go(idx+1)}
+    if(e.key==="ArrowLeft"||e.key==="ArrowUp"){e.preventDefault();go(idx-1)}
+  });
+  var tx=0;window.addEventListener("touchstart",function(e){tx=e.touches[0].clientX});
+  window.addEventListener("touchend",function(e){var dx=tx-e.changedTouches[0].clientX;if(Math.abs(dx)>50)go(idx+(dx>0?1:-1))});
+  go(0);
+})();
+</script>
+</body>
+</html>

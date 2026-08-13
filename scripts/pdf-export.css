@@ -1,0 +1,104 @@
+/* ================================================================
+   TRIO 3.0 PDF 排版样式 v5 — 参考 Eisvogel + IBM Design + Butterick
+   设计原则: 高对比度 / 清晰层级 / 克制的装饰 / 舒适的阅读节奏
+   ================================================================ */
+
+/* ── 字体 (weasyprint 通过 fontconfig 解析) ── */
+
+/* ── 页面 ── */
+@page {
+  size: A4;
+  margin: 2.5cm 2.2cm 2.2cm 2.2cm;
+  @bottom-center { content: counter(page); font-family: 'Noto Sans CJK SC'; font-size: 8pt; color: #aaa; }
+}
+@page:first { @bottom-center { content: none; } }
+
+/* ── 正文 ── */
+body {
+  font-family: 'Noto Sans CJK SC', sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.75;
+  color: #1a1a1a;
+  max-width: 100%;
+}
+
+/* ── 标题 ── */
+h1 {
+  font-size: 22pt; font-weight: 900; color: #111;
+  margin: 0 0 8px 0; padding-bottom: 10px;
+  border-bottom: 3.5px solid #1a1a1a;
+}
+h2 {
+  font-size: 13pt; font-weight: 700; color: #1a1a1a;
+  margin: 30px 0 12px 0; padding-bottom: 4px;
+  border-bottom: 1px solid #ccc;
+}
+h3 {
+  font-size: 11pt; font-weight: 700; color: #1a1a1a;
+  margin: 22px 0 8px 0; padding-left: 10px;
+  border-left: 3px solid #1a1a1a;
+}
+h4 { font-size: 10.5pt; font-weight: 700; color: #333; margin: 16px 0 4px 0; }
+
+/* ── 段落 ── */
+p { margin: 0 0 6px 0; orphans: 3; widows: 3; }
+
+/* ── 表格 (Eisvogel 风格: 顶底线 + 细横线) ── */
+table {
+  width: 100%; border-collapse: collapse;
+  margin: 14px 0; font-size: 9pt;
+  border-top: 2px solid #1a1a1a;
+  border-bottom: 1px solid #1a1a1a;
+}
+thead th {
+  font-weight: 700; font-size: 8.5pt; color: #1a1a1a;
+  padding: 9px 10px 7px 10px; text-align: left;
+  border-bottom: 1.5px solid #1a1a1a;
+}
+tbody td {
+  padding: 6px 10px; vertical-align: top;
+  border-bottom: 0.5px solid #e0e0e0;
+}
+tbody tr:last-child td { border-bottom: none; }
+
+/* ── 引用 ── */
+blockquote {
+  border-left: 3px solid #555;
+  padding: 8px 16px; margin: 12px 0;
+  background: #fafafa; color: #444; font-size: 10pt;
+}
+blockquote p { margin: 0; }
+
+/* ── 代码 ── */
+code {
+  font-family: 'DejaVu Sans Mono', monospace;
+  background: #f4f4f4; padding: 1px 5px;
+  font-size: 9pt; border-radius: 2px; color: #1a1a1a;
+}
+pre {
+  font-family: 'DejaVu Sans Mono', monospace;
+  background: #f7f7f7; border: 1px solid #e0e0e0;
+  padding: 12px 16px; font-size: 8pt; line-height: 1.55;
+  overflow-x: auto; margin: 12px 0; border-radius: 2px;
+}
+pre code { background: none; padding: 0; border: none; }
+
+/* ── 列表 ── */
+ul, ol { padding-left: 22px; margin: 6px 0; }
+li { margin: 3px 0; }
+
+/* ── 分隔线 ── */
+hr { border: none; border-top: 1px solid #ccc; margin: 24px 0; }
+
+/* ── 强调 ── */
+strong { font-weight: 700; color: #111; }
+
+/* ── 链接 ── */
+a { color: #1a1a1a; text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── 标题后的元信息块（pandoc 生成的 blockquote 紧接 h1） ── */
+h1 + blockquote {
+  border-left-color: #999; background: #fafafa;
+  font-size: 9.5pt; color: #666;
+  margin-top: 16px; margin-bottom: 28px;
+}

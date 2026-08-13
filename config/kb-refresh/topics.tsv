@@ -1,0 +1,41 @@
+# TRIO 3.0 知识刷新注册表						
+# 格式: id	path	category	last_refreshed	interval_days	priority	description
+# priority: 1=仅过期时刷新  2=低  3=中  4=高  5=关键						
+# last_refreshed: YYYY-MM-DD						
+client-portrait-01	knowledge/client-library/laodeng-portraits/01-ruiran-laodeng.md	client	2026-06-23	90	3	瑞燃客户画像——老邓关系图谱与互动策略
+relationship-framework	knowledge/client-library/亲密关系避雷框架-v0.2.md	framework	2026-06-23	180	2	亲密关系避雷框架——结构化评估模板
+eval-10dim	knowledge/evaluation-framework/10-dim-model.md	framework	2026-06-23	180	2	10维尽调评估模型——评分维度与权重
+scoring-guide	knowledge/evaluation-framework/scoring-guide.md	framework	2026-06-23	180	2	尽调评分指南——各维度打分细则
+trio-roadmap	research/roadmap.md	strategy	2026-06-24	30	4	TRIO研发路线图——版本演进与里程碑
+causal-analysis-methodology	knowledge/evaluation-framework/causal-analysis-methodology.md	custom	2026-06-24	180	4	因果分析方法论——因果阶梯、DAG构建、反事实检验、混淆变量检测
+context-engineering	knowledge/evaluation-framework/context-engineering.md	custom	2026-06-24	180	4	上下文工程方法论——上下文选择、衰减管理、Delta写入、上下文包传递规范
+index	knowledge/company-library/INDEX.md	custom	2026-06-24	30	5	AI公司逆向工程索引——收录公司、逆向日期、状态
+00-readme	knowledge/company-library/00-README.md	custom	2026-06-24	90	3	AI公司知识库使用指南
+index	knowledge/company-library/INDEX.md	custom	2026-06-24	30	5	AI公司逆向工程索引——收录公司、逆向日期、状态
+2026-06-24-	knowledge/capability-mirror/2026-06-24-首次能力镜像.md	custom	2026-07-03	7	5	首次能力镜像——4个确认能力+2个候选+2个盲点
+mini-trainer	knowledge/evaluation-framework/mini-trainer.md	custom	2026-06-24	180	3	迷你训练器——AI训练人的最小可行原型
+metrics	metrics.md	custom	2026-07-03	7	5	TRIO度量仪表盘——量化系统进步
+project-context	knowledge/project-context.md	custom	2026-07-03	7	5	TRIO项目上下文——跨run项目历史追踪
+10-dim-model	knowledge/evaluation-framework/10-dim-model.md	custom	2026-06-24	180	4	10维项目评估模型——含地缘政治风险维度（Manus案例新增）
+trio-self-check-20260624	knowledge/capability-mirror/trio-self-check-20260624.md	custom	2026-06-24	30	4	TRIO自检报告——系统能力评估与改进追踪
+00-readme	knowledge/client-library/00-README.md	custom	2026-06-24	90	3	客户库使用指南——客户画像管理与检索规范
+00-readme	knowledge/decision-log/00-README.md	custom	2026-06-24	90	3	决策日志使用指南——决策记录与检索规范
+scoring-template	knowledge/evaluation-framework/scoring-template.md	custom	2026-06-24	180	3	尽调评分模板——标准化评分输出格式
+client-portrait-template	knowledge/client-library/client-portrait-template.md	custom	2026-06-24	180	3	客户画像模板——标准化客户信息采集格式
+overview	knowledge/company-library/.template/overview.md	custom	2026-06-24	180	2	公司逆向工程模板——标准化公司信息采集格式
+architecture	docs/architecture.md	custom	2026-06-24	90	5	TRIO系统架构——四平面两回路
+capability-stack	docs/capability-stack.md	custom	2026-06-24	30	5	TRIO能力栈——14层81能力
+absorption-plan	docs/absorption-plan.md	custom	2026-06-24	30	5	TRIO全盘吸收计划——9画像×75家公司
+daily	DAILY.md	custom	2026-07-03	1	5	TRIO每日任务+学习记录
+metrics	metrics.md	custom	2026-07-03	1	5	TRIO度量仪表盘
+index	knowledge/people-library/INDEX.md	custom	2026-06-24	30	5	TRIO人物库——从65家公司提取的关键人物决策模式
+index	knowledge/signal-library/INDEX.md	custom	2026-06-24	30	5	TRIO信号库——早期预警指标+老登模型
+-	knowledge/evaluation-framework/五维穿透框架.md	custom	2026-06-24	180	5	五维穿透框架——尽调前置检查，不看人只看交易结构闭合度
+-	knowledge/evaluation-framework/六层因果链.md	custom	2026-06-24	180	5	六层因果链——分子→物理→工艺→系统→经济→商业，精确定位断裂层
+-	knowledge/evaluation-framework/八维认知框架.md	custom	2026-06-24	180	4	八维认知框架——进入陌生领域的认知扫描协议
+-	knowledge/超跑系统.md	custom	2026-06-24	90	5	超跑系统——五零五全，Rex个人执行协议
+-	knowledge/evaluation-framework/淘金式批判性提问.md	custom	2026-06-24	180	5	淘金式批判性提问——八维批判思维框架，不只验证事实，验证推理本身
+-	knowledge/evaluation-framework/紧致吸引子枚举.md	custom	2026-06-24	180	4	紧致吸引子枚举——企业存活形态的五种不可约简生成元
+-	knowledge/evaluation-framework/伪连通检测.md	custom	2026-06-24	180	4	伪连通检测——区分组织叙事连通与商业现实连通
+-	knowledge/evaluation-framework/技术同构度排序.md	custom	2026-06-24	180	4	技术同构度排序——从核心能力出发按同构度排序扩张路径
+index	knowledge/TRIO-本体/INDEX.md	custom	2026-06-24	30	5	TRIO本体索引——系统越用越厚的证据

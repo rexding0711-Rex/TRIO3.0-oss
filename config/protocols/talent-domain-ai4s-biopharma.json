@@ -1,0 +1,163 @@
+{
+  "name": "talent-domain-ai4s-biopharma",
+  "version": "1.0.0",
+  "type": "domain_config",
+  "engine_ref": "config/protocols/talent-reverse-trace-engine.json",
+  "template_ref": "config/protocols/talent-domain-config-template.json",
+  "description": "AI for Science 生物制药方向——从竞赛获奖到高校实验室到工业界人才池",
+  "tested_on": "2026-07-08 Ada 生物制药公司 AI4S 人才锁定需求",
+
+  "domain": {
+    "name": "ai4s_biopharma",
+    "display_name": "AI for Science · 生物制药",
+    "client_industry": "生物制药",
+    "typical_titles": ["计算生物学研究员", "AI药物设计工程师", "分子模拟科学家", "蛋白质设计研究员", "PROTAC/ADC AI平台工程师"]
+  },
+
+  "traces": {
+    "competitive": {
+      "enabled": true,
+      "competitions": [
+        {
+          "name": "CASP (Critical Assessment of Structure Prediction)",
+          "cycle": "每两年",
+          "authority": "蛋白质结构预测奥林匹克——与诺奖深度绑定(2024诺奖得主Jumper/Baker均在此做报告)",
+          "talent_value": "获奖者=全球蛋白质结构预测领域最高水平。可直接用于药物靶点结构建模",
+          "search_queries": [
+            "\"CASP16\" \"2024\" results Chinese team university winner",
+            "\"CASP15\" \"CASP16\" 中国 高校 获奖 导师 蛋白质"
+          ]
+        },
+        {
+          "name": "OGB-LSC (KDD Cup / NeurIPS)",
+          "cycle": "每年",
+          "authority": "图学习+分子性质预测全球最高规格",
+          "talent_value": "PCQM4M赛道直接对标药物虚拟筛选。获奖者=分子建模+深度学习双重能力",
+          "search_queries": [
+            "\"OGB-LSC\" \"PCQM4M\" competition Chinese team university",
+            "\"NeurIPS\" \"KDD Cup\" molecular property prediction winner Chinese"
+          ]
+        },
+        {
+          "name": "全国科算智药创新创业大赛",
+          "cycle": "2025首届",
+          "authority": "国内首个AI制药专项赛事——院士徐兵河任专家主席",
+          "talent_value": "ADC/PROTAC/GPCR方向直接对口制药管线",
+          "search_queries": [
+            "\"科算智药\" 2025 获奖 高校 团队 导师"
+          ]
+        },
+        {
+          "name": "上海国际计算生物学创新大赛",
+          "cycle": "2025",
+          "authority": "AI+湿实验验证——全世界唯一的'计算→筛选→湿实验'全链路竞赛",
+          "talent_value": "'计算驱动+实验验证'全栈能力——可直接对接药企管线",
+          "search_queries": [
+            "\"上海计算生物学\" \"2025\" 获奖 团队 高校"
+          ]
+        },
+        {
+          "name": "清华全球药物设计大赛",
+          "cycle": "2025-2026",
+          "authority": "Science/AAAS认可",
+          "talent_value": "底层算法+生物机制——不是调参，是重构",
+          "search_queries": [
+            "\"清华\" \"全球药物设计\" 大赛 获奖 AngelPro"
+          ]
+        },
+        {
+          "name": "华为杯中国研究生AI创新大赛（药学赛道）",
+          "cycle": "每年",
+          "authority": "国内研究生AI竞赛最高规格",
+          "talent_value": "PROTAC-Agent——全球首个AI-PROTAC平台。IC50经湿实验验证",
+          "search_queries": [
+            "\"华为杯\" \"研究生AI创新\" 药学 一等奖 2025"
+          ]
+        },
+        {
+          "name": "DREAM Challenges",
+          "cycle": "不定期",
+          "authority": "系统生物学+精准医学全球标杆",
+          "talent_value": "疾病亚型预测+药物反应预测",
+          "search_queries": [
+            "\"DREAM challenge\" cancer drug prediction Chinese team 2025 2026"
+          ]
+        }
+      ]
+    },
+
+    "academic": {
+      "enabled": true,
+      "paper_sources": [
+        { "name": "arXiv", "url_pattern": "arxiv.org", "fields": ["q-bio.BM", "cs.LG", "physics.chem-ph"] },
+        { "name": "PubMed", "url_pattern": "pubmed.ncbi.nlm.nih.gov", "fields": ["protein structure", "drug design", "molecular dynamics"] },
+        { "name": "Google Scholar", "url_pattern": "scholar.google.com" }
+      ],
+      "conferences": [
+        { "name": "NeurIPS", "cycle": "每年", "authority": "AI顶会", "talent_value": "ML+科学计算交叉" },
+        { "name": "ICML", "cycle": "每年", "authority": "AI顶会", "talent_value": "基础算法能力" },
+        { "name": "ISMB", "cycle": "每年", "authority": "计算生物学顶会", "talent_value": "生物信息学+AI" },
+        { "name": "RECOMB", "cycle": "每年", "authority": "计算分子生物学顶会", "talent_value": "算法+分子生物学" },
+        { "name": "MLSys", "cycle": "每年", "authority": "ML系统顶会", "talent_value": "大规模AI计算基础设施" }
+      ]
+    },
+
+    "organizational": {
+      "enabled": true,
+      "org_watchlist": [
+        {
+          "org_name": "字节跳动 AI4S",
+          "org_type": "大厂",
+          "why_watch": "Protenix/SeedFold在FoldBench上超越AlphaFold3。50人核心团队。2026年6月AI制药业务拆分融资",
+          "recent_signals": "顾全全(斯隆奖得主)2026.6离职创业, 肖文之同期离职, 近一年约70人从Seed流出"
+        },
+        {
+          "org_name": "DP Technology (深势科技)",
+          "org_type": "创业公司",
+          "why_watch": "Uni-Mol——15个分子性质预测任务中14个超越最优。Nature Communications发表",
+          "recent_signals": "持续招聘中"
+        },
+        {
+          "org_name": "阿里巴巴 DAMO Academy",
+          "org_type": "大厂研究院",
+          "why_watch": "元素爪——首个超导材料发现AI智能体。2026年开源六领域统一科学AI模型",
+          "recent_signals": "开源——团队在对外释放技术信号"
+        },
+        {
+          "org_name": "百度 AI药物团队",
+          "org_type": "大厂",
+          "why_watch": "mRNA疫苗AI优化——抗体应答提升128倍。KDD Cup连续制霸",
+          "recent_signals": "需确认组织稳定性"
+        }
+      ]
+    }
+  },
+
+  "l3_query_templates": {
+    "find_students": [
+      "\"{PI}\" \"{university}\" 团队 成员 博士生 姓名",
+      "\"{PI}\" {university_en} PhD student CASP"
+    ],
+    "find_authors": [
+      "\"{PI}\" \"{tool_name}\" first author paper {year}",
+      "site:arxiv.org \"{PI}\" {year}",
+      "\"{PI}\" Google Scholar co-authors"
+    ],
+    "find_career": [
+      "\"{student}\" LinkedIn AI drug discovery",
+      "\"{student}\" GitHub protein structure"
+    ]
+  },
+
+  "authority_indicators": {
+    "academic": ["斯隆研究奖(Sloan Fellowship)", "国家杰出青年科学基金(杰青)", "博新计划", "优秀青年科学基金(优青)", "青年千人"],
+    "industry": ["字节AI4S核心团队", "微软MSRA AI4Science", "DeepMind AlphaFold团队", "DP Technology核心团队"],
+    "mobility_triggers": ["博新计划结束", "博士毕业年份(通常第4-6年)", "博后出站(通常第2-3年)", "公司拆分/融资/裁员", "核心PI离职创业"]
+  },
+
+  "meta": {
+    "created": "2026-07-08",
+    "tested_on": "Ada 生物制药公司 AI4S 竞赛人才锁定需求",
+    "test_results": "产出L3级人才清单——15+实验室、30+可追踪人才、字节拆分+斯隆奖得主离职窗口。客户反馈: '有企业级需求要的样子了'"
+  }
+}

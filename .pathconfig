@@ -1,0 +1,51 @@
+# TRIO 3.0 路径配置 | 2026-06-28
+
+# ── TRIO OS（系统文件）──
+OS_ROOT   = D:\TRIO 3.0
+CONFIG    = D:\TRIO 3.0\config
+KNOWLEDGE = D:\TRIO 3.0\knowledge
+DOCS      = D:\TRIO 3.0\docs
+
+# ── 项目数据库（业务产出）──
+PROJECTS  = D:\工作\项目
+BENCHMARK = D:\工作\对标库
+TRIO_DATA = D:\工作\TRIO
+KN_BASE   = D:\工作\知识库
+RAW_DATA  = D:\工作\原始数据
+ARCHIVE   = D:\工作\归档
+
+# ── 文件路由（v2.0 新增）──
+ROUTING_TABLE = D:\TRIO 3.0\config\file-routing.json
+CLASSIFY_CMD  = mgmt.sh classify scan
+
+# ── 规则（2026-07-01 更新）──
+# 1. 框架方法论/协议/脚本/设计系统 → OS_ROOT (TRIO 3.0)
+# 2. 项目交付物/报告/客户数据/日志 → TRIO_DATA 或 PROJECTS
+# 3. 公司/人物/行业对标 → BENCHMARK
+# 4. 纯方法论/模板/SOP/提示词 → KN_BASE
+# 5. 不确定 → 问用户，禁止猜测。运行 mgmt.sh classify scan 自动检测
+# 6. 二进制文件(.pdf/.docx/.pptx/.xlsx/.db)禁止出现在 OS_ROOT
+
+# ── 交付管道（按格式选技术路线）──
+# Markdown → PDF:   pandoc → docx → LibreOffice PDF (CJK表格不崩)
+# Markdown → Word:  pandoc --to docx
+# PPTX:             pptx skill (引用 pptx-blueprint.js FONT 常量)
+# Word → 精排:      解包 XML → 直接编辑 → 打包 (不走md重生成，保留用户排版)
+# ❌ 禁止: pandoc + xelatex 直出 PDF (中文表格出行)
+# ❌ 禁止: 产出物写 C:\Users\Rex\
+
+# ── 环境关键路径（从 bashrc 归档 2026-06-29）──
+PUPPETEER  = ~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome
+NODE_PATH  = ~/.npm-global/lib/node_modules
+SHARED_VENV= ~/.local/share/venv/default
+GO_BIN     = ~/go/bin
+CARGO      = ~/.cargo
+
+# ── 铁律 ──
+# ⚠️ 杜绝连续的正确最后导致全面的失败。
+#    每个决策单独看都合理。合在一起可能构成灾难。
+#    案例: Qwen 每次架构调整都合理 → 林俊旸离职
+#         东方嘉富每笔投资都符合政策方向 → DPI差/COO走
+#         Claude-Driven-Workflow 每个路径配置都对 → 借尸还魂
+#    对策: 做任何"正确"的决策前，问一句——
+#         "这个正确决定和之前那些正确决定叠在一起，会变成什么？"

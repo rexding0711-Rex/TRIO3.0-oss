@@ -1,0 +1,102 @@
+{
+  "name": "semantic-input-manifold",
+  "version": "1.0.0",
+  "created": "2026-07-09",
+  "type": "theoretical_framework",
+  "description": "语义输入七维流形——从信息几何学角度描述 LLM 输入空间的完整可观测属性。前四维可解(S4)，第五维加入后不可解(S5→伽罗瓦型相变)。",
+
+  "dimensions": {
+    "d1_length": {
+      "name": "长 · 序列深度",
+      "question": "多大？",
+      "scale": ["单句", "段落", "章节", "语料库"],
+      "math_domain": "序列长度 L ∈ [10^1, 10^6] tokens",
+      "tri_coverage": "Step2 实时搜索自动扩展"
+    },
+    "d2_width": {
+      "name": "宽 · 领域广度",
+      "question": "多广？",
+      "scale": ["单域", "相邻域", "跨域", "全域"],
+      "math_domain": "领域集合基数 |D|",
+      "tri_coverage": "三视角认知隔离自动覆盖"
+    },
+    "d3_height": {
+      "name": "高 · 抽象层级",
+      "question": "多深？",
+      "scale": ["数据", "模式", "理论", "方法论"],
+      "math_domain": "抽象层级 h ∈ {1,2,3,4}",
+      "tri_coverage": "CORE.md Phase 0→4 递推"
+    },
+    "d4_density": {
+      "name": "密度 · 信息浓度",
+      "question": "多浓？",
+      "scale": ["稀疏", "正常", "密集", "超压缩"],
+      "math_domain": "信息熵 H(input) / length(input)",
+      "tri_coverage": "需手动感知——已写入 CLAUDE.md 自检 I4D"
+    },
+    "d5_time": {
+      "name": "时间 · 时效性",
+      "question": "多新？",
+      "scale": ["实时", "近期", "周期", "永恒"],
+      "math_domain": "半衰期 t½——信息有效性的衰减速率",
+      "tri_coverage": "不可优化——只能追求鲁棒性",
+      "phase_transition": "第五维加入 → 全对称群从 S4 变为 S5 → 伽罗瓦不可解 → 无封闭形式最优解"
+    },
+    "d6_stance": {
+      "name": "立场 · 主体性",
+      "question": "谁说的？",
+      "scale": ["纯外部·教科书", "观察者·分析师", "参与者·当事人", "元视角·三立场叠加"],
+      "math_domain": "认知坐标系变换——与其他维度非对称",
+      "tri_coverage": "TRIO 认知隔离 = 三立场同时激活并叠加"
+    },
+    "d7_intent": {
+      "name": "意图 · 目的性",
+      "question": "为什么说？",
+      "scale": ["复述·原样返回", "推理·框架内推", "创造·新结构生成", "元操作·改变模型行为"],
+      "math_domain": "输出空间的拓扑约束——意图定义了从输入到输出的映射类型",
+      "tri_coverage": "由用户输入隐式定义。Agent 应显式识别并标注",
+      "closure": "第七维闭合框架——D1-4(什么)+D5(何时)+D6(谁说)+D7(为什么)=穷尽语言行为的所有可分析属性"
+    }
+  },
+
+  "phase_transition": {
+    "description": "语义输入流形在 4→5 维度处发生伽罗瓦型相变",
+    "galois_connection": {
+      "4_dimensions": "S4 可解群 → 256 种输入类型可完全枚举、诊断、优化",
+      "5_dimensions": "S5 不可解群 → 1024 种输入类型不可根式求解 → 只能导航不能控制",
+      "mathematical_precision": "仅当 D1-5 的变换群为 S5 全对称时严格成立。实际五个维度可能不完全自由交换——需要形式化验证。"
+    },
+    "engineering_implication": "4 维以内 = 科学（可复现、可量化、可传递）。5 维及以上 = 导航（鲁棒性优先、不追求全局最优）"
+  },
+
+  "linguistic_grounding": {
+    "description": "七维映射到语言学的经典范畴——不是巧合，是同一个底层结构",
+    "mapping": {
+      "syntax": "D1(长) + D4(密度)——形式结构",
+      "semantics": "D2(宽) + D3(高)——意义深度",
+      "pragmatics": "D6(立场) + D7(意图)——使用情境",
+      "diachrony": "D5(时间)——历史维度"
+    }
+  },
+
+  "combinatorics": {
+    "four_dim_types": "4×4×4×4 = 256 种语义输入类型",
+    "five_dim_types": "256 × 4 = 1,024",
+    "six_dim_types": "1,024 × 4 = 4,096",
+    "seven_dim_types": "4,096 × 4 = 16,384",
+    "practical_note": "大多数 LLM 使用场景只触及 256 种中的 ~8-12 个格子。16,384 的理论空间几乎未被探索。"
+  },
+
+  "research_agenda": {
+    "formalization": "用信息论精确定义每个维度的度量单位和独立性",
+    "empirical": "在真实 LLM 上对 16,384 个格子进行系统性能测绘——每个格子的 accuracy/latency/hallucination rate",
+    "theory": "严格证明 4→5 相变与伽罗瓦对应的数学结构——哪些条件下成立、哪些条件下可规避",
+    "practical": "提炼为可操作的提示词诊断卡——每个输入标注七维坐标→输出前诊断瓶颈"
+  },
+
+  "meta": {
+    "inspiration": "Rex 2026-07-08 直觉：语义输入有自己的三维坐标。经由 TRIO 三视角逐层展开至七维。",
+    "evolution": "D1-4(首日)→D5(时间)→D6(立场)→D7(意图·闭合)",
+    "related": ["memory/semantic-input-manifold.md", "CLAUDE.md I4D自检规则"]
+  }
+}

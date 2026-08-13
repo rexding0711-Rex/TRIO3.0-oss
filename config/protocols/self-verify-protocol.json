@@ -1,0 +1,83 @@
+{
+  "id": "self-verify-protocol",
+  "version": "1.0.0",
+  "description": "Fable 5 自验证循环在 TRIO 的工程落地。所有场景完成后强制执行，不可跳过。",
+  "inspiration": "Fable 5 self-verification + Devin review-agent 干净上下文",
+  "trigger": "场景最后一步完成后，自动触发。不等待用户指令。",
+  "steps": {
+    "audit": {
+      "role": "复盘工程师",
+      "mask": "deepseek",
+      "action": "对照场景 acceptance_criteria 逐条 PASS/FAIL。每项附证据（指向具体文件/行号）。全部 PASS → 输出 ✅。有 FAIL → 附带修复指引（哪个文件、哪条标准未满足、怎么改）。"
+    },
+    "fix": {
+      "role": "全栈交付工程师",
+      "mask": "claude",
+      "action": "根据审计 FAIL 项逐条修复。修复后重新审计。循环直到全部 PASS 或达到 3 轮上限。3 轮后仍有 FAIL → ESCALATE 人工裁决。全部 PASS → 更新 run state 为 completed。"
+    }
+  },
+  "output_format": {
+    "audit": "| 标准 | 结果 | 证据/修复指引 |",
+    "fix": "| FAIL项 | 修复操作 | 重审结果 |"
+  },
+  "retry_handshake_with_escalate": {
+    "retry_counter": "每次重新审计后递增。仅当审计全部 PASS 或 ESCALATE 触发时重置为 0",
+    "escalate_interrupt": "ESCALATE 触发后，当前修复循环暂停。用户裁决后，retry_counter 重置为 0，从用户指定的方向重新执行修复",
+    "escalate_accept": "用户裁决 '接受当前状态' → 视为全部 PASS → state = completed（不强制执行未通过的 criteria）",
+    "max_retry": 3,
+    "note": "ESCALATE 触发的四种条件见 escalate-protocol.json。格式/措辞类 FAIL 不计数"
+  },
+  "hard_rules": [
+    "所有 full 模式场景必须执行此协议",
+    "quick 模式场景仅执行单轮审计（不修复）",
+    "手动单面具模式下，面具本身交付前必须对照自己的 acceptance_criteria 自检并标注 [自检 ✅]",
+    "审计报告必须写入 runs/{run_id}/step{N}-audit.md",
+    "修复报告必须写入 runs/{run_id}/step{N+1}-fix.md",
+    "【交付检查】审计必须验证: PDF存在/非空 + 承诺的公司库文件非空模板 + INDEX已更新。详见 delivery_check。违反任一项 = FAIL",
+    "【对话模式】每次回复前执行 chat_mode_check。场景完成后执行完整审计。两次质控，不同粒度。",
+    "【知识库写入】跨域类比/方法论声明写入前必须过DeepSeek审计。先入drafts/→审计→通过后移入knowledge/。详见 knowledge-write-protocol.json"
+  ],
+  "delivery_check": {
+    "description": "审计时强制检查交付物格式完整性",
+    "checks": [
+      {
+        "check": "PDF 文件存在且 >0 字节",
+        "applies_to": "full, standard",
+        "fail_action": "标记 FAIL → 触发修复: 运行 pandoc+weasyprint 生成 PDF"
+      },
+      {
+        "check": "MD 文件存在且 >0 字节",
+        "applies_to": "all",
+        "fail_action": "标记 FAIL"
+      },
+      {
+        "check": "承诺写入的 company-library 文件存在且非空模板",
+        "applies_to": "deconstruct",
+        "fail_action": "标记 FAIL，指出哪个文件是空模板"
+      },
+      {
+        "check": "INDEX.md 已更新（如 criteria 要求）",
+        "applies_to": "deconstruct, archive_distribute",
+        "fail_action": "标记 FAIL"
+      },
+      {
+        "check": "research/ideas/ 自增强建议文件已生成（如 criteria 要求）",
+        "applies_to": "deconstruct",
+        "fail_action": "标记 FAIL"
+      }
+    ]
+  },
+  "chat_mode_check": {
+    "description": "连续对话模式下的轻量自检。每次回复前执行，不等场景完成。",
+    "trigger": "每次用户回复后、TRIO 输出前",
+    "checklist": [
+      "事实: 声明有来源？还是靠记忆？",
+      "时间: 日期取系统时钟？不是手写的字符串？",
+      "文件: 引用的路径存在？不是凭空写的？",
+      "项目: 项目状态从 projects.json 读的？不是猜的？",
+      "越界: 没做其他面具的活？越界了标注了吗？"
+    ],
+    "cost": "<1秒，不需要独立 Agent 调用",
+    "failure_mode": "任一 ❌ → 修正后发送，不等待用户指令"
+  }
+}

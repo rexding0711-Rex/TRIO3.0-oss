@@ -1,0 +1,163 @@
+# TRIO 3.0 — LLM 可读系统索引
+
+> 灵感: Manus open.manus.ai/docs/llms.txt
+> 用途: LLM 启动时读此文件即可理解 TRIO 全貌
+> 更新: 2026-08-11 | 入口收敛后重建
+> 维护: 内容为手动维护(SessionEnd Hook 仅刷新日期,不重写内容)——命令/路径变动须同步本文件
+
+## 系统概览
+
+TRIO 3.0 是核心信息处理引擎——三种 AI 人格面具(Kimi/DeepSeek/Claude)构成通用认知管线(发散→审计→收敛),可处理尽调、战略分析、人才评估、关系诊断、自我校准等任意信息处理任务。不是尽调工具,是认知操作系统。
+
+- **位置**: D:\TRIO 3.0\
+- **数据**: D:\工作\(知识库 + 项目)
+- **模型**: DeepSeek V4 Pro API
+- **运行时**: Claude Code CLI
+- **核心**: [CORE.md](CORE.md) — 三根柱子 + 通用执行规则 + 新建工作流止损规则。所有场景必须引用。
+
+## 命令 (5个 · 2026-08-10 入口收敛)
+
+命令真身位于用户级 Claude Code 命令目录:`/mnt/c/Users/Rex/.claude/commands/`(Windows 路径 `C:\Users\Rex\.claude\commands\`)。
+
+### 入口
+- [/all](/mnt/c/Users/Rex/.claude/commands/all.md) — **唯一分析入口**。三面具协同,深度模式 5 层解剖 / 标准模式三视角。正式分析自动启动 run 状态机(写 run-history + decision-log + 交付物落库 D:\工作)。原尽调/竞品/逆向/赛道/复盘/速判/内容/决策/反向思考 9 个分析场景已并入。
+- [/TRIO](/mnt/c/Users/Rex/.claude/commands/TRIO.md) — 系统启动入口。环境检测 + 状态概览。
+
+### 面具切换 (3个)
+- [/claude](/mnt/c/Users/Rex/.claude/commands/claude.md) — 工程/架构面具
+- [/kimi](/mnt/c/Users/Rex/.claude/commands/kimi.md) — 内容/洞察面具
+- [/deepseek](/mnt/c/Users/Rex/.claude/commands/deepseek.md) — 审计/批判面具
+
+**已归档 20 命令**(尽调/竞品/逆向/速判/内容等分析场景并入 /all;trio-run/investor/低频维护命令):`D:\TRIO 3.0\archive\commands-20260810\`,可恢复。
+
+## 角色 (11个)
+
+路径:`D:\TRIO 3.0\config\roles\`
+
+### 情报层 (Kimi面具)
+- [产业情报工程师](config/roles/产业情报工程师.md) — 行业全景+竞品初筛。P5。任何场景的第一步
+- [认知镜像工程师](config/roles/认知镜像工程师.md) — 观察Rex交互模式,识别隐藏能力。P4。独立运行
+
+### 质控层 (DeepSeek面具)
+- [事实核查工程师](config/roles/事实核查工程师.md) — 逐条验证声明,溯源,置信度标注。P5
+- [成本拆解工程师](config/roles/成本拆解工程师.md) — BOM拆解+隐性成本+估值合理性。P4
+- [因果分析工程师](config/roles/因果分析工程师.md) — 因果DAG+反事实检验+混淆变量检测。P4。Manus案例新增
+- [复盘工程师](config/roles/复盘工程师.md) — 系统性缺陷挖掘+PR叙事vs真相。P4
+
+### 战略层 (Claude面具)
+- [产品架构师](config/roles/产品架构师.md) — 10维评分+最终判定+场景排兵。P5。有权否决
+- [任务编排工程师](config/roles/任务编排工程师.md) — 目标→DAG分解+并行识别+失败隔离。P5。Manus 3-Agent模式吸收
+
+### 交付层
+- [全栈交付工程师](config/roles/全栈交付工程师.md) — PDF/Word/Markdown/HTML全格式打包。P4
+- [内容生产工程师](config/roles/内容生产工程师.md) — 文档/PPT/报告生成。P4
+
+### 基建层
+- [资产盘点工程师](config/roles/资产盘点工程师.md) — 知识库索引维护+归档+公司库写入。P3
+
+## 场景 (11个)
+
+路径:`D:\TRIO 3.0\config\scenarios\`。场景由 /all 自动路由触发,不单独敲命令。
+
+- [due_diligence](config/scenarios/due_diligence.json) — 尽调。7步。Step 0任务编排→Step1行业全景→Step2事实核查→Step3成本拆解→Step4复盘→Step5综合判定→Step6交付
+- [deconstruct](config/scenarios/deconstruct.json) — 逆向工程。7步。Step0编排→Step1信息收集→Step2因果分析→Step3成本→Step4叙事解剖→Step5综合+提取→Step6入库→Step7打包
+- [competitive_intelligence](config/scenarios/competitive_intelligence.json) — 竞品分析。5步
+- [investor](config/scenarios/investor.json) — 投资专项(对接 TRIO-Investor 分支)
+- [audit_review](config/scenarios/audit_review.json) — 审计复盘。2步
+- [quick_assessment](config/scenarios/quick_assessment.json) — 快速判断。2步
+- [content_delivery](config/scenarios/content_delivery.json) — 内容交付。3步
+- [org_restructure](config/scenarios/org_restructure.json) — 组织调整。3步
+- [archive_distribute](config/scenarios/archive_distribute.json) — 归档分发。1步
+- [explore](config/scenarios/explore.json) — 探索模式。1步
+
+## 运行时 (runs/)
+
+**已归档为多余设计**——入口收敛(2026-08-10)后,run 产物不再写入 runs/,改为由 /all 自动落库:
+- `state/run-history.jsonl` — run 记录(run_id/日期/任务类型/评分)
+- `state/decision-log.jsonl` — 决策记录(判断/置信度/依据)
+- 交付物 → `D:\工作\项目\{项目}\`
+
+## 知识资产 (knowledge/)
+
+### 评估框架
+- [10-dim-model](knowledge/evaluation-framework/10-dim-model.md) — 10维项目评估模型
+- [六维穿透框架](knowledge/evaluation-framework/六维穿透框架.md) — 交易结构闭合度前置检查
+- [八维认知框架](knowledge/evaluation-framework/八维认知框架.md) — 陌生领域系统性认知扫描
+- [六层因果链](knowledge/evaluation-framework/六层因果链.md) — 分子→物理→工艺→系统→经济→商业
+- [紧致吸引子枚举](knowledge/evaluation-framework/紧致吸引子枚举.md) — 企业存活形态的五种不可约简生成元
+- [伪连通检测](knowledge/evaluation-framework/伪连通检测.md) — 区分组织叙事连通与商业现实连通
+- [技术同构度排序](knowledge/evaluation-framework/技术同构度排序.md) — 从核心能力按同构度排序扩张路径
+- [淘金式批判性提问](knowledge/evaluation-framework/淘金式批判性提问.md) — 八维批判思维框架
+- [causal-analysis-methodology](knowledge/evaluation-framework/causal-analysis-methodology.md) — 因果分析方法论
+- [context-engineering](knowledge/evaluation-framework/context-engineering.md) — 上下文工程>提示词工程。Devin证据:干净上下文→58%严重bug发现率
+- [scoring-guide](knowledge/evaluation-framework/scoring-guide.md) — 尽调评分指南
+- [mini-trainer](knowledge/evaluation-framework/mini-trainer.md) — AI训练人最小原型
+- [business-frameworks-trio](knowledge/evaluation-framework/business-frameworks-trio.md) — 商业框架→TRIO映射(尽调四问/VRIO/颠覆检测/代理问题)
+
+### 执行系统
+- [超跑系统](knowledge/超跑系统.md) — 五零五全,Rex个人执行协议(继承自Kimi控制论OS v1.0)
+
+### 公司库
+- [company-benchmark](D:\工作\对标库\company-benchmark\INDEX.md) — 公司对标索引,AI+非AI+跨行业方法论
+
+### 其他
+- [project-context](knowledge/project-context.md) — 跨run项目上下文。活跃项目
+- [capability-mirror](knowledge/capability-mirror/) — Rex能力镜像报告
+- [topology-thinking-methodology](knowledge/topology-thinking-methodology.md) — 拓扑思考方法论
+- [trio-niche-partitioning](knowledge/trio-niche-partitioning.md) — TRIO 三系统市场边界
+
+## 基础设施
+
+路径:`D:\TRIO 3.0\config\protocols\`
+
+- [self-verify-protocol](config/protocols/self-verify-protocol.json) — 自验证闭环。full模式场景完成后强制执行审计→修复→重审循环
+- [context-isolation-protocol](config/protocols/context-isolation-protocol.json) — 上下文隔离。Step间只传≤500字结构化摘要
+- [escalate-protocol](config/protocols/escalate-protocol.json) — ESCALATE精度化。四级触发
+- [deconstruct-protocol](config/protocols/deconstruct-protocol.json) — 逆向工程协议(深度模式 5 层解剖引用)
+- [topology-thinking-protocol](config/protocols/topology-thinking-protocol.json) — 拓扑思考协议(反脑补/Phase 0 种子图)
+- [run-eval-protocol](config/protocols/run-eval-protocol.json) — run 评分协议
+- [project-registry](config/projects.json) — 项目状态+里程碑单一真相源
+
+## 自动化
+
+- **SessionStart**: kb-refresh reset(扫描过期知识)
+- **SessionEnd**: post-session(更新metrics + 扫描增量)+ llms.txt 日期刷新
+- **Cron**: 每天 08:57 kb-refresh next
+- **度量**: metrics.md(Post-Session自动更新)
+
+## 数据源 (D:\工作\)
+
+- [index](D:\工作\知识库\index.md) — 知识库总索引。TRIO场景自动加载
+- [industry](D:\工作\知识库\industry/) — 产业数据(材料/能源/医药)
+- [benchmarks](D:\工作\知识库\benchmarks/) — 公司对标
+- [compliance](D:\工作\知识库\compliance/) — 法务合规
+- [methods](D:\工作\知识库\methods/) — 方法论资产
+- [sop](D:\工作\知识库\sop/) — 标准流程
+- [项目](D:\工作\项目/) — 活跃项目
+
+## 吸收的外部能力
+
+**已落地核心能力**: 3-Agent编排(Manus)、自验证循环(Fable5)、上下文隔离(Devin)、地缘政治一票否决(Manus)、因果DAG+反事实(Aether)、NCR深度分级(MiniMax)、幻觉率目标(百川)、设计系统(Midjourney)、Token效率追踪(Anthropic+Meta)、Search-as-Code(Perplexity)、世界模型概念(Runway)、研究→产品闭环(DeepMind)、vibe coding简化(Replit)、主权AI多模型路由(Mistral)
+
+**公司库**: 详见 [company-benchmark 索引](D:\工作\对标库\company-benchmark\INDEX.md)
+
+## 硬规则
+
+1. **人类可读性**(灵感:Fable 5 私密推理警示):所有 Step 输出必须人类可审计。每个判断必须附自然语言解释。
+2. **自验证优先**(灵感:Fable 5 self-verification):Agent 在交付前必须自检——对照 acceptance_criteria → 自行修正 → 再检。
+3. **能力回退不拒绝**(灵感:Fable 5 安全回退):高风险场景不拒绝服务——降级到保守模式执行。用户永远得到输出。
+
+## 核心设计原则
+
+1. **人→AI→人 三层全体架构**: Layer1人思维编码为TRIO → Layer2 AI观察反射给人 → Layer3 双向增强
+2. **声明式优于过程式**: 用户说"什么",TRIO处理"怎么"
+3. **上下文工程>提示词工程**: 给模型恰好需要的信息,不是全部信息
+4. **三重质控**: 任何重要判断经过≥2个独立视角交叉验证
+5. **每次交互进步**: Post-Session自动处理→度量更新→日进化提醒
+
+## TRIO-Investor (投资专项子系统)
+- **位置**: D:\Agent文件\TRIO-Investor\
+- **用途**: 一级市场行研/尽调/竞品分析——7 条铁律 + 四层审阅 + 错误模式库
+- **核心**: [IRON-LAW.md](D:\Agent文件\TRIO-Investor\IRON-LAW.md) — 先算后写·硬软信号分级·排名脆弱性·偏见检测·反证100%
+- **门禁**: `bash D:\Agent文件\TRIO-Investor\delivery-gate.sh <报告.md>` — 投资专项检查
+- **触发**: /all 中包含排名/评分/跨国估值对比的分析任务

@@ -1,0 +1,17 @@
+{
+  "techbook": {
+    "name": "技术书",
+    "package": "@vivliostyle/theme-techbook",
+    "bestFor": "含代码块的技术文档"
+  },
+  "academic": {
+    "name": "学术论文",
+    "package": "@vivliostyle/theme-academic",
+    "bestFor": "报告、论文"
+  },
+  "slide": {
+    "name": "幻灯片",
+    "package": "@vivliostyle/theme-slide",
+    "bestFor": "演示文稿"
+  }
+}

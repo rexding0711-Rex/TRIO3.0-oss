@@ -1,0 +1,54 @@
+{
+  "name": "external-review-protocol",
+  "version": "1.0.0",
+  "created": "2026-07-09",
+  "source": "2026-07-09 七维流形假说被独立 Claude 实例审查——外部反馈质量显著不同于内部审计",
+  "type": "protocol",
+  "description": "TRIO 流水线的可选 Step 6——将产出物发给另一个 LLM 实例做独立交叉验证。填补内部审计(L1-L2)和外部审查之间的断层。",
+
+  "trigger": {
+    "auto": "产出物声明等级为'理论'或'数学定理'→自动建议外部审查",
+    "manual": "用户说'外部审查'/'cross-validate'/'让另一个模型看看'",
+    "skip": "工程规则级别的日常交付——不触发"
+  },
+
+  "reviewer_config": {
+    "principle": "审查者的认知立场必须不同于 TRIO 内部三视角。不同模型、不同系统提示词、不同认知坐标系。",
+    "presets": {
+      "academic_peer_review": {
+        "model": "claude",
+        "stance": "你是一位计算语言学和数学领域的学术审稿人。逐条验证以下框架的声明。引用前人工作。标注每个声明的置信度。提出证伪路径。",
+        "best_for": "理论假说、声称有数学贡献的框架"
+      },
+      "engineering_adversary": {
+        "model": "claude|gpt",
+        "stance": "你是一位资深 ML 工程师。你在生产环境中部署过 LLM。对以下框架——找出它在实际应用中会断裂的地方。不要引用论文——引用你的工程直觉。",
+        "best_for": "工程规则、工具设计、SOP"
+      },
+      "domain_expert": {
+        "model": "any",
+        "stance": "你是{领域}的专家。从该领域的标准出发——评估以下框架在该领域的有效性。",
+        "best_for": "行业分析、尽调报告"
+      }
+    }
+  },
+
+  "execution": {
+    "step1": "将 TRIO 产出物 + 审查者系统提示词发送给目标 LLM",
+    "step2": "审查者独立输出——不与 TRIO 内部视角交叉污染",
+    "step3": "将外部审查结果作为 Step 3.5 矛盾图谱的新输入——与 Kimi/DeepSeek/Claude 的内部判断对照",
+    "step4": "外部发现的问题 → 标注'外部审查发现' → 决定是否修改产出物",
+    "step5": "更新产出物审计状态：外部审查通过 / 外部审查发现{N}个问题"
+  },
+
+  "value_proposition": {
+    "internal_blind_spot": "TRIO 三个面具共享同一套底层假设（认知隔离、结构化怀疑、自验证闭环）。外部审查不会被这套假设限制。",
+    "example": "2026-07-09 Claude 批判指出了伽罗瓦类比是比喻而非定理——这是 DeepSeek 审计已经知道但标注为 [3] 的同一件事。区别在于：DeepSeek 说'置信度 [3]'。Claude 批判用 23 个引用证明了为什么。两者的严格度差了两个数量级。",
+    "net_effect": "外部审查不替代内部审计——它暴露内部审计和外部标准之间的差距。知道这个差距存在 = 诚实。不知道 = 盲区。"
+  },
+
+  "related": [
+    "config/protocols/audit-strictness-standard.json",
+    "CLAUDE.md § 产出物声明等级"
+  ]
+}

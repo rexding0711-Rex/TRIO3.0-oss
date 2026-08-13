@@ -1,0 +1,331 @@
+{
+  "_layer": "capability",
+  "id": "protocol-018-vpa",
+  "name": "TRIO 脆弱点分析协议",
+  "version": "1.1",
+  "status": "active",
+  "created": "2026-07-13",
+  "source": "NS 方程 Grujić 机制分析 + P vs NP 多模型实验",
+  "trigger_words": ["脆弱点扫描", "VPA", "vulnerability scan", "攻击面分析"],
+  "ooda_layer": "L2-L3",
+  "description": "将任何技术声称（论文/方案/架构/商业叙事）拆解为因果链，定位最致命的未证明假设，输出可证伪的脆弱点矩阵。",
+
+  "activation": {
+    "condition": "input 包含因果性声称 AND chain_length ≥ 3",
+    "excludes": ["纯描述性文档", "单步推导", "教科书知识"]
+  },
+
+  "phases": {
+    "P0_causal_chain": {
+      "name": "因果链提取",
+      "budget": "5-10 min",
+      "input": "目标声称",
+      "output": ["causal_chain[]", "implicit_assumptions[]"],
+      "operations": [
+        "一句话陈述终极结论",
+        "反向追溯: 结论 ← 依赖₁ ← 依赖₂ ← ... ← 起点",
+        "每个箭头标注: tool(技术工具), status(proven|assumed|partial), gain_order(多项式|对数|常数|退化)",
+        "无法标注 tool 的箭头 → push to implicit_assumptions[]"
+      ],
+      "quality_gate": "len(causal_chain) ≥ 3 AND each arrow.tool ≠ null OR arrow in implicit_assumptions"
+    },
+
+    "P1_gate_location": {
+      "name": "Gate 定位",
+      "budget": "5 min",
+      "input": "causal_chain[]",
+      "output": ["gate_position", "author_claimed_gate", "delta"],
+      "operations": [
+        "FILTER chain WHERE arrow.status == 'assumed'",
+        "SORT by position (越上游越优先)",
+        "gate_position = assumed_arrows[0]",
+        "delta = gate_position - author_claimed_gate"
+      ],
+      "core_test": "IF gate关闭 THEN 整条链是否无声? YES → gate定位正确 | NO → 存在旁路，继续搜索",
+      "bias_alert": {
+        "condition": "delta ≠ 0",
+        "warning": "Gate 实际位置与作者声称不符",
+        "classify": "无意遗漏 | 有意隐藏 | 表述歧义"
+      }
+    },
+
+    "P2_stepwise_scan": {
+      "name": "逐步脆弱点扫描",
+      "budget": "10-20 min",
+      "input": "causal_chain[]",
+      "output": "vp_candidates[]",
+      "five_dimensions": {
+        "D1_technical_validity": "该工具在此上下文中是否合法使用？",
+        "D2_condition_completeness": "是否依赖隐含的正则性/有界性/连续性假设？",
+        "D3_magnitude_match": "增益是否足够支撑下一步？（方向正确 ≠ 量级足够）",
+        "D4_extreme_degradation": "在极限/边界条件下，常数是否退化为零？",
+        "D5_counterexample_existence": "是否存在已知的失效情形？"
+      },
+      "vp_schema": {
+        "id": "VP{n}",
+        "step": "chain[i] → chain[i+1]",
+        "dimension": "D1-D5",
+        "description": "string",
+        "flip_condition": null,
+        "severity": null
+      }
+    },
+
+    "P3_severity_ranking": {
+      "name": "致命度排序",
+      "budget": "5 min",
+      "input": "vp_candidates[]",
+      "output": "vp_ranked[]",
+      "severity_levels": {
+        "critical": {"symbol": "🔴", "definition": "此点失败 → 整个声称崩塌（无旁路）"},
+        "high": {"symbol": "🔴/🟡", "definition": "此点失败 → 声称降级为条件性成立"},
+        "medium": {"symbol": "🟡", "definition": "技术性缺口，可能可修补但需额外工作"},
+        "low": {"symbol": "🟢", "definition": "已有覆盖或影响有限"}
+      },
+      "scoring_weights": {
+        "upstream_weight": 3,
+        "no_bypass_weight": 2,
+        "irreparable_weight": 2,
+        "direction_impact": 1
+      },
+      "fatal_weakness_interrupt": {
+        "condition": "any vp.severity == 🔴 AND vp.flip_condition.testable == true",
+        "action": "TRIGGER fatal-weakness-interrupt → HALT → PRESENT options [攻击此VP, 绕过, 收工] → AWAIT"
+      }
+    },
+
+    "P4_flip_conditions": {
+      "name": "翻转条件制定",
+      "budget": "5-10 min",
+      "input": "vp_ranked[] (severity ≥ 🟡)",
+      "output": "flip_conditions[]",
+      "template": "如果 [可观测/可构造事件] 发生 → 对声称的影响: [...] → 置信度调整: [X%→Y%]。如果不发生 → 支撑程度: [...]",
+      "quality_gate_three_musts": {
+        "actionable": "有人能原则上验证",
+        "precise": "非同义反复（不是'如果错了就是错了'）",
+        "consistency_required": "需在系统约束下构造（不是孤立反例）"
+      },
+      "anti_pattern": "IF flip ≈ '如果有人证明它错了则它错了' → REJECT → RETRY with constraint: 必须指定具体构造方法或可观测量"
+    },
+
+    "P5_self_limitation_loop": {
+      "name": "自限环检测",
+      "budget": "10-15 min",
+      "input": "causal_chain[]",
+      "output": ["feedback_loops[]", "loop_break_conditions[]"],
+      "operations": [
+        "搜索回路: step[j].output → step[i].input (i < j)",
+        "分类: 正反馈(放大型，可能导致失控) | 负反馈(抑制型，自限)",
+        "对每个负反馈环: 评估极限下强度 + 检查独立证据 + 标注环断裂条件"
+      ],
+      "loop_schema": {
+        "loop_id": "L{n}",
+        "type": "negative_feedback | positive_feedback",
+        "path": ["step_a", "step_b", "...", "step_a"],
+        "strength": "sufficient | marginal | unverified",
+        "independent_evidence": ["引用"],
+        "break_condition": "string"
+      },
+
+      "P5a_edge_verification": {
+        "name": "回路边独立证据验证",
+        "description": "检测负反馈环中每条边是否都有独立证据支撑——防止'虚假负反馈'（看起来是自限环，实际是未验证的物理直觉伪装）",
+        "trigger": "loop.type == 'negative_feedback'",
+        "operations": [
+          "对回路中每条边, 检查是否有独立于该回路其他边的验证来源",
+          "独立证据判定: 不同实验/不同理论框架/不同团队的独立确认",
+          "至少一条边无独立证据 → 标记 'unverified_intuition_edge'"
+        ],
+        "severity_escalation": {
+          "condition": "loop 中存在 ≥1 条 unverified_intuition_edge",
+          "action": "loop.strength → 'unverified' | loop.severity += 1 level",
+          "tag": "🚩 未验证直觉边——负反馈环可能不存在"
+        },
+        "anti_pattern_example": "NS 分析中 INTENSE→OSC 边（'涡量集中→方向场振荡'）迄今只有物理直觉，无独立验证。如果此边不成立，整个自限环断裂"
+      }
+    },
+
+    "P6_closure_stability": {
+      "name": "闭包稳定性检验",
+      "budget": "5-10 min",
+      "input": "causal_chain[] 中每步的 gain_order",
+      "output": "closure_stability_verdict",
+      "operations": [
+        "提取: gains = [step.gain_order for step in chain]",
+        "累积: cumulative = product(gains)",
+        "极限检查: IF any gain depends on distance_to_failure → COMPUTE lim_{t→T*} cumulative"
+      ],
+      "judgment_matrix": {
+        "all_polynomial": {"cumulative": "多项式级", "verdict": "✅ 安全"},
+        "contains_logarithmic": {"cumulative": "对数级", "verdict": "⚠️ 边缘——需检查极限行为"},
+        "contains_degenerate": {"cumulative": "可能 → 0", "verdict": "🔴 新增 VP"},
+        "gain_depends_on_distance": {"cumulative": "极限下 → 0", "verdict": "🔴 新增 VP"}
+      }
+    },
+
+    "P6_5_approximation_stability": {
+      "name": "逼近稳定性检验",
+      "budget": "5-10 min",
+      "description": "检查临界空间/边界条件分析中，光滑逼近序列的控制是否在极限下保持——即极限过程能否与控制交换",
+      "input": "causal_chain[] 中涉及极限/逼近/紧性论证的步骤",
+      "output": "approximation_stability_verdict",
+      "operations": [
+        "识别链中使用逼近/光滑化/紧性论证的步骤",
+        "对每个步骤检查: 逼近序列 x_n → x 在自然拓扑下收敛时，该步的控制/估计是否稳定？",
+        "稳定判据: 控制量在逼近序列上一致有界 + 极限函数继承控制",
+        "不稳定判据: 控制量依赖序列的逼近速率，或极限函数跳出了被控空间"
+      ],
+      "generic_trigger_conditions": {
+        "condition_1": "分析涉及临界函数空间（如 BMO, L∞, 端点 Sobolev）",
+        "condition_2": "论证使用光滑逼近 + 紧性 + 极限通过",
+        "condition_3": "控制量在逼近序列上的常数与极限函数上的常数不一致"
+      },
+      "verdict_schema": {
+        "step": "chain[i] → chain[i+1]",
+        "approximation_type": "光滑逼近 | 紧性论证 | 粘性消失 | 其他",
+        "control_stability": "stable | conditionally_stable | unstable | unexamined",
+        "failure_mode": "如果控制不稳定，具体失效方式是什么？",
+        "new_vp_candidate": "如果 unstable → 新增 VP{n}"
+      },
+      "domain_specificity": {
+        "pde_analysis": "核心检查——PDE 中临界空间分析几乎总是涉及逼近稳定性",
+        "engineering": "对应'离散化 → 连续极限'的网格收敛性",
+        "manufacturing": "对应'样本测试 → 批量生产'的工艺窗口稳定性",
+        "business": "对应'试点 → 规模化'的单位经济模型是否保持"
+      },
+      "ns_case_reference": "NS 分析中 VP6: ξ_n → ξ 在自然拓扑下收敛时，bmo/log 控制是否稳定？光滑逼近的 ξ_n 可能都在 bmo/log 内，但极限 ξ 跳出——导致 L2 传播定理在极限通过时断裂"
+    },
+
+    "P7_bridge_lemma_gate": {
+      "name": "Bridge-Lemma-Gate 自检 (C9)",
+      "budget": "3-5 min",
+      "input": "整体声称",
+      "output": "C9_verdict: pass | partial | fail",
+      "three_questions": {
+        "C9_1_formal_precision": {"question": "前提条件是否有精确的数学/技术表述？", "pass": "能写成 If P then Q"},
+        "C9_2_violation_consequence": {"question": "如果前提不满足，是否有明确的失败模式？", "pass": "有具体失败模式描述"},
+        "C9_3_falsifiable_path": {"question": "是否存在原则上可执行的方法来测试前提？", "pass": "有构造性方法或数值实验方案"}
+      },
+      "routing": {
+        "all_pass": "CLASSIFY as '合法条件定理'",
+        "partial": "CLASSIFY as '部分形式化声称' + TAG missing items",
+        "all_fail": "CLASSIFY as '领域映射'（方向正确但缺形式化）+ DOWNGRADE confidence by 20%"
+      }
+    },
+
+    "P8_confidence_calibration": {
+      "name": "置信度分布 + 校准",
+      "budget": "5-10 min",
+      "input": "P2-P7 全部输出",
+      "output": ["confidence_distribution{}", "calibration_notes[]"],
+      "distribution_schema": {
+        "conclusion_A": "0.XX（标签 + 概率）",
+        "conclusion_B": "0.XX",
+        "conclusion_C": "0.XX"
+      },
+      "evidence_weights_schema": {
+        "source": "string",
+        "weight": "high | medium | low",
+        "reason": "string",
+        "bias_risk": "搜索空间有限 | 非独立 | 过度计数 | 确认偏误"
+      },
+      "calibration_checklist": [
+        "数值搜索证据: 搜索空间覆盖率标注了吗？",
+        "理论一致性: 多条证据是否独立？（共同依赖同一假设？）",
+        "反面证据: 是否有已知的相反结果未纳入？",
+        "确认偏误: 是否因为'希望结论为X'而高估了支撑X的证据？"
+      ]
+    },
+
+    "P9_archive_reopen": {
+      "name": "归档与重开",
+      "budget": "5 min",
+      "input": "全部分析结果",
+      "output": ["归档包", "reopen_gates[]"],
+      "archive_checklist": [
+        "因果链 + Gate 位置图",
+        "脆弱点矩阵（终版，severity 排序）",
+        "翻转条件清单",
+        "自限环拓扑（如有）+ 边验证状态",
+        "闭包稳定性判定",
+        "逼近稳定性判定",
+        "置信度分布 + 校准修正",
+        "认识论状态标注: 硬结论 / 软信号 / 未覆盖层",
+        "重开条件"
+      ],
+      "reopen_gate_schema": {
+        "event": "具体可观测事件",
+        "direction": "重开后的攻击方向",
+        "new_priority": "🔴 | 🟡"
+      },
+      "termination_rules": {
+        "terminate": ["继续推演退化为纯猜测（无新信息源）", "进入证明论沼泽（答案可能不可判定）", "用户显式收工"],
+        "continue": ["存在可执行的验证实验", "最高 severity VP 有新信息输入"]
+      }
+    }
+  },
+
+  "domain_weight_overrides": {
+    "数学/理论物理": {"P5_self_limitation": 1.5, "P6_closure": 1.5, "P6_5_approximation": 1.5, "reason": "对数级增益常见 + 临界空间逼近稳定性是核心风险"},
+    "工程方案": {"P1_gate_location": 2.0, "reason": "工程方案常把 Gate 藏在隐含假设里"},
+    "商业叙事": {"P4_flip_conditions": 2.0, "reason": "商业逻辑常不可证伪"},
+    "竞品分析": {"P2_scan_D3": 1.5, "reason": "竞品常'方向正确但量级不够'"},
+    "制造工艺": {"P6_closure": 2.0, "P6_5_approximation": 1.5, "P0_gain_order": "必填", "reason": "参数漂移→累积失效 + 样本测试→批量生产的逼近稳定性"}
+  },
+
+  "mvp_paths": {
+    "quick_15min": {
+      "description": "最小可行执行路径——回答'最致命的未证明假设在哪'",
+      "phases": ["P0", "P1", "P3"],
+      "output": "一句话: 最致命的 Gate 位置 + 致命度"
+    },
+    "standard_45min": {
+      "description": "标准深度——完整脆弱点矩阵 + 可证伪条件",
+      "phases": ["P0", "P1", "P2", "P3", "P4", "P9"],
+      "output": "完整 VP 矩阵 + flip conditions + 归档包"
+    },
+    "full_depth": {
+      "description": "全深度——含自限环、闭包稳定、逼近稳定、C9、置信度校准",
+      "phases": ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P6.5", "P7", "P8", "P9"],
+      "output": "完整归档包，可用于正式研究决策"
+    }
+  },
+
+  "anti_patterns": {
+    "AP1": {"name": "攻击最弱而非最致命", "detection": "最先攻击的 VP 不是 severity 最高的", "fix": "重新排序，优先攻击 🔴"},
+    "AP2": {"name": "同义反复翻转条件", "detection": "flip ≈ '如果错了就是错了'", "fix": "要求具体构造方法或可观测量"},
+    "AP3": {"name": "'没找到'='不存在'", "detection": "evidence = '数值搜索未发现'", "fix": "标注搜索空间覆盖率"},
+    "AP4": {"name": "二值思维", "detection": "只考虑成立/不成立", "fix": "显式列出第三种可能（不可判定/条件成立）"},
+    "AP5": {"name": "直觉代替证明", "detection": "loop.independent_evidence == null", "fix": "标记为 unverified_intuition_edge + severity += 1"},
+    "AP6": {"name": "对数安全幻觉", "detection": "所有增益为对数级且未做极限检查", "fix": "跑 P6 闭包稳定性检验"},
+    "AP7": {"name": "跟随作者 Gate", "detection": "delta == 0 且未独立验证", "fix": "跑 P1 独立 Gate 定位"},
+    "AP8": {"name": "虚假负反馈", "detection": "负反馈环中 ≥1 条边无独立证据", "fix": "跑 P5a 边验证 + severity escalation"}
+  },
+
+  "system_interfaces": {
+    "input": ["competitive-intel-engine: 竞品技术声称", "用户直接输入: 论文/方案/架构"],
+    "internal": [
+      "topology-check.sh: Gate 偏差触发拓扑违规日志",
+      "fatal-weakness-interrupt: 🔴 VP 触发中断",
+      "state/decision-log.jsonl: 归档写入决策日志",
+      "Neo4j KG: VP 节点写入知识图谱"
+    ],
+    "output": [
+      "归档包 (.md) → vault/",
+      "reopen_gates → state/reopen-gates.yaml",
+      "confidence_distribution → run 自评环"
+    ]
+  },
+
+  "promotion_criteria": {
+    "current_version": "1.1",
+    "next_version": "1.2",
+    "condition": "3 次跨领域成功应用后升级 + 写入 CLAUDE.md 触发词路由表",
+    "validation_log": "state/vpa-validation-log.jsonl"
+  },
+
+  "changelog": {
+    "v1.0": "初始版本——提炼自 NS 方程 Grujić 机制 TRIO 分析 (2026-07-13)",
+    "v1.1": "+ P5a 回路边独立证据验证（防虚假负反馈）+ P6.5 逼近稳定性检验 + AP8 反模式"
+  }
+}

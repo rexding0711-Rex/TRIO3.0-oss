@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRIO 分析报告</title>
+
+<!-- TRIO Design Tokens (必须第一个加载) -->
+<link rel="stylesheet" href="trio-tokens.css">
+
+<!-- 可选: Tailwind v4 CDN (学习/原型阶段; 生产构建换 @tailwindcss/vite) -->
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   TRIO 报告骨架样式 — 基于 trio-tokens.css
+   所有颜色通过 var(--xxx) 引用，不硬编码 hex
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 布局 ── */
+.trio-container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ── 导航 ── */
+.trio-header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-default);
+  backdrop-filter: blur(12px);
+  transition: background 0.3s;
+}
+.trio-header-inner {
+  max-width: 1280px; margin: 0 auto; padding: 0 1.5rem;
+  height: 3.5rem; display: flex; align-items: center; justify-content: space-between;
+}
+
+/* ── 封面区 ── */
+.trio-cover {
+  text-align: center; padding: 5rem 1rem 3rem;
+  max-width: 800px; margin: 0 auto;
+}
+.trio-cover h1 {
+  font-size: 2.5rem; font-weight: 700; color: var(--text-primary);
+  line-height: 1.3; margin-top: 1.5rem;
+}
+.trio-cover p {
+  color: var(--text-secondary); font-size: 1.125rem; line-height: 1.7;
+  margin-top: 1rem;
+}
+
+/* ── 卡片 ── */
+.trio-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+.trio-card-highlight {
+  border-left: 3px solid var(--accent-primary);
+}
+
+/* ── 表格 ── */
+.trio-table {
+  width: 100%; border-collapse: collapse; font-size: 0.875rem;
+}
+.trio-table thead {
+  background: var(--bg-tertiary);
+  border-bottom: 2px solid var(--border-default);
+}
+.trio-table th {
+  text-align: left; padding: 0.5rem 0.75rem;
+  color: var(--text-primary); font-weight: 600;
+}
+.trio-table td {
+  padding: 0.5rem 0.75rem; color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-default);
+}
+.trio-table tbody tr:hover { background: var(--bg-hover); }
+
+/* ── 按钮 ── */
+.trio-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 0.625rem 1.5rem;
+  font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  border-radius: var(--radius-md); transition: all 0.2s;
+}
+.trio-btn-primary {
+  background: var(--accent-primary); color: #fff; border: none;
+}
+.trio-btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px rgba(217, 119, 6, 0.3);
+}
+.trio-btn-secondary {
+  background: var(--bg-secondary); color: var(--text-primary);
+  border: 1px solid var(--border-default);
+}
+.trio-btn-secondary:hover { background: var(--bg-hover); }
+
+/* ── 标签/徽章 ── */
+.trio-badge {
+  display: inline-block; padding: 0.15rem 0.6rem;
+  border-radius: 999px; font-size: 0.75rem; font-weight: 500;
+  background: var(--bg-tertiary); color: var(--text-secondary);
+}
+.trio-badge-success { background: var(--color-success); color: #fff; }
+.trio-badge-warning { background: var(--color-warning); color: #fff; }
+.trio-badge-danger  { background: var(--color-danger);  color: #fff; }
+
+/* ── 章节 ── */
+.trio-section {
+  max-width: 1100px; margin: 0 auto; padding: 3rem 1rem;
+}
+.trio-section h2 {
+  font-size: 1.5rem; font-weight: 600; color: var(--text-primary);
+  margin-bottom: 1.5rem; text-align: center;
+}
+
+/* ── 网格 ── */
+.trio-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.trio-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.trio-grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+
+/* ── 页脚 ── */
+.trio-footer {
+  border-top: 1px solid var(--border-default);
+  padding: 2rem 1rem; text-align: center;
+  color: var(--text-tertiary); font-size: 0.75rem;
+}
+
+/* ── Mermaid 容器 ── */
+.trio-mermaid {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem; overflow-x: auto;
+  margin: 1.5rem 0;
+}
+.trio-mermaid::before {
+  content: "拓扑图 — 如在 PDF 中查看，请参考 HTML 版本";
+  display: block; font-size: 0.75rem; color: var(--text-tertiary);
+  margin-bottom: 0.75rem;
+}
+
+/* ── 打印 ── */
+@media print {
+  .trio-header { position: static; }
+  .trio-btn { display: none; }
+  body { font-size: 11pt; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════════════════ -->
+<header class="trio-header">
+  <div class="trio-header-inner">
+    <a href="#" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="10" cy="10" r="7" stroke="var(--accent-warm)" stroke-width="1.5" opacity="0.5"/>
+        <circle cx="14" cy="10" r="7" stroke="var(--accent-primary)" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="12" cy="14" r="7" stroke="var(--accent-primary)" stroke-width="1.5" opacity="0.9"/>
+      </svg>
+      <span style="font-size:1.25rem;font-weight:600;font-style:italic;color:var(--text-primary);">
+        TRIO 3.0
+      </span>
+    </a>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="trio-badge" id="theme-label">亮色</span>
+      <button class="trio-btn trio-btn-secondary" onclick="toggleTheme()" style="padding:0.25rem 0.5rem;font-size:0.75rem;">
+        <span id="theme-icon">🌙</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     COVER
+     ═══════════════════════════════════════════════════════════ -->
+<section class="trio-cover">
+  <span class="trio-badge">TRIO 3.0 · 分析报告</span>
+  <h1>报告标题</h1>
+  <p>副标题或执行摘要一句话。本报告由 TRIO 三视角协同生成。</p>
+  <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center;">
+    <button class="trio-btn trio-btn-primary">查看正文</button>
+    <button class="trio-btn trio-btn-secondary">下载 PDF</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CONTENT: 卡片网格
+     ═══════════════════════════════════════════════════════════ -->
+<section class="trio-section">
+  <h2>关键发现</h2>
+  <div class="trio-grid-3">
+    <div class="trio-card trio-card-highlight">
+      <div style="font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">发现 1</div>
+      <p style="color:var(--text-secondary);font-size:0.875rem;">内容占位——此处填入分析发现。所有颜色通过 var(--xxx) 引用。</p>
+    </div>
+    <div class="trio-card">
+      <div style="font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">发现 2</div>
+      <p style="color:var(--text-secondary);font-size:0.875rem;">内容占位——此处填入分析发现。</p>
+    </div>
+    <div class="trio-card">
+      <div style="font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">发现 3</div>
+      <p style="color:var(--text-secondary);font-size:0.875rem;">内容占位——此处填入分析发现。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CONTENT: 表格
+     ═══════════════════════════════════════════════════════════ -->
+<section class="trio-section">
+  <h2>数据对比</h2>
+  <div class="trio-card" style="overflow-x:auto;">
+    <table class="trio-table">
+      <thead>
+        <tr><th>指标</th><th>方案 A</th><th>方案 B</th><th>方案 C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>成本</td><td>低</td><td>中</td><td>高</td></tr>
+        <tr><td>风险</td><td>中</td><td>低</td><td>低</td></tr>
+        <tr><td>速度</td><td>快</td><td>中</td><td>慢</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CONTENT: 状态标签
+     ═══════════════════════════════════════════════════════════ -->
+<section class="trio-section">
+  <h2>风险评估</h2>
+  <div class="trio-grid-2">
+    <div class="trio-card">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+        <span class="trio-badge trio-badge-danger">P0</span>
+        <span style="font-weight:600;color:var(--text-primary);">关键风险</span>
+      </div>
+      <p style="color:var(--text-secondary);font-size:0.875rem;">风险描述——需要立即处理。</p>
+    </div>
+    <div class="trio-card">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+        <span class="trio-badge trio-badge-warning">P1</span>
+        <span style="font-weight:600;color:var(--text-primary);">次要风险</span>
+      </div>
+      <p style="color:var(--text-secondary);font-size:0.875rem;">风险描述——本季度内处理。</p>
+    </div>
+    <div class="trio-card">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+        <span class="trio-badge trio-badge-success">已控</span>
+        <span style="font-weight:600;color:var(--text-primary);">已控制</span>
+      </div>
+      <p style="color:var(--text-secondary);font-size:0.875rem;">此风险已有应对措施。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════ -->
+<footer class="trio-footer">
+  <p>TRIO 3.0 — Claude/Kimi/DeepSeek 三视角协同分析引擎</p>
+  <p style="margin-top:0.25rem;">生成时间: <span id="gen-time"></span> · 主题: <span id="gen-theme">默认</span></p>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     THEME TOGGLE
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.getElementById('theme-label').textContent = next === 'dark' ? '暗色' : '亮色';
+  document.getElementById('theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('trio-theme', next);
+}
+
+(function() {
+  const saved = localStorage.getItem('trio-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('theme-label').textContent = saved === 'dark' ? '暗色' : '亮色';
+  document.getElementById('theme-icon').textContent = saved === 'dark' ? '☀️' : '🌙';
+  document.getElementById('gen-time').textContent = new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'});
+})();
+</script>
+
+</body>
+</html>

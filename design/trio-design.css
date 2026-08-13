@@ -1,0 +1,107 @@
+/* TRIO 3.0 设计系统 — 独立CSS文件 */
+/* 用法: pandoc --css=trio-design.css 或 HTML <link> */
+/* v1.0 · 2026-07-19 */
+
+/* ===== Primitives ===== */
+:root, [data-theme="light"] {
+  --trio-stone-50:  #fafaf9; --trio-stone-100: #f5f5f4; --trio-stone-200: #e7e5e4;
+  --trio-stone-300: #d6d3d1; --trio-stone-400: #a8a29e; --trio-stone-500: #78716c;
+  --trio-stone-600: #57534e; --trio-stone-700: #44403c; --trio-stone-800: #292524;
+  --trio-stone-900: #1c1917; --trio-white: #ffffff;
+  --trio-amber-400: #fbbf24; --trio-amber-500: #f59e0b;
+  --trio-amber-600: #d97706; --trio-amber-700: #b45309;
+  --trio-blue-500: #3b82f6; --trio-blue-600: #2563eb;
+  --trio-green-500: #22c55e; --trio-green-600: #16a34a;
+  --trio-red-500: #ef4444; --trio-red-600: #dc2626;
+
+  /* ===== Semantic ===== */
+  --bg: var(--trio-stone-50); --bg-card: var(--trio-white);
+  --bg-code: var(--trio-stone-100); --bg-hover: var(--trio-stone-100);
+  --text: var(--trio-stone-900); --text-soft: var(--trio-stone-600);
+  --text-muted: var(--trio-stone-400);
+  --accent: var(--trio-amber-600); --accent-hover: var(--trio-amber-700);
+  --border: var(--trio-stone-200); --hairline: var(--trio-stone-200);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.06);
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+  --ok: var(--trio-green-600); --warn: var(--trio-amber-600);
+  --err: var(--trio-red-600); --info: var(--trio-blue-600);
+}
+
+[data-theme="dark"] {
+  --bg: var(--trio-stone-900); --bg-card: var(--trio-stone-800);
+  --bg-code: var(--trio-stone-700); --bg-hover: var(--trio-stone-700);
+  --text: var(--trio-stone-50); --text-soft: var(--trio-stone-300);
+  --text-muted: var(--trio-stone-500);
+  --accent: var(--trio-amber-500); --accent-hover: var(--trio-amber-400);
+  --border: var(--trio-stone-700); --hairline: var(--trio-stone-700);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.3);
+  --ok: var(--trio-green-500); --warn: var(--trio-amber-500);
+  --err: var(--trio-red-500); --info: var(--trio-blue-500);
+}
+
+/* ===== Base ===== */
+body {
+  max-width: 960px; margin: 0 auto; padding: 40px 20px;
+  font-family: system-ui, -apple-system, "Microsoft YaHei", "Segoe UI", sans-serif;
+  font-size: 15px; line-height: 1.7; color: var(--text); background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+h1 { font-size: 1.6rem; font-weight: 700; border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin-top: 0; }
+h2 { font-size: 1.3rem; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-top: 40px; color: var(--text); }
+h3 { font-size: 1.1rem; font-weight: 600; margin-top: 28px; color: var(--text); }
+a { color: var(--accent); }
+blockquote { border-left: 3px solid var(--accent); margin: 16px 0; padding: 8px 20px; background: var(--bg-code); color: var(--text); }
+hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+strong { color: var(--text); }
+
+/* ===== Tables ===== */
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .85rem; }
+th { background: var(--bg-code); font-weight: 600; text-align: left; padding: 8px 12px; border-bottom: 2px solid var(--border); color: var(--text); }
+td { padding: 6px 12px; border-bottom: 1px solid var(--border); color: var(--text-soft); }
+tr:nth-child(even) td { background: var(--bg-code); }
+table { table-layout: auto; }
+@media print { table { table-layout: fixed; } td, th { word-break: break-word; } }
+
+/* ===== Code ===== */
+code { font-family: "Cascadia Code","JetBrains Mono",monospace; font-size: .85em; background: var(--bg-code); padding: 2px 6px; border-radius: 3px; color: var(--err); }
+pre { background: var(--bg-code); border: 1px solid var(--border); padding: 16px 20px; border-radius: var(--radius-md); overflow-x: auto; white-space: pre-wrap; word-break: break-word; font-size: .85em; }
+pre code { background: none; padding: 0; color: var(--text); }
+
+/* ===== Mermaid ===== */
+.mermaid { text-align: center; margin: 24px 0; }
+
+/* ===== TRIO Components ===== */
+.callout { padding: 12px 16px; border-radius: var(--radius-md); margin: 12px 0; font-size: .9em; }
+.callout-warn  { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+.callout-info  { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+.callout-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; margin: 16px 0; box-shadow: var(--shadow-sm); }
+.card-highlight { border-left: 3px solid var(--accent); }
+.card-error { border-left: 3px solid var(--err); }
+
+.tag { display: inline-block; font-size: .7em; font-weight: 600; padding: 2px 6px; border-radius: 3px; }
+.tag-ok { background: #f0fdf4; color: var(--ok); }
+.tag-warn { background: #fffbeb; color: var(--warn); }
+.tag-err { background: #fef2f2; color: var(--err); }
+.tag-info { background: #eff6ff; color: var(--info); }
+
+.decision-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; margin: 16px 0; font-family: "Cascadia Code",monospace; font-size: .85em; line-height: 1.8; white-space: pre-wrap; }
+
+/* ===== Layout Wrappers ===== */
+.trio-header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 0; margin-bottom: 24px; }
+.trio-header-inner { max-width: 960px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+.trio-brand { font-size: .85rem; font-weight: 700; color: var(--text); }
+.trio-theme-btn { background: var(--bg-code); border: 1px solid var(--border); color: var(--text-soft); padding: 4px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: .75rem; font-family: system-ui, -apple-system, "Microsoft YaHei", sans-serif; }
+.trio-theme-btn:hover { background: var(--bg-hover); }
+.trio-body { max-width: 960px; margin: 0 auto; padding: 0 20px 40px; }
+.trio-footer { max-width: 960px; margin: 0 auto; padding: 16px 20px; border-top: 1px solid var(--border); text-align: center; font-size: .7rem; color: var(--text-muted); }
+
+/* ===== Print ===== */
+@media print {
+  body { max-width: 100%; font-size: 12px; }
+  .mermaid { page-break-inside: avoid; }
+  .trio-header, .trio-footer, .trio-theme-btn { display: none; }
+}

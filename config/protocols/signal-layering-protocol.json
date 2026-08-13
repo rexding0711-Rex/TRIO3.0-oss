@@ -1,0 +1,31 @@
+{
+  "_layer": "quality-control",
+  "id": "signal-layering",
+  "name": "信号分层协议",
+  "version": "1.0.0",
+  "created": "2026-07-10",
+  "origin": "2026-07-10 终极测试展现'两真一半真一假一查无'的逐条分层。固化为默认行为，替代二元通过/拒绝。",
+  "description": "对任务拆解出的每个核心命题独立判定信号密度，替代整体通过/拒绝。这是定义层——交付分区(templates/delivery-partition.md)消费本层的分类结果，不重复定义边界。",
+  "source_count_standard": {
+    "硬": "≥2 个独立公开来源交叉验证",
+    "软": "1 个来源，或仅间接信号",
+    "查无": "0 来源，或仅传闻/单一口述"
+  },
+  "layers": {
+    "🟢 充足": { "条件": "≥2 独立公开来源交叉", "处理": "正常分析·结论可对外(可上会)" },
+    "🟡 部分": { "条件": "1 来源·或仅间接信号", "处理": "分析但标注'软信号·仅供内部'" },
+    "🔴 不足": { "条件": "0 来源·或仅传闻/单一信源", "处理": "不分析·标注'查无/待验'·给补充建议" }
+  },
+  "decision_rules": [
+    "所有子问题都 🔴 → 整体拒绝(触发信号不足报告)",
+    "混合 → 分层模式：🟢 正常跑、🟡 跑但标注、🔴 明确不做",
+    "最终交付按 templates/delivery-partition.md 分两区呈现"
+  ],
+  "relationship_to_scripts": "signal-density-check.sh 保留为独立手动/CI 验证工具，不在 /all 流程中自动调用。本协议是流程内的表格式人工分层。",
+  "integration_point": "/all Step 2 搜索完成后、Step 3 三视角之前",
+  "related": [
+    "templates/delivery-partition.md",
+    "config/protocols/memory-stitch-detection.json",
+    "scripts/signal-density-check.sh"
+  ]
+}

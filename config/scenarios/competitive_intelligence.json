@@ -1,0 +1,72 @@
+{
+  "id": "competitive_intelligence",
+  "name": "竞品分析",
+  "version": "3.0.0",
+  "triggers": [
+    "竞品",
+    "竞争对手",
+    "差异化",
+    "市场格局",
+    "替代方案"
+  ],
+  "mode": "full",
+  "steps": [
+    {
+      "order": 1,
+      "role": "产业情报工程师",
+      "mask": "kimi",
+      "action": "竞品信息采集+竞品矩阵构建+差异化定位分析。**同时按 topology-thinking-protocol Phase 0 构建种子图**：以目标公司为中心，4-7 节点种子图，含 ??? 未知节点和虚线不确定边。图状态写入 runs/{run_id}/topology-state.json",
+      "output": "竞品情报报告（含竞品矩阵+差异化机会）+ 种子拓扑图",
+      "acceptance_criteria": "覆盖5+竞品对比，含产品/定价/渠道/技术四维矩阵，所有数据有来源。对照 D:\\工作\\对标库\\knowledge-benchmark\\ 已有竞品数据。种子图：4-7节点、≥1个???节点、≥1条虚线边"
+    },
+    {
+      "order": 2,
+      "role": "事实核查工程师",
+      "mask": "deepseek",
+      "action": "验证竞品关键数据（融资/团队/客户/专利）。**同时按 topology-thinking-protocol Phase 1 扩展拓扑图**：Read topology-state.json，新增 ≥5 个节点（每个连 ≥2 条边），识别竞争聚类和桥接边",
+      "acceptance_criteria": "每条竞品声明标注置信度[1-5]和source，至少发现1个竞品间的数据矛盾。扩展图：新增≥5节点、聚类≥1个、桥接边≥1条"
+    },
+    {
+      "order": 3,
+      "role": "成本拆解工程师",
+      "mask": "deepseek",
+      "action": "竞品成本结构逆向+定价策略对比",
+      "depends_on": [
+        2
+      ],
+      "acceptance_criteria": "覆盖3+竞品的BOM对比，附定价策略分析和成本优势判断"
+    },
+    {
+      "order": 4,
+      "role": "产品架构师",
+      "mask": "claude",
+      "action": "差异化定位建议+竞争策略推荐。**同时完成 topology-thinking-protocol Phase 2-4**：扰动推演（市场上某竞品退出/新进入者的影响）+ 时间化（竞争关系的动态变化）+ 脆弱点扫描（目标公司的竞争脆弱点）。Read topology-state.json",
+      "depends_on": [
+        2,
+        3
+      ],
+      "acceptance_criteria": "明确差异化方向（成本/技术/渠道/品牌），附风险评估。扰动推演≥1个意外发现。竞争脆弱点非安全答案。拓扑分析发现纳入策略建议"
+    },
+    {
+      "order": 5,
+      "role": "全栈交付工程师",
+      "mask": "claude",
+      "action": "打包竞品分析报告",
+      "depends_on": [
+        4
+      ],
+      "acceptance_criteria": "PDF+MD双格式，含竞品矩阵表+差异化路线图"
+    }
+  ],
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json",
+    "context_isolation": "config/protocols/context-isolation-protocol.json",
+    "escalate": "config/protocols/escalate-protocol.json",
+    "delivery": "config/delivery-protocol.json",
+    "knowledge_write": "config/knowledge-write-protocol.json",
+    "topology_gate": "bash scripts/topology-check.sh <output> <domain>", "topology_doc": "docs/topology-check-layer.md",
+    "topology_thinking": "config/protocols/topology-thinking-protocol.json",
+    "topology_methodology": "docs/topology-thinking-methodology.md"
+  },
+  "_layer": "scenario"
+}

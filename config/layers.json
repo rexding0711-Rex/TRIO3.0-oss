@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "rule": "上层依赖下层，下层不知上层。mgmt.sh是唯一跨层通道。",
+  "layers": [
+    {
+      "id": 1,
+      "name": "交互层",
+      "key": "interface",
+      "dir": ".claude/commands/",
+      "depends_on": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": 2,
+      "name": "场景层",
+      "key": "scenario",
+      "dir": "config/scenarios/",
+      "depends_on": [
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": 3,
+      "name": "能力层",
+      "key": "capability",
+      "dir": "config/roles/ config/protocols/",
+      "depends_on": [
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": 4,
+      "name": "知识层",
+      "key": "knowledge",
+      "dir": "knowledge/ docs/",
+      "depends_on": [
+        6
+      ]
+    },
+    {
+      "id": 5,
+      "name": "进化层",
+      "key": "evolution",
+      "dir": "DAILY.md metrics.md docs/adr/ knowledge/capability-mirror/ knowledge/decision-log/",
+      "depends_on": [
+        4,
+        6
+      ]
+    },
+    {
+      "id": 6,
+      "name": "基础设施层",
+      "key": "infra",
+      "dir": "mgmt.sh state.json config/projects.json config/layers.json",
+      "depends_on": []
+    }
+  ],
+  "cross_layer_channel": "mgmt.sh",
+  "header_convention": "<!-- @layer: {key} --> 或 # @layer: {key}",
+  "_layer": "infra"
+}

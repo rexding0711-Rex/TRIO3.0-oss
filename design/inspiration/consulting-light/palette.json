@@ -1,0 +1,63 @@
+{
+  "source": "McKinsey / BCG / Bain 公开报告 + 2025-2026 咨询风格趋势",
+  "extracted": "2026-06-25",
+
+  "palettes": {
+    "mckinsey-classic": {
+      "description": "McKinsey 经典 — 权威、分析感、极简",
+      "background": "FFFFFF",
+      "primaryText": "1E3A5F",
+      "secondaryText": "4A5568",
+      "accent": "336699",
+      "neutral": "F3F4F6",
+      "positive": "059669",
+      "alert": "DC2626"
+    },
+
+    "bcg-growth": {
+      "description": "BCG 风格 — 增长导向、清新",
+      "background": "FFFFFF",
+      "primaryText": "1A2332",
+      "secondaryText": "4A5568",
+      "accent": "0D9488",
+      "highlight": "0284C7",
+      "neutral": "F5F7FA",
+      "positive": "059669"
+    },
+
+    "navy-gold-prestige": {
+      "description": "2025 最受推荐的 Navy+Gold 提案风格",
+      "background": "FFFFFF",
+      "primaryText": "0F1A2E",
+      "secondaryText": "475569",
+      "accent": "C9A227",
+      "neutral": "F4F6F8",
+      "positive": "059669",
+      "alert": "DC2626"
+    },
+
+    "teal-amber-modern": {
+      "description": "深青+琥珀 — 2025 前瞻策略风格",
+      "background": "F8FAFC",
+      "primaryText": "0F172A",
+      "accent": "0E7490",
+      "highlight": "D97706",
+      "neutral": "F1F5F9"
+    }
+  },
+
+  "typography": {
+    "headlines": ["Inter", "SF Pro Display", "Source Sans Pro"],
+    "body": ["Source Sans Pro", "Segoe UI"],
+    "maxFamilies": 2,
+    "trend": "大号数字 + 一句话标题"
+  },
+
+  "rules": [
+    "每张幻灯片只说一件事",
+    "标题必须是完整的行动陈述（不是标签）",
+    "每个图表必须有 takeaway 标注",
+    "充足的留白 > 紧凑的排版",
+    "一个主强调色 + 其余全是中性色"
+  ]
+}

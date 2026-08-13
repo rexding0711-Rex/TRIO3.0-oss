@@ -1,0 +1,38 @@
+{
+  "id": "audit_review",
+  "name": "复盘审计",
+  "version": "3.0.0",
+  "triggers": [
+    "复盘",
+    "审计",
+    "检查",
+    "bug",
+    "问题",
+    "诊断"
+  ],
+  "mode": "quick_audit",
+  "steps": [
+    {
+      "order": 1,
+      "role": "复盘工程师",
+      "mask": "deepseek",
+      "action": "系统性缺陷挖掘+决策回溯审计+改进机会诊断",
+      "output": "复盘报告（缺陷清单+根因分析+改进建议）",
+      "acceptance_criteria": "至少发现3个可操作改进点。对照 D:\\工作\\知识库\\methods\\ 已有决策日志，检查同类问题是否重复出现"
+    },
+    {
+      "order": 2,
+      "role": "产品架构师",
+      "mask": "claude",
+      "action": "审核复盘发现+判定严重程度+制定修复优先级",
+      "depends_on": [
+        1
+      ],
+      "acceptance_criteria": "每条发现标注严重程度（🔴🟠🟡🟢），修复计划含责任人和时间"
+    }
+  ],
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json"
+  },
+  "_layer": "scenario"
+}

@@ -1,0 +1,30 @@
+{
+  "_layer": "quality-control",
+  "id": "memory-stitch-detection",
+  "name": "记忆缝合检测协议",
+  "version": "1.0.0",
+  "created": "2026-07-10",
+  "origin": "2026-07-10 终极测试(芯驰科技)首次展现此能力。固化为协议确保可复现，不再靠临场发挥。",
+  "description": "用户口述的精确断言常是'真实碎片+错误连接'。本协议强制逐条溯源，防止对传闻直接建模。查无≠判无。",
+  "scope": "全局——任何分析型会话(/all /速判 /尽调 /竞品 /逆向工程)，不限 /all。",
+  "trigger_conditions": [
+    "用户输入含'我记得/我听说/据说/朋友说/内部消息/有人说/传闻'",
+    "用户输入含精确数字或人名+公司关系断言，但未给出可核实来源",
+    "用户引用了之前 run 的结论，但措辞与原 run 不一致"
+  ],
+  "execution": [
+    "Step 1: 将每个精确断言独立提取为可验证命题（每条 ≤ 一句话）",
+    "Step 2: 对每个命题独立搜索验证（≥2 个独立来源交叉——与 signal-layering 源数标准一致）",
+    "Step 3: 分类标注 —— ✅属实 / ⚠️半真(方向对数字错/口径不同) / 🚩大概率假(公开信号指向反面) / ❌查无",
+    "Step 4: 对 🚩 和 ❌ 项，追溯缝合来源——什么真实信息被错误拼接？",
+    "Step 5: 以核验表呈现——原话 / 公开信源 / 判定 / 置信度"
+  ],
+  "output_format": "逐条核验表 + 缝合来源追溯（如适用）",
+  "integration_point": "/all Step 0 致命缺口扫描——搜索之后、分析之前；非 /all 场景在事实核查阶段执行",
+  "source_count_standard": "≥2 独立公开来源 = 可定性(硬)；1 = 软信号；0 = 查无。全协议统一，见 signal-layering-protocol.json",
+  "related": [
+    "config/protocols/signal-layering-protocol.json",
+    "config/protocols/self-verify-protocol.json",
+    "CLAUDE.md § 记忆缝合检测"
+  ]
+}

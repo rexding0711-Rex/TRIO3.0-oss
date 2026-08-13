@@ -1,0 +1,324 @@
+{
+  "description": "TRIO 3.0 知识抽取 Ground Truth v1 — 三分类回归测试集",
+  "version": "1.0.0",
+  "created": "2026-07-16",
+  "usage": "每次 Prompt / Schema / Pipeline 变更后，跑此测试集。positive 必须 ACCEPT，negative 必须 REJECT，abstain 必须 ABSTAIN。",
+  "success_criteria": {
+    "accept_precision": "≥ 95%",
+    "abstain_precision": "≥ 90%",
+    "false_fact_rate": "≤ 3%",
+    "entity_resolution": "≥ 95%",
+    "json_schema_validity": "100%"
+  },
+
+  "positive": [
+    {
+      "id": "GT-P-001",
+      "source_report": "TRIO-Stock-066-半导体材料",
+      "evidence_span": "安集科技是国内CMP抛光液龙头，产品已进入中芯国际、华虹等国内主要晶圆厂供应链",
+      "expected": "ACCEPT",
+      "subject": "安集科技",
+      "predicate": "SUPPLIES_MATERIAL",
+      "object": "CMP抛光液",
+      "object_type": "Material",
+      "source_type": "research_report",
+      "note": "安集科技 CMP 抛光液已被验证进入中芯国际产线"
+    },
+    {
+      "id": "GT-P-002",
+      "source_report": "TRIO-Stock-半导体材料",
+      "evidence_span": "鼎龙股份CMP抛光垫已通过中芯国际验证并实现批量供货",
+      "expected": "ACCEPT",
+      "subject": "鼎龙股份",
+      "predicate": "SUPPLIES_MATERIAL",
+      "object": "CMP抛光垫",
+      "object_type": "Material",
+      "source_type": "research_report",
+      "note": "鼎龙CMP抛光垫已量产供货"
+    },
+    {
+      "id": "GT-P-003",
+      "source_report": "TRIO-Stock-半导体材料",
+      "evidence_span": "根据2025年报披露，南大光电先进ArF光刻胶已通过头部晶圆厂流片测试并批量供应，贡献营收1200万元",
+      "expected": "ACCEPT",
+      "subject": "南大光电",
+      "predicate": "SUPPLIES_MATERIAL",
+      "object": "ArF光刻胶",
+      "object_type": "Material",
+      "source_type": "annual_report",
+      "note": "年报明确说批量供应+营收数字——最高置信度"
+    },
+    {
+      "id": "GT-P-004",
+      "source_report": "TRIO-Stock-半导体材料",
+      "evidence_span": "彤程新材收购北京科华，KrF光刻胶国内市占率超40%，上海基地2026年投产",
+      "expected": "ACCEPT",
+      "subject": "彤程新材",
+      "predicate": "SUPPLIES_MATERIAL",
+      "object": "KrF光刻胶",
+      "object_type": "Material",
+      "source_type": "research_report",
+      "note": "市占率40%证明已量产"
+    },
+    {
+      "id": "GT-P-005",
+      "source_report": "TRIO-Stock-半导体材料",
+      "evidence_span": "华特气体光刻气通过ASML认证，是国内唯一获此认证的特气公司",
+      "expected": "ACCEPT",
+      "subject": "华特气体",
+      "predicate": "SUPPLIES_MATERIAL",
+      "object": "电子特气",
+      "object_type": "Material",
+      "source_type": "company_website",
+      "note": "ASML认证=全球顶级认证"
+    },
+    {
+      "id": "GT-P-006",
+      "source_report": "TRIO-Stock-半导体材料",
+      "evidence_span": "雅克科技通过收购UP Chemical成为全球前驱体主要供应商，前驱体收入占比超60%",
+      "expected": "ACCEPT",
+      "subject": "雅克科技",
+      "predicate": "SUPPLIES_MATERIAL",
+      "object": "前驱体",
+      "object_type": "Material",
+      "source_type": "annual_report",
+      "note": "营收占比超60%=主营业务=最高置信度"
+    },
+    {
+      "id": "GT-P-007",
+      "source_report": "TRIO-Stock-半导体设备",
+      "evidence_span": "中微公司CCP刻蚀机进入台积电5nm产线",
+      "expected": "ACCEPT",
+      "subject": "中微公司",
+      "predicate": "CAN_PERFORM",
+      "object": "刻蚀",
+      "object_type": "Process",
+      "source_type": "research_report",
+      "note": "台积电5nm是全球最先进节点之一"
+    },
+    {
+      "id": "GT-P-008",
+      "source_report": "TRIO-Stock-半导体设备",
+      "evidence_span": "北方华创PVD/CVD设备进入国内主要晶圆厂",
+      "expected": "ACCEPT",
+      "subject": "北方华创",
+      "predicate": "CAN_PERFORM",
+      "object": "薄膜沉积",
+      "object_type": "Process",
+      "source_type": "research_report",
+      "note": ""
+    },
+    {
+      "id": "GT-P-009",
+      "source_report": "TRIO-Stock-半导体设备",
+      "evidence_span": "拓荆科技PECVD设备国内领先，进入中芯国际/华虹产线",
+      "expected": "ACCEPT",
+      "subject": "拓荆科技",
+      "predicate": "CAN_PERFORM",
+      "object": "薄膜沉积",
+      "object_type": "Process",
+      "source_type": "research_report",
+      "note": ""
+    },
+    {
+      "id": "GT-P-010",
+      "source_report": "TRIO-Stock-半导体设备",
+      "evidence_span": "盛美上海是国内清洗设备龙头，SAPS技术全球领先",
+      "expected": "ACCEPT",
+      "subject": "盛美上海",
+      "predicate": "CAN_PERFORM",
+      "object": "清洗",
+      "object_type": "Process",
+      "source_type": "research_report",
+      "note": ""
+    },
+    {
+      "id": "GT-P-011",
+      "source_report": "TRIO-Stock-半导体设备",
+      "evidence_span": "华海清科是国内CMP设备龙头，12寸设备进入国内主流产线",
+      "expected": "ACCEPT",
+      "subject": "华海清科",
+      "predicate": "CAN_PERFORM",
+      "object": "CMP",
+      "object_type": "Process",
+      "source_type": "research_report",
+      "note": ""
+    },
+    {
+      "id": "GT-P-012",
+      "source_report": "TRIO-Stock-AI芯片",
+      "evidence_span": "寒武纪(思元)与海光信息(深算DCU)在国产AI芯片市场直接竞争",
+      "expected": "ACCEPT",
+      "subject": "寒武纪",
+      "predicate": "COMPETES_WITH",
+      "object": "海光信息",
+      "object_type": "Company",
+      "source_type": "research_report",
+      "note": ""
+    },
+    {
+      "id": "GT-P-013",
+      "source_report": "TRIO-Stock-光模块",
+      "evidence_span": "中际旭创与新易盛在800G/1.6T光模块市场直接竞争",
+      "expected": "ACCEPT",
+      "subject": "中际旭创",
+      "predicate": "COMPETES_WITH",
+      "object": "新易盛",
+      "object_type": "Company",
+      "source_type": "research_report",
+      "note": ""
+    },
+    {
+      "id": "GT-P-014",
+      "source_report": "TRIO-Stock-半导体设备",
+      "evidence_span": "北方华创年报披露-半导体设备产品线包含清洗设备",
+      "expected": "ACCEPT",
+      "subject": "北方华创",
+      "predicate": "MAKES",
+      "object": "清洗设备",
+      "object_type": "ProductCategory",
+      "source_type": "annual_report",
+      "note": ""
+    },
+    {
+      "id": "GT-P-015",
+      "source_report": "TRIO-Stock-半导体设备",
+      "evidence_span": "上海新阳配套显影液打破日本垄断，与光刻胶协同供应",
+      "expected": "ACCEPT",
+      "subject": "上海新阳",
+      "predicate": "SUPPLIES_MATERIAL",
+      "object": "湿电子化学品",
+      "object_type": "Material",
+      "source_type": "research_report",
+      "note": ""
+    }
+  ],
+
+  "negative": [
+    {
+      "id": "GT-N-001",
+      "subject": "雅克科技",
+      "source_report": "TRIO-Stock-半导体材料",
+      "evidence_span": "雅克科技是国内光刻胶重要企业",
+      "expected": "REJECT",
+      "reason": "雅克科技主营前驱体（收入占比>60%），光刻胶仅占极小份额。'光刻胶重要企业'是研报的夸大表述，与年报披露的主营结构矛盾。应被 L2 LLM 判断识别为信号过弱",
+      "wrong_predicate": "SUPPLIES_MATERIAL",
+      "wrong_object": "光刻胶",
+      "source_type": "research_report",
+      "note": "审计发现的经典案例——前驱体才是主业，光刻胶是次要业务被研报夸大"
+    },
+    {
+      "id": "GT-N-002",
+      "subject": "容大感光",
+      "source_report": "合成案例",
+      "evidence_span": "容大感光是国内光刻胶龙头企业",
+      "expected": "REJECT",
+      "reason": "容大感光主营PCB光刻胶，非半导体光刻胶。如果object未区分variant（ArF/KrF/PCB），应 REJECT 而非将PCB光刻胶混入半导体供应链。正确做法是ABSTAIN并要求指定variant",
+      "wrong_predicate": "SUPPLIES_MATERIAL",
+      "wrong_object": "ArF光刻胶",
+      "source_type": "research_report",
+      "note": "粗粒度陷阱——PCB光刻胶≠半导体光刻胶"
+    },
+    {
+      "id": "GT-N-003",
+      "subject": "小米集团",
+      "source_report": "合成案例",
+      "evidence_span": "小米集团为消费电子企业提供芯片",
+      "expected": "REJECT",
+      "reason": "小米是芯片消费者，不是供应商。证据中'为...提供'是被动语态误判为主动供应。实体角色颠倒",
+      "wrong_predicate": "SUPPLIES_TO",
+      "wrong_object": "芯片",
+      "source_type": "inference",
+      "note": "角色颠倒——消费者被误标为供应商"
+    }
+  ],
+
+  "abstain": [
+    {
+      "id": "GT-A-001",
+      "source_report": "TRIO-Stock-半导体材料",
+      "evidence_span": "彤程新材正积极进行高频ArF光刻胶产业规划与未来三年建设展望，期待通过认证",
+      "expected": "ABSTAIN",
+      "reason": "L1 硬规则命中：'规划' + '未来三年' + '期待'。全是未来时态，无任何已量产的证据",
+      "trigger_layer": "L1_HARD_RULE",
+      "hit_keywords": ["规划", "未来三年", "期待"],
+      "source_type": "research_report"
+    },
+    {
+      "id": "GT-A-002",
+      "source_report": "合成案例",
+      "evidence_span": "雅克科技光刻胶正积极布局，目前已经在晶圆厂客户端开展相关测试",
+      "expected": "ABSTAIN",
+      "reason": "L1 硬规则命中：'布局'。'客户端开展测试'≠商业化供应。信号强度不足以 ACCEPT",
+      "trigger_layer": "L1_HARD_RULE",
+      "hit_keywords": ["布局"],
+      "source_type": "research_report"
+    },
+    {
+      "id": "GT-A-003",
+      "source_report": "合成案例",
+      "evidence_span": "公司持续推进光刻胶验证工作，部分产品已送样",
+      "expected": "ABSTAIN",
+      "reason": "L2 LLM 判断应识别：'送样'≠量产。虽然不触发L1黑名单，但evidence_strength应≤0.5，触发L2 ABSTAIN",
+      "trigger_layer": "L2_LLM_JUDGMENT",
+      "expected_sub_scores": {
+        "evidence_strength": "≤ 0.5",
+        "source_authority": "取决于报告类型",
+        "resolution_certainty": "取决于object解析"
+      },
+      "source_type": "research_report"
+    },
+    {
+      "id": "GT-A-004",
+      "source_report": "合成案例",
+      "evidence_span": "公司拟投资10亿元建设光刻胶产线，预计2027年投产",
+      "expected": "ABSTAIN",
+      "reason": "L3 后置硬规则：虽然不含L1关键词（'拟'不在当前L1列表），但'拟投资'+'预计投产'是典型的未来承诺，LLM容易误判为ACCEPT。L3后置规则应捕获",
+      "trigger_layer": "L3_POST_RULE",
+      "hit_keywords": ["拟投资", "预计", "投产"],
+      "source_type": "news",
+      "note": "L3 存在的价值——LLM容易把'计划投入10亿建产线'错误转成SUPPLIES_MATERIAL conf=0.87"
+    },
+    {
+      "id": "GT-A-005",
+      "source_report": "合成案例",
+      "evidence_span": "公司参股某光刻胶企业20%股权",
+      "expected": "ABSTAIN",
+      "reason": "L1 硬规则命中：'参股'。参股≠自己生产。不能从参股推导出SUPPLIES_MATERIAL",
+      "trigger_layer": "L1_HARD_RULE",
+      "hit_keywords": ["参股"],
+      "source_type": "news"
+    }
+  ],
+
+  "metadata": {
+    "total_examples": 23,
+    "positive_count": 15,
+    "negative_count": 3,
+    "abstain_count": 5,
+    "predicate_coverage": {
+      "SUPPLIES_MATERIAL": 12,
+      "CAN_PERFORM": 5,
+      "COMPETES_WITH": 2,
+      "MAKES": 1,
+      "SUPPLIES_TO": 0,
+      "HAS_CAPABILITY": 0,
+      "REQUIRES_MATERIAL": 0,
+      "USES_TECH": 0
+    },
+    "known_gaps": [
+      "SUPPLIES_TO / HAS_CAPABILITY / REQUIRES_MATERIAL / USES_TECH 缺少测试样本——后续批次补充",
+      "negative 样本偏少（3条）——生产环境中每发现一个错误ACCEPT都应加入此测试集",
+      "abstain 样本中 3/5 是合成案例（GT-A-002~005），需用真实报告文本替换"
+    ],
+    "next_update": "跑完 10 份半导体报告试点后，将试点中发现的错误 ACCEPT / 错误 REJECT 加入此文件",
+    "cypher_null_traps": {
+      "description": "2026-07-16 发现的两个 Cypher null 陷阱——任何新增 Cypher 查询必须遵守",
+      "defensive_rule": "所有 Cypher WHERE 中的 <> 比较，必须写成 (x IS NULL OR x <> value)。所有 reduce 数值必须 COALESCE",
+      "traps": [
+        {"id":"NULL_TRAP_1","name":"COALESCE in reduce()","pattern":"reduce(w, d | w + d.conf)","fix":"COALESCE(d.conf, 0.0)","rationale":"null 污染累加器归零"},
+        {"id":"NULL_TRAP_2","name":"null <> value = null","pattern":"WHERE r.status <> 'x'","fix":"WHERE (r.status IS NULL OR r.status <> 'x')","rationale":"null<>'x'=null, WHERE把null当false"}
+      ]
+    }
+  }
+}

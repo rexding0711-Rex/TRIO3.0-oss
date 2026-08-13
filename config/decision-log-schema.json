@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TRIO 决策追溯日志 Schema",
+  "description": "三面具关键判断的可追溯日志。灵感来源: Chris Olah 可解释性文化——每个判断应可追溯其来源、置信度和推理基础。",
+  "version": "1.0.0",
+  "fields": {
+    "ts": {
+      "type": "string",
+      "format": "ISO 8601 with timezone",
+      "example": "2026-07-01T16:30:00+08:00",
+      "description": "决策时间戳"
+    },
+    "persona": {
+      "type": "string",
+      "enum": ["kimi", "deepseek", "claude"],
+      "description": "做出判断的面具"
+    },
+    "claim_type": {
+      "type": "string",
+      "enum": [
+        "fact_assertion",
+        "causal_claim",
+        "evaluative_judgment",
+        "architectural_decision",
+        "risk_assessment",
+        "prioritization"
+      ],
+      "description": "判断类型"
+    },
+    "claim": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "核心判断，一句话"
+    },
+    "confidence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "置信度 (1=猜测, 5=权威来源证实)"
+    },
+    "basis": {
+      "type": "string",
+      "maxLength": 300,
+      "description": "判断依据——数据源/推理链/引用文件"
+    },
+    "upstream": {
+      "type": "string",
+      "description": "依赖的上游决策ID (如 'kimi-20260701-001')，无依赖则 null"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^(kimi|deepseek|claude)-\\d{8}-\\d{3}$",
+      "description": "唯一ID: {persona}-{YYYYMMDD}-{序号}"
+    },
+    "verification": {
+      "type": "string",
+      "enum": ["pending", "verified", "falsified"],
+      "default": "pending",
+      "description": "验证状态：pending=待验证, verified=被证实, falsified=被证伪（2026-08-11 阶段二新增）"
+    },
+    "verification_date": {
+      "type": "string",
+      "format": "date",
+      "description": "验证日期（何时可以判断对错）"
+    },
+    "actual_outcome": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "实际结果（对账时记录）"
+    },
+    "prediction_contract": {
+      "type": "object",
+      "description": "可证伪预测登记（Falsifiable Prediction Record）——注册时锁定成功/失败条件，防事后定义。**非法律合同**：仅为系统内部假设检验断言，不构成任何承诺/担保/合同义务（2026-08-11 第三轮评审修正：避免'契约'法律暗示）",
+      "properties": {
+        "success_condition": "type: string——什么算预测成功（可机械执行）",
+        "failure_condition": "type: string——什么算预测失败（可机械执行）",
+        "verification_source": "type: string——验证证据来源（官方/司法/第三方）"
+      }
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "判断有效期（何时过期失效，需重新评估）"
+    },
+    "financial_exposure": {
+      "type": "string",
+      "description": "金额/敞口阈值——超 X 万需人工复核"
+    },
+    "hitl_gate": {
+      "type": "string",
+      "description": "人工介入点：置信度≤3 或敞口>X 时强制人工确认"
+    },
+    "key_assumptions": {
+      "type": "array",
+      "items": "type: string",
+      "description": "关键假设清单——假设被推翻则结论翻转"
+    },
+    "counter_evidence": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "主要反证——Rule 1 要求高置信判断(≥4)必须附反证，无反证不得标 ≥4"
+    },
+    "minority": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "少数派意见——认知隔离时被保留的分歧（CORE.md 少数派保护：不取平均，不杀死，标注触发边界）"
+    }
+  },
+  "required": ["ts", "persona", "claim_type", "claim", "confidence", "basis", "id", "verification"],
+  "logging_triggers": {
+    "description": "以下情况必须记录决策日志",
+    "rules": [
+      "置信度 ≤ 3 的任何声明",
+      "被其他面具作为输入采纳的判断",
+      "方案选择/架构决策 (claude 面具)",
+      "事实断言被推翻或修正",
+      "审计发现致命/重大缺陷 (deepseek 面具)",
+      "跨域类比或模式发现 (kimi 面具)"
+    ]
+  }
+}

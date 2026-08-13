@@ -1,0 +1,70 @@
+{
+  "name": "run-eval-protocol",
+  "version": "1.0.0",
+  "created": "2026-07-09",
+  "source": "翁荔 Harness Engineering + DGM 20%→50% 启示",
+  "type": "protocol",
+  "description": "每次 TRIO 任务结束后自动评分。积累 ≥10 次 run 后——反校准引擎 L5 评分权重。这是 TRIO Harness 自进化的最小闭环。",
+
+  "run_record": {
+    "location": "runs/{YYYY-MM-DD}-{slug}/run-state.json",
+    "template": {
+      "run_id": "{YYYY-MM-DD}-{slug}",
+      "created": "{timestamp}",
+      "task_type": "{人才追踪|竞品情报|尽调|关系分析|自指审计|M4训练|其他}",
+      "engines_used": ["{引擎名}"],
+      "outputs": ["{产出物路径}"],
+      "eval": {
+        "client_feedback": "{有|无|正面|负面|未收到}",
+        "delivery_timeliness": "{提前|按时|延迟}",
+        "internal_audit_level": "{L1|L2|L3}",
+        "external_review": "{有|无}",
+        "external_review_outcome": "{通过|发现N个问题|未做}",
+        "self_improvement_triggered": "{触发的升级描述或'无'}"
+      },
+      "post_mortem": "{一句话：这次 run 最大的教训是什么？}"
+    }
+  },
+
+  "scoring": {
+    "dimensions": {
+      "client_feedback_score": { "正面": 5, "未收到": 3, "有": 3, "负面": 1 },
+      "timeliness_score": { "提前": 5, "按时": 4, "延迟": 2 },
+      "audit_score": { "L2": 5, "L1": 3 },
+      "external_review_score": { "通过": 5, "发现N个问题": 3, "未做": 2 },
+      "improvement_bonus": { "有": 2, "无": 0 }
+    },
+    "composite": "sum(all_scores) / max_possible * 10",
+    "calibration_trigger": "≥10 runs → analyze score distribution → recommend engine L5 weight adjustments"
+  },
+
+  "integration": {
+    "run_state_db": "runs/ → state/run-history.jsonl（每次 run 结束后追加一行）",
+    "data_dir": "D:\\工作\\TRIO\\ → Reports/（交付物） + 对标库/（基准数据） + 知识库/（方法论）",
+    "neo4j_sync": "(deprecated ADR-010, reserved for 4.0)"
+  },
+
+  "reverse_evidence": {
+    "_added": "2026-07-10 · 反证覆盖率从深度模式(L3+)扩展到所有引擎 run",
+    "rule": "每个核心结论必须附至少一条——'如果 X 发生，此结论作废'(翻转条件) 或 '前提假设 Y，Y 不成立则重估'",
+    "enforcement": "topology-check.sh C8(WARN 级·分析型报告)。核心结论建议打【结论】显式标记便于机检；升级为硬 FAIL 待写作规范定义后再议",
+    "scope": "所有引擎 run，不限深度模式"
+  },
+
+  "engine_orchestration": {
+    "_added": "2026-07-10 · 双引擎编排降级进此节，不单建协议——未实测前不过度设计(审计 🟡-9)",
+    "when": "一个任务同时触发多个引擎(如竞品+人才)",
+    "sequence": [
+      "1. 按 signal-layering 判定每个引擎信号是否充足",
+      "2. 🟢/🟡 引擎并行跑 Step 2 搜索",
+      "3. 按信号密度决定各引擎是否进 Step 3",
+      "4. Step 5 交叉验证——两引擎一致→置信上升(标'交叉验证通过')；冲突→标'战略信号·需用户裁决'；一方信号不足→明确'该维度无法提供结论'"
+    ],
+    "cross_validation_example": "竞品引擎'X 在招 Y 方向' + 人才引擎'Y 方向的人流向 X' → 双向验证=强信号"
+  },
+
+  "meta": {
+    "next_evolution": "当 ≥10 runs 积累后→生成第一份 Harness 自进化报告→提议引擎参数调整→人确认后生效",
+    "related": ["config/protocols/competitive-intel-engine.json", "config/protocols/talent-reverse-trace-engine.json", "CLAUDE.md § 产出物声明等级"]
+  }
+}

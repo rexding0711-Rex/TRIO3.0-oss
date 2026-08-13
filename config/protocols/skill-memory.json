@@ -1,0 +1,50 @@
+{
+  "_layer": "infra",
+  "id": "skill-memory",
+  "name": "技能记忆协议",
+  "version": "1.2.0",
+  "inspiration": "Hermes Agent auto SKILL.md generation",
+  "description": "每次 run 完成 + DeepSeek 审计通过后，自动提取可复用模式→生成 SKILL 文件→下次同类 run 先加载",
+  "trigger": "run status = completed AND audit = PASS",
+  "output": "knowledge/skills/{scenario}/{skill_name}.md",
+  "schema": {
+    "skill_name": "string",
+    "scenario": "string",
+    "source_run": "string",
+    "timestamp": "ISO 8601",
+    "optimal_steps": [
+      "step1",
+      "step2",
+      "..."
+    ],
+    "pitfalls": [
+      "踩过的坑"
+    ],
+    "reusable_patterns": [
+      "可复用模式"
+    ],
+    "confidence": "integer (1-5)"
+  },
+  "auto_curation": {
+    "dedup": "同名技能→对比内容→保留最新或合并",
+    "retire": "连续3次run未使用→标记为archived",
+    "upgrade": "新run产生更高分模式→更新技能文件"
+  },
+  "failure_handling": {
+    "skill_extraction_fails": "标记run state = skill_failed，不阻塞run完成",
+    "duplicate_skill": "内容对比→同名技能内容相似度>80%→合并；差异大→保留两份人工裁决",
+    "template_corrupted": "回退到内置默认模板，告警写入errors.log",
+    "index_update_fails": "重试3次→降级为手动INDEX更新提醒"
+  },
+  "evolution": {
+    "versioning": "每次更新skill内容时递增版本号(v1.0→v1.1)，保留上一版本为.skill-backup",
+    "retire_policy": "连续3次run未使用→标记archived→30天后删除。被引用≥5次的技能永久保留",
+    "upgrade_trigger": "同场景新run评分>旧skill评分→自动更新skill内容+记录变更原因"
+  },
+  "_note": "这不是分布式协议——是TRIO内部配置。名称由协议设计模式一书启发修正。",
+  "compatibility": {
+    "rule": "新版本向后兼容旧版本。旧版本遇到新字段→忽略(不报错)。",
+    "breaking_change_policy": "破坏性变更需提前1个版本声明deprecated→再1个版本后移除",
+    "last_breaking_change": "无"
+  }
+}

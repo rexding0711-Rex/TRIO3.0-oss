@@ -1,0 +1,27 @@
+{
+  "M1": {
+    "name": "结构化多视角强制",
+    "version": "2.0",
+    "updated": "2026-07-09",
+    "description": "在共享上下文约束下，通过流程纪律确保三个独立分析视角不相互稀释",
+    "completion_criteria": [
+      "每个面具的输出以独立段落存在，物理分隔（## Kimi / ## DeepSeek / ## Claude）",
+      "DeepSeek 面具必须至少质疑 Kimi 结论中的 1 条",
+      "Claude 面具的综合必须标注'共识/分歧/盲区'三区",
+      "isolation_audit.py 扫描通过率 ≥ 90%（无跨面具因果引用）",
+      "每个面具声明至少 1 个自身盲区"
+    ],
+    "honest_limitation": "非物理隔离。三面具共享 Claude Code 上下文。隔离依赖流程纪律而非技术强制。",
+    "verified": "2026-07-09 isolation_audit.py 全量扫描: 56/56 runs 0 violations"
+  },
+  "M2": {
+    "name": "可证伪条件覆盖率",
+    "status": "active",
+    "description": "每个分析结论附'在什么条件下会被推翻'"
+  },
+  "M3": {
+    "name": "runs/ 状态机",
+    "status": "active",
+    "description": "57 runs 结构化归档·INDEX 自动生成·100% 健康率"
+  }
+}

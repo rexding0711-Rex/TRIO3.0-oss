@@ -1,0 +1,32 @@
+{
+  "name": "Data Heavy",
+  "version": "1.0",
+  "description": "数据看板风 — 白底+蓝橙双色系，表格密集场景最优",
+  "useWhen": ["行业数据报告", "市场分析", "对标分析", "数据看板"],
+
+  "fonts": {
+    "zh": "Microsoft YaHei",
+    "zhBold": "Microsoft YaHei Bold",
+    "en": "Segoe UI",
+    "enBold": "Segoe UI Bold",
+    "mono": "Cascadia Code"
+  },
+
+  "colors": {
+    "pageBg":   "F8FAFC",
+    "white":    "FFFFFF",
+    "cardBg":   "F1F5F9",
+    "dark":     "0F172A",
+    "textMain": "0F172A",
+    "textBody": "334155",
+    "textMuted":"64748B",
+    "blue":     "1D4ED8",
+    "amber":    "EA580C",
+    "green":    "059669",
+    "red":      "DC2626",
+    "tblHead":  "1E293B",
+    "tblRow1":  "FFFFFF",
+    "tblRow2":  "F1F5F9",
+    "line":     "CBD5E1"
+  }
+}

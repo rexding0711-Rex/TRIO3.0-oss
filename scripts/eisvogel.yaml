@@ -1,0 +1,51 @@
+# ================================================================
+# TRIO 3.0 · Eisvogel 管道默认配置
+# ================================================================
+# 用法：md-to-pdf.sh 自动读取此文件
+# 项目级覆盖：在项目目录放置 eisvogel.yaml 即可覆盖此处字段
+# ================================================================
+
+# ── 引擎 ──
+pdf_engine: xelatex
+
+# ── 模板 ──
+template: eisvogel
+
+# ── 默认配色方案 ──
+# 纯黑白 ("000000"/"FFFFFF") — 正式报告默认
+# 深蓝 ("1A3A5C"/"FFFFFF") — 咨询报告风格
+# 深灰 ("2D2D2D"/"FFFFFF") — 技术文档风格
+titlepage_color: "000000"
+titlepage_text_color: "FFFFFF"
+titlepage_rule_color: "FFFFFF"
+
+# ── 字体配置 ──
+cjk_main_font: Noto Sans CJK SC
+cjk_sans_font: Noto Sans CJK SC
+cjk_mono_font: Noto Sans CJK SC
+main_font: Noto Sans CJK SC
+mono_font: Source Code Pro
+
+# ── 页面设置 ──
+font_size: 11pt
+paper_size: a4
+margin_top: 25mm
+margin_bottom: 25mm
+margin_left: 22mm
+margin_right: 22mm
+
+# ── 功能开关 ──
+toc: true
+toc_depth: 2
+number_sections: true
+listings: true
+highlight_style: monochrome
+
+# ── 标题页 ──
+titlepage: true
+titlepage_rule_height: 2
+
+# ── 页脚 ──
+# 留空则只显示页码
+footer_left: ""
+footer_center: "\\thepage"

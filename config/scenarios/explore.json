@@ -1,0 +1,26 @@
+{
+  "id": "explore",
+  "name": "通用探索",
+  "version": "3.0.0",
+  "triggers": [
+    "trio-run",
+    "探索",
+    "explore",
+    "跑一个"
+  ],
+  "mode": "solo",
+  "steps": [
+    {
+      "order": 1,
+      "role": "产品架构师",
+      "mask": "claude",
+      "action": "理解用户意图→判断属于哪个领域→如果接近已有场景则建议切换，否则直接给出答案或探索计划",
+      "output": "意图分析 + 回答/探索建议",
+      "acceptance_criteria": "明确说出理解了什么、建议下一步怎么做。不强行套用不匹配的场景。先 Read D:\\工作\\知识库\\index.md 了解已有知识资产"
+    }
+  ],
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json"
+  },
+  "_layer": "scenario"
+}

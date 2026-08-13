@@ -1,0 +1,42 @@
+{
+  "name": "Tech Deep",
+  "version": "1.0",
+  "description": "深色科技风 — 深蓝黑底+霓虹青/紫/橙，适合大型发布会 Keynote",
+  "useWhen": ["大型发布会", "产品发布", "技术大会", "品牌宣传"],
+
+  "fonts": {
+    "zh": "Microsoft YaHei",
+    "zhBold": "Microsoft YaHei Bold",
+    "en": "Segoe UI",
+    "enBold": "Segoe UI Bold",
+    "mono": "Cascadia Code"
+  },
+
+  "colors": {
+    "pageBg":   "080C1A",
+    "cardBg":   "141E3A",
+    "white":    "FFFFFF",
+    "dark":     "080C1A",
+
+    "textMain": "FFFFFF",
+    "textBody": "C8CDD8",
+    "textMuted":"8E94A5",
+
+    "blue":     "00D4FF",
+    "amber":    "FF6B35",
+    "green":    "00E5A0",
+    "red":      "FF3B5C",
+    "purple":   "7B5CFC",
+
+    "tblHead":  "141E3A",
+    "tblRow1":  "141E3A",
+    "tblRow2":  "1A2744",
+    "line":     "5A6072",
+
+    "cyan":     "00D4FF",
+    "orange":   "FF6B35",
+    "coral":    "FF3B5C",
+    "cardBg2":  "1A2744",
+    "ice":      "1E2D4A"
+  }
+}

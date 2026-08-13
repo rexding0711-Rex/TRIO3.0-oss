@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$title$</title>
+<style>
+$if(trio-css)$
+$trio-css$
+$endif$
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:'base',securityLevel:'loose'});</script>
+</head>
+<body>
+<div class="trio-header">
+  <div class="trio-header-inner">
+    <span class="trio-brand">TRIO 3.0</span>
+    <button class="trio-theme-btn" onclick="(function(){var h=document.documentElement;var n=h.getAttribute('data-theme')==='dark'?'light':'dark';h.setAttribute('data-theme',n);this.textContent=n==='dark'?'亮色':'暗色';}).call(this)">暗色</button>
+  </div>
+</div>
+<div class="trio-body">
+$body$
+</div>
+<footer class="trio-footer">
+  <p>TRIO 3.0 · $title$ · $date$</p>
+</footer>
+</body>
+</html>

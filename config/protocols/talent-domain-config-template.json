@@ -1,0 +1,118 @@
+{
+  "name": "talent-domain-config-template",
+  "version": "1.0.0",
+  "type": "domain_config_template",
+  "engine_ref": "config/protocols/talent-reverse-trace-engine.json",
+  "description": "领域配置模板。换领域 = 复制此文件 → 重命名为 talent-domain-{领域名}.json → 填入具体参数 → 加载到引擎。10 分钟完成一个新领域。",
+
+  "_instructions": "复制此文件后，删除所有以 _ 开头的说明字段，填入真实数据。",
+
+  "domain": {
+    "name": "{领域名称，如 ai4s_biopharma / semiconductor / autonomous_driving / quant_finance}",
+    "display_name": "{中文显示名，如 AI for Science 生物制药}",
+    "client_industry": "{客户行业，用于调整人才价值判断基准}",
+    "typical_titles": ["{该领域典型职位1}", "{职位2}", "{职位3}"],
+    "_note": "typical_titles 用于搜索时过滤噪音——Agent 不会把'AI制药研究员'的数据喂给招'芯片设计工程师'的客户"
+  },
+
+  "traces": {
+    "_note": "从引擎的六类痕迹中，为本领域选 2-3 类。删掉不适用的类别。",
+
+    "competitive": {
+      "enabled": true,
+      "competitions": [
+        {
+          "name": "{竞赛名称}",
+          "cycle": "{每年/每两年/不定期}",
+          "url_pattern": "{竞赛官网URL模式}",
+          "authority": "{为什么这个竞赛在领域内权威}",
+          "talent_value": "{获奖者能做什么——从客户角度}",
+          "search_queries": [
+            "\"{竞赛名} {年份} winner Chinese team\"",
+            "\"{竞赛名} results {年份} {高校关键词}\""
+          ]
+        }
+      ]
+    },
+
+    "academic": {
+      "enabled": true,
+      "paper_sources": [
+        {
+          "name": "{arXiv / PubMed / IEEE Xplore / Google Scholar}",
+          "url_pattern": "{搜索URL模式}",
+          "search_queries": [
+            "\"{领域关键词} {年份} state of the art\""
+          ]
+        }
+      ],
+      "conferences": [
+        {
+          "name": "{顶会名称}",
+          "cycle": "{每年/每两年}",
+          "authority": "{为什么重要}",
+          "talent_value": "{发这个会的人能做什么}"
+        }
+      ]
+    },
+
+    "engineering": {
+      "enabled": false,
+      "platforms": [],
+      "_note": "如果该领域不看重开源贡献，删除本节"
+    },
+
+    "intellectual_property": {
+      "enabled": false,
+      "patent_sources": [],
+      "_note": "芯片/半导体/材料领域启用。AI/软件领域通常不需要"
+    },
+
+    "influence": {
+      "enabled": false,
+      "platforms": [],
+      "_note": "设计/产品/教育领域启用"
+    },
+
+    "organizational": {
+      "enabled": true,
+      "org_watchlist": [
+        {
+          "org_name": "{公司名}",
+          "org_type": "{大厂/创业公司/研究院}",
+          "why_watch": "{为什么这家公司的人才对本领域有价值}",
+          "recent_signals": "{最近的融资/拆分/裁员/高层变动}"
+        }
+      ]
+    }
+  },
+
+  "l3_query_templates": {
+    "_note": "L3 个人级追踪的搜索模板。{} 内为变量——Agent 运行时填充。",
+    "find_students": [
+      "\"{PI姓名}\" \"{高校}\" 团队 博士 学生",
+      "\"{PI姓名}\" PhD student {高校英文名}"
+    ],
+    "find_authors": [
+      "\"{PI姓名}\" \"{竞赛/工具名}\" first author",
+      "site:arxiv.org \"{PI姓名}\" {年份}"
+    ],
+    "find_career": [
+      "\"{学生姓名}\" LinkedIn {领域关键词}",
+      "\"{学生姓名}\" GitHub {工具关键词}"
+    ]
+  },
+
+  "authority_indicators": {
+    "_note": "该领域内代表'这个人很厉害'的信号——用于筛选优先级",
+    "academic": ["{奖项1}", "{人才计划1}", "{头衔1}"],
+    "industry": ["{大厂名1} 核心团队", "{知名开源项目} 维护者"],
+    "mobility_triggers": ["{毕业年份}", "{博后出站}", "{任期结束}", "{公司动荡}"]
+  },
+
+  "meta": {
+    "created": "{日期}",
+    "tested_on": "{首次使用的项目名}",
+    "test_results": "{效果评估——是否找到了客户认可的人才？}"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "state-schema-v1.0",
+  "description": "TRIO run state.json 标准格式。支持断点续跑和上下文恢复。",
+  "required_fields": {
+    "run_id": "string — 唯一标识",
+    "scenario": "string — 场景ID",
+    "status": "running | paused_escalate | completed | aborted",
+    "step_index": "int — 当前执行到的步骤",
+    "total_steps": "int — 场景总步骤数",
+    "created_at": "ISO8601 with +08:00 — 创建时间（系统时钟）",
+    "updated_at": "ISO8601 with +08:00 — 最后更新时间（系统时钟）",
+    "schema_version": "string — '1.0'"
+  },
+  "resume_fields": {
+    "context_summary": "string ≤500字 — 已完成的步骤摘要，恢复时直接读取而非重跑",
+    "pending_decisions": "[]string — 待用户裁决的事项列表",
+    "retry_count": "int — 当前修复循环计数"
+  },
+  "completion_fields": {
+    "completed_at": "ISO8601 — 完成时间",
+    "final_score": "float — 综合评分",
+    "final_verdict": "string — 最终判定"
+  }
+}

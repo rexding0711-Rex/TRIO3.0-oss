@@ -1,0 +1,46 @@
+{
+  "_description": "TRIO 三面具回归测试用例 — 每次改 prompt 后跑一遍",
+  "_usage": "python tests/regression_runner.py",
+  "cases": [
+    {
+      "id": "claude-001",
+      "persona": "claude",
+      "input": "分析宁德时代的供应链风险，重点关注上游锂材料的供应稳定性",
+      "expected_entities": ["Organization", "Material"],
+      "expected_tools": ["kg-query"],
+      "forbidden_phrases": ["我不知道", "无法确定"],
+      "min_tokens": 200
+    },
+    {
+      "id": "kimi-001",
+      "persona": "kimi",
+      "input": "用创意角度描述动力电池行业的未来十年趋势",
+      "expected_tools": ["web-search"],
+      "forbidden_phrases": ["数据不足"],
+      "min_tokens": 300
+    },
+    {
+      "id": "deepseek-001",
+      "persona": "deepseek",
+      "input": "审计以下结论：'碳酸锂价格将在2026年下半年大幅下跌'",
+      "expected_tools": ["web-search"],
+      "forbidden_phrases": ["完全正确", "毫无疑问"],
+      "quality_checks": ["是否列出了反证", "是否区分了确定性与推测"]
+    },
+    {
+      "id": "kg-extract-001",
+      "persona": "kg-extractor",
+      "input": "蜂巢能源(SVOLT)总部位于常州，主要生产短刀电池，由长城汽车投资。其正极材料由当升科技供应。",
+      "expected_entity_count": {"min": 5, "max": 15},
+      "expected_relation_count": {"min": 3, "max": 10},
+      "expected_labels": ["Organization", "Product", "Material", "Location"]
+    },
+    {
+      "id": "kg-extract-002",
+      "persona": "kg-extractor",
+      "input": "瑞浦兰钧(Rept Battero)是青山集团旗下的电池企业，总部位于温州。主打产品为问顶电池，供应给上汽集团和零跑汽车。",
+      "expected_entity_count": {"min": 5, "max": 15},
+      "expected_labels": ["Organization", "Product", "Location"]
+    }
+  ]
+}

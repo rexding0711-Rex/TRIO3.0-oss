@@ -1,0 +1,50 @@
+{
+  "id": "org_restructure",
+  "name": "组织架构调整",
+  "version": "3.0.0",
+  "triggers": [
+    "架构调整",
+    "合并",
+    "重组",
+    "休眠",
+    "激活",
+    "新增角色",
+    "删除角色"
+  ],
+  "mode": "quick_audit",
+  "steps": [
+    {
+      "order": 1,
+      "role": "复盘工程师",
+      "mask": "deepseek",
+      "action": "分析当前角色健康度+识别合并/休眠/激活机会",
+      "output": "角色健康度评估+调整建议",
+      "acceptance_criteria": "每个角色标注健康度（🟢🟡🔴）和调整理由。对照 D:\\TRIO 3.0\\config\\roles\\ 现有角色文件"
+    },
+    {
+      "order": 2,
+      "role": "产品架构师",
+      "mask": "claude",
+      "action": "审核调整方案+制定执行计划+更新角色文件",
+      "depends_on": [
+        1
+      ],
+      "acceptance_criteria": "调整方案含：哪些角色合并/休眠/激活、新角色定义、过渡期安排。更新受影响的角色文件 frontmatter"
+    },
+    {
+      "order": 3,
+      "role": "资产盘点工程师",
+      "mask": "claude",
+      "action": "归档旧角色文件+更新索引+记录决策",
+      "depends_on": [
+        2
+      ],
+      "acceptance_criteria": "旧角色→archive/v2-roles/，索引更新，决策日志 D-YYYY-NNN 入库"
+    }
+  ],
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json",
+    "topology_gate": "bash scripts/topology-check.sh <output> <domain>", "topology_doc": "docs/topology-check-layer.md"
+  },
+  "_layer": "scenario"
+}

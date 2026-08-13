@@ -1,0 +1,45 @@
+{
+  "id": "context-isolation-protocol",
+  "version": "1.0.0",
+  "description": "Devin clean-slate isolation 在 TRIO 的工程落地。Agent 间不共享完整上下文，只传递结构化摘要。",
+  "inspiration": "Cognition/Devin: 审查 Agent 不与编写 Agent 共享上下文 → 每 PR 平均发现 2 个 bug，58% 为严重问题。TRIO 已吸收为 knowledge/context-engineering.md。",
+  "rule": "Step N 的完整产出只写入文件。传给 Step N+1 的 Agent prompt 中，只包含 ≤500 字结构化摘要。Agent 如需深入信息，主动 Read 完整文件。",
+  "summary_template": {
+    "fields": [
+      {
+        "name": "核心结论",
+        "max_chars": 150
+      },
+      {
+        "name": "关键数据",
+        "max_items": 5,
+        "format": "bullet"
+      },
+      {
+        "name": "传递给下一步的输入",
+        "max_chars": 100
+      },
+      {
+        "name": "完整文件路径",
+        "format": "path"
+      }
+    ],
+    "total_max_chars": 500
+  },
+  "why": {
+    "principle": "更短的上下文 → 更高的推理质量（Transformer 注意力机制的数学特性）",
+    "devin_evidence": "干净上下文的审查 Agent 发现 58% 严重 bug，共享上下文则大幅下降",
+    "anti_pattern": "把 Step 1 的 3000 字全文塞进 Step 2 的 prompt → 上下文污染 → 推理衰减"
+  },
+  "exceptions": [
+    "Step 之间传递结构化 JSON schema 数据（如 Step 1 的 structured_output_schema → Step 2）不受 500 字限制",
+    "跨场景共享的方法论知识（如 scoring-guide.md）直接 Read，不经过摘要"
+  ],
+  "hard_rules": [
+    "Step N 产出只写入文件。传 Step N+1 的 prompt 只含 ≤500 字结构化摘要（核心结论+关键数据+传递输入+文件路径）",
+    "Agent 如需深入信息，主动 Read 完整文件——不要靠摘要做判断",
+    "并行步骤之间不共享上下文",
+    "违反以上任一条 = 上下文污染，审计发现后标为 FAIL",
+    "摘要模板: 核心结论(≤150字) + 关键数据(≤5条) + 传递输入(≤100字) + 文件路径"
+  ]
+}

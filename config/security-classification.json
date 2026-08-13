@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "version": "v1.0",
+    "created": "2026-07-16",
+    "description": "TRIO 3.0 数据安全三级分类。定义每类数据的存储路径、Git 策略、加密要求、AI 训练退出和保留策略。",
+    "inherited_from": "TRIO-Investor v1.1 §10 安全模型"
+  },
+  "tiers": {
+    "L1_Public": {
+      "label": "公开",
+      "description": "方法论、模板、本体论、架构文档——可分享，无需脱敏",
+      "examples": ["CORE.md", "trio-ontology.md", "模板文件", "脚本源码", "GLOSSARY.md"],
+      "storage_path": ["D:/TRIO 3.0/core/", "D:/TRIO 3.0/templates/", "D:/TRIO 3.0/scripts/", "D:/TRIO 3.0/config/"],
+      "git_policy": "tracked",
+      "encryption": false,
+      "ai_training_opt_out": false,
+      "retention": "indefinite"
+    },
+    "L2_Internal": {
+      "label": "内部",
+      "description": "分析报告、决策日志、竞品情报、行业分析——含业务逻辑但无 PII/客户名",
+      "examples": ["尽调报告", "竞品对比", "decision-log.jsonl", "run-history.jsonl", "topology-scores.jsonl"],
+      "storage_path": ["D:/TRIO 3.0/reports/", "D:/TRIO 3.0/state/", "D:/TRIO 3.0/runs/", "D:/TRIO 3.0/out/"],
+      "git_policy": "tracked (脱敏后)",
+      "encryption": false,
+      "ai_training_opt_out": true,
+      "retention": "12 months"
+    },
+    "L3_Restricted": {
+      "label": "受限",
+      "description": "客户交付物、财务模型、个人身份数据、API 密钥——加密存储，绝不入 git，绝不入 AI 训练",
+      "examples": ["客户名称", "创始人真实姓名", "财务原始数据", "API_KEY", "settings.local.json", "投资金额/估值"],
+      "storage_path": ["D:/TRIO 3.0/.claude/settings.local.json", "D:/TRIO 3.0/config/investor-env.sh"],
+      "git_policy": "gitignored (never tracked)",
+      "encryption": true,
+      "ai_training_opt_out": true,
+      "retention": "per project policy"
+    }
+  },
+  "data_flow_rules": {
+    "never_upload": [
+      "公司名称 / 创始人姓名",
+      "财务数据 / 估值 / 条款",
+      "投资判断 / 内部决策笔记",
+      "LP 信息 / 客户名单",
+      "API 密钥 / 密码"
+    ],
+    "sanitize_before_upload": [
+      "行业搜索 query（去公司名）",
+      "市场规模数据（不含具体公司）",
+      "技术趋势 / 学术论文搜索"
+    ],
+    "unrestricted": [
+      "公开信息 / 上市公司公告",
+      "学术论文 / 专利 / 新闻"
+    ]
+  },
+  "guard_rules": {
+    "tier_mismatch": {
+      "description": "L3 文件出现在 L1/L2 路径 → 阻断",
+      "action": "block"
+    },
+    "key_in_git": {
+      "description": "检测到 API_KEY / PASSWORD 在 tracked 文件中 → 阻断",
+      "action": "block"
+    },
+    "client_name_in_public": {
+      "description": "L3 数据（客户名/财务）出现在 L1 目录 → 阻断 + 告警",
+      "action": "block_and_alert"
+    }
+  },
+  "quick_reference": {
+    "L1": "✅ 自由使用 · Git tracked · 可入 AI 训练",
+    "L2": "⚠️ 内部使用 · Git tracked (脱敏) · AI 训练退出",
+    "L3": "🔴 加密存储 · 绝不入 Git · 绝不入 AI 训练 · 绝不上云"
+  }
+}

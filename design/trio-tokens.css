@@ -1,0 +1,168 @@
+/* ═══════════════════════════════════════════════════════════
+   TRIO 3.0 Design Tokens — Two-Tier CSS Variable System
+   吸收: Inkwell (分层) + shadcn/ui v4 (@theme inline) + Hygge (逆向)
+
+   用法:
+   1. 纯 CSS:  <link rel="stylesheet" href="trio-tokens.css">
+   2. Tailwind v4: @import "./trio-tokens.css"; 然后 @theme inline { ... }
+   3. 主题切换: document.documentElement.setAttribute('data-theme', 'dark')
+
+   硬规则:
+   - 组件代码只引用语义层 (--bg-xx, --text-xx, --accent-xx)
+   - 绝不直接引用原始层 (--color-stone-xx, --color-amber-xx)
+   - 换主题: 改原始层映射, 不改语义层
+   ═══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   Layer 1: Primitives (原始色板)
+   组件禁止引用此层。仅供语义层映射。
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* Stone 系 — 背景和文字 */
+  --color-stone-50:  #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-300: #d6d3d1;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-600: #57534e;
+  --color-stone-700: #44403c;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+
+  /* Amber 系 — TRIO 主强调色 */
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+
+  /* 功能色 */
+  --color-blue-500:  #3b82f6;
+  --color-blue-600:  #2563eb;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-red-500:   #ef4444;
+  --color-red-600:   #dc2626;
+
+  /* 基础值 */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* 间距单位 */
+  --space-unit: 0.25rem;  /* 4px grid */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Layer 2: Semantic Tokens (语义层)
+   组件唯一允许引用的层。亮色模式 = 默认。
+   ═══════════════════════════════════════════════════════════ */
+
+:root,
+[data-theme="light"] {
+  /* 背景层级 */
+  --bg-primary:    var(--color-stone-50);
+  --bg-secondary:  var(--color-white);
+  --bg-tertiary:   var(--color-stone-100);
+  --bg-hover:      var(--color-stone-100);
+
+  /* 文字层级 */
+  --text-primary:    var(--color-stone-900);
+  --text-secondary:  var(--color-stone-600);
+  --text-tertiary:   var(--color-stone-400);
+
+  /* 强调色 — TRIO 琥珀/暖金 */
+  --accent-primary:  var(--color-amber-600);
+  --accent-hover:    var(--color-amber-700);
+  --accent-warm:     var(--color-amber-500);
+
+  /* 功能色 */
+  --color-success: var(--color-green-600);
+  --color-warning: var(--color-amber-600);
+  --color-danger:  var(--color-red-600);
+  --color-info:    var(--color-blue-600);
+
+  /* 边框 */
+  --border-default: var(--color-stone-200);
+  --hairline-rgb:   231, 229, 228;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Dark Mode — 只覆写映射关系，不改语义 token 名称
+   ═══════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] {
+  --bg-primary:    var(--color-stone-900);
+  --bg-secondary:  var(--color-stone-800);
+  --bg-tertiary:   var(--color-stone-700);
+  --bg-hover:      var(--color-stone-700);
+
+  --text-primary:    var(--color-stone-50);
+  --text-secondary:  var(--color-stone-300);
+  --text-tertiary:   var(--color-stone-500);
+
+  --accent-primary:  var(--color-amber-500);
+  --accent-hover:    var(--color-amber-400);
+  --accent-warm:     var(--color-amber-600);
+
+  --color-success: var(--color-green-500);
+  --color-warning: var(--color-amber-500);
+  --color-danger:  var(--color-red-500);
+  --color-info:    var(--color-blue-500);
+
+  --border-default: var(--color-stone-700);
+  --hairline-rgb:   41, 37, 36;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Base Styles — 全局应用语义 token
+   ═══════════════════════════════════════════════════════════ */
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  font-family: system-ui, -apple-system, "Microsoft YaHei", "Segoe UI", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 标题层级 */
+h1 { font-size: 1.875rem; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+h2 { font-size: 1.5rem;   font-weight: 600; color: var(--text-primary); line-height: 1.4; }
+h3 { font-size: 1.25rem;  font-weight: 600; color: var(--text-primary); line-height: 1.4; }
+
+/* 链接 */
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover { color: var(--accent-hover); }
+
+/* 代码 */
+code {
+  background: var(--bg-tertiary);
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+  font-family: "Cascadia Code", "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.875em;
+}
+
+/* 选中 */
+::selection {
+  background: var(--accent-primary);
+  color: var(--color-white);
+}

@@ -1,0 +1,219 @@
+{
+  "_layer": "capability",
+  "id": "topology-thinking-protocol",
+  "name": "拓扑思维协议",
+  "version": "1.0.0",
+  "description": "拓扑思维方法论——将图构建、扰动推演、脆弱点发现、时间动态感知嵌入分析过程，而非事后检查。图是分析的脚手架，不是交付物附件。",
+  "inspiration": "图论渐进式构造 + 反事实推理 + TRIO 三面具辩证法",
+  "why": "topology-check.sh 2天记录14次违规——Agent 不知道如何拓扑思考，只知道要被检查。本协议将拓扑从门禁改造为思考框架。",
+
+  "core_philosophy": {
+    "graph_first": "图先于文——Agent 边分析边建图，图是分析的脚手架，文字是图的展开",
+    "perturbation_as_discovery": "扰动不是作业——移除/注入是发现隐藏结构的工具",
+    "uncertainty_is_structural": "??? 节点和虚线边是一等公民——图展示你不知道什么",
+    "time_is_topology": "每条边都有时间方向(↑/↓/→)——图是动态系统的快照",
+    "self_reinforcing": "每阶段结束自问「发现了什么之前不知道的事？」——答不出就是没做够"
+  },
+
+  "phases": {
+    "phase_0_seed": {
+      "name": "播种——构建种子图",
+      "order": 0,
+      "preferred_mask": "kimi",
+      "trigger": "第一轮信息采集完成后立即执行",
+      "goal": "构建 4-7 个节点的种子图，作为分析的结构骨架",
+      "rules": {
+        "seed_min_nodes": 4,
+        "seed_max_nodes": 7,
+        "seed_required_edge_types": "至少 2 种不同关系类型（如 DEPENDS_ON、COMPETES_WITH、SUPPLIES_TO、FUNDED_BY、REGULATED_BY）",
+        "seed_must_have_unknown": "至少 1 个 ??? 节点——你知道存在但缺乏数据的实体，用虚线边框标注",
+        "seed_must_have_uncertain_edge": "至少 1 条虚线边——你怀疑有关联但不确定的连线，标注不确定性原因"
+      },
+      "heuristics": [
+        "哪些 4-7 个实体如果被移除，会让整个分析变得毫无意义？",
+        "有没有一个你怀疑存在但叫不出名字的实体？画成 ??? 并给它一个描述性标签",
+        "有没有两个节点你觉得可能有关联但不确定？画虚线边并标注「不确定：需要验证___」",
+        "种子图不要求美观——要求诚实。未知比错误好"
+      ],
+      "anti_patterns": [
+        "把目标公司和它的 3 个客户连起来就交差——这不是种子图，是偷懒",
+        "所有节点都是确定性的——你肯定有不确定的东西，画出来",
+        "种子图超过 10 个节点——你画的是最终图，不是种子图，收敛范围"
+      ],
+      "output": "Mermaid graph TD 代码块（4-7 节点）+ 每个 ??? 节点的说明 + 每条虚线边的不确定性标注",
+      "reflection": "这个种子图中，哪个节点/边是你画图之前没意识到的？如果没有——重画。"
+    },
+
+    "phase_1_expand": {
+      "name": "扩展——饱和化图结构",
+      "order": 1,
+      "preferred_mask": "deepseek",
+      "trigger": "事实核查/验证步骤完成后执行",
+      "goal": "扩展种子图为完整结构图，发现聚类和桥接边",
+      "rules": {
+        "expansion_min_new_nodes": 5,
+        "expansion_edge_rule": "每个新增节点必须连接至少 2 个已有节点（不允许悬挂叶子节点，除非有明确理由）",
+        "cluster_detection": "识别至少 1 个聚类——3+ 节点相互连接形成子图密度 ≥0.5 的区域，给聚类命名",
+        "bridge_detection": "识别至少 1 条桥接边——移除它会把图分成两个连通分量的边",
+        "leaf_justification": "如果某个节点只有 1 条连接，必须标注「为什么只连一个」"
+      },
+      "heuristics": [
+        "对审计报告中的每条声明，问：这个声明暗示了什么实体存在？加入图中",
+        "观察自然形成的聚类——聚类 = 子系统，给它命名并描述其功能",
+        "如果某节点只有 1 条连接，追问：它真的没有其他关联吗？找不到 → 标注为叶子并解释原因",
+        "桥接边是最脆弱的结构——标注时特别注意"
+      ],
+      "anti_patterns": [
+        "新增节点都是同类型（比如全是客户或全是竞品）——你应该添加不同角色的实体",
+        "所有新增节点都连向同一个中心节点——这是星形图，没有结构性洞察",
+        "没有聚类识别——如果图里找不到任何子系统，你的分析粒度不够"
+      ],
+      "output": "扩展后的 Mermaid 图 + 聚类列表（含命名和密度） + 桥接边列表 + 叶子节点说明",
+      "reflection": "扩展后的图中，哪个聚类或桥接边让你对该系统的理解发生了变化？"
+    },
+
+    "phase_2_perturb": {
+      "name": "扰动——用推演发现隐藏结构",
+      "order": 2,
+      "preferred_mask": "deepseek",
+      "trigger": "图扩展完成、因果分析完成后执行",
+      "goal": "通过移除枢纽节点和注入新边，发现隐藏的脆弱性和反馈环",
+      "operations": {
+        "removal": {
+          "description": "删除一个枢纽节点，追踪级联效应",
+          "method": "选择当前图中介数中心性最高的节点（连接最多的枢纽），将它从图中删除",
+          "rules": {
+            "layer_1": "列出所有直接受影响的节点——因为被删节点是它们的供应方/客户/依赖（≥3 个）",
+            "layer_2": "对每个第一层受影响节点，追踪其下游传播路径——至少 2 条分叉路径",
+            "surprise_requirement": "必须找到至少 1 个你删除前未预料到的级联后果——如果全在意料之中，换一个枢纽节点重试"
+          },
+          "anti_patterns": [
+            "只做线性因果链 A→B→C→D，没有分叉——这不是树状扰动",
+            "删除一个边缘叶子节点——必须是枢纽（度数 ≥3 的节点）",
+            "层级分析写成散文——必须用结构化格式：第1层/第2层/分叉路径"
+          ]
+        },
+        "injection": {
+          "description": "在两个原本不连通的节点之间添加新边，观察网络重组",
+          "method": "选择两个当前无连接的节点，它们之间如果建立关系会改变整个网络结构",
+          "rules": {
+            "structural_change": "描述添加这条边后网络如何重组——至少识别 1 个新形成的集群或 1 个被打破的壁垒",
+            "feedback_detection": "如果新边形成了反馈环（A→B→C→A），标注反馈是正反馈还是负反馈",
+            "insight_requirement": "注入必须产生至少 1 个在原图中不可见的结构性发现"
+          }
+        }
+      },
+      "output": "移除推演（树状结构）+ 注入推演（重组描述）+ 扰动发现清单（操作前不知道的事）",
+      "reflection": "扰动推演中，哪个发现是你做推演之前完全没有意识到的？如果没有——你选的节点不对，重选。"
+    },
+
+    "phase_3_temporalize": {
+      "name": "时间化——标注边的动态方向",
+      "order": 3,
+      "preferred_mask": "claude",
+      "trigger": "扰动推演完成后执行",
+      "goal": "将静态图转化为动态快照，每条边标注时间方向",
+      "rules": {
+        "all_edges_labeled": "每条边必须携带时间标签：[↑ strengthening] / [↓ weakening] / [→ stable]",
+        "time_window_required": "每个 ↑ 或 ↓ 标签必须附带时间窗口（6个月 / 1年 / 3年）",
+        "min_strengthening": "≥2 条 ↑ 边",
+        "min_weakening": "≥2 条 ↓ 边",
+        "trend_reversal": "至少识别 1 条可能在未来时间窗口内反转方向的边——标注反转条件和概率"
+      },
+      "heuristics": [
+        "对每条边问：一年前这个关系更强还是更弱？一年后呢？",
+        "稳定 [→] 不是默认值——稳定是一种需要证据支撑的判断",
+        "标注反转条件比标注方向更有价值——「如果 X 发生，这条边可能反转」",
+        "多条边同方向变化 → 可能存在共同的驱动力，标注这个驱动力"
+      ],
+      "anti_patterns": [
+        "所有边都标 → stable——你肯定有在变化的关系",
+        "只有 ↑ 没有 ↓——任何系统都有此消彼长",
+        "时间窗口全是 1 年——不同关系的变化速度不同"
+      ],
+      "output": "带时间标注的完整 Mermaid 图（每条边附 ↑↓→ + 时间窗口）+ 趋势反转预警清单",
+      "reflection": "时间标注中，哪条边的方向最让你意外？（例：你原本以为是稳定的，实际在快速变化）"
+    },
+
+    "phase_4_harden": {
+      "name": "硬化——脆弱点扫描与反证",
+      "order": 4,
+      "preferred_mask": "deepseek_then_claude",
+      "trigger": "时间标注完成后执行",
+      "goal": "基于图结构定位真实脆弱点，拒绝直觉型安全答案",
+      "rules": {
+        "structural_vulnerability_scan": {
+          "q1_highest_betweenness": "哪个节点如果被移除，会断开最多的其他节点？（介数中心性最高）",
+          "q2_least_alternative": "哪条边拥有最少的替代路径？（边介数 / 最小割）",
+          "q3_most_isolated": "哪个聚类最孤立？（聚类间边密度最低）",
+          "structural_requirement": "以上三个问题的答案必须能从图中推导出来——不能靠直觉"
+        },
+        "safe_answer_rejection": {
+          "rule": "如果脆弱点答案是「最大客户依赖」「CEO离职」「单一供应商」——这些是不画图也能得出的安全答案，不通过",
+          "remedy": "运行介数中心性分析——基于图结构得出脆弱点。如果结构分析结果与直觉一致，标注「结构验证通过」，但必须额外找一个结构揭示的非直觉脆弱点"
+        },
+        "attack_surface": {
+          "attack_method": "攻击手段是什么？（技术攻击/商业打压/供应链中断/监管打击）",
+          "attack_cost": "攻击成本多少？（资金/时间/技术门槛）",
+          "cascade_depth": "级联深度——攻击影响传播几跳后停止？",
+          "top_2": "对结构扫描出的前 2 个脆弱点，分别描述攻击面和级联深度"
+        },
+        "counter_evidence": {
+          "low_confidence_annotation": "分析文本中每条置信度 [1][2] 的声明，在图中对应节点/边上标注反证",
+          "alternative_edges": "至少 2 条虚线边表示替代解释——「如果 X 不成立，则可能 Y」",
+          "coverage_rule": "低置信度声明中 ≥50% 必须附带反证标注——覆盖率不足则 Phase 4 不通过"
+        }
+      },
+      "output": "脆弱点报告（结构扫描 + 攻击面 + 安全答案拒绝说明）+ 反证标注图（虚线替代边）",
+      "reflection": "硬化分析中，结构扫描找出的最脆弱点和你的直觉一致吗？如果不一致——为什么你的直觉会错？如果一致——额外找的非直觉脆弱点是什么？"
+    }
+  },
+
+  "mask_interactions": {
+    "description": "各阶段的首选面具（非强制——任何面具可执行任何阶段，但以下是各面具最优的阶段）",
+    "kimi_best_at": ["phase_0_seed"],
+    "deepseek_best_at": ["phase_1_expand", "phase_2_perturb"],
+    "claude_best_at": ["phase_3_temporalize", "phase_4_harden"],
+    "handoff_rule": "面具切换时传递 ≤500 字摘要 + topology-graph.json 路径。图状态作为结构化数据，不受 500 字限制"
+  },
+
+  "integration": {
+    "load_trigger": "场景 JSON 的 protocols 块包含 topology_thinking 时，场景的第一个分析步骤执行前 Read 本协议",
+    "load_once": "协议在整个 run 中加载一次，保持在 Agent 工作记忆中",
+    "graph_state_persistence": "每阶段结束后，将当前图状态写入 runs/{run_id}/topology-state.json",
+    "graph_state_format": {
+      "phase": "当前阶段名",
+      "nodes": [{"id": "string", "label": "string", "type": "entity|unknown|counter_evidence", "note": "string"}],
+      "edges": [{"from": "string", "to": "string", "label": "string", "type": "solid|dashed", "temporal": "↑|↓|→", "time_window": "string|null"}],
+      "insights": ["本阶段发现的反直觉/新认知"]
+    },
+    "interaction_with_context_isolation": "图状态 JSON 属于结构化数据，符合 context-isolation-protocol.json 例外条款，不受 500 字摘要限制。Agent 间传递图状态文件路径，接收方直接 Read 完整 JSON",
+    "interaction_with_self_verify": "self-verify 审计时检查：是否按阶段构建拓扑图？每阶段是否有 reflection 记录？图状态 JSON 是否存在？"
+  },
+
+  "hard_rules": [
+    "拓扑图必须在第一个分析步骤中就开始构建（Phase 0 种子图），禁止等到分析完成再补图",
+    "每阶段结束时必须记录 reflection——发现了什么之前不知道的事？记录到 topology-state.json 的 insights 字段",
+    "??? 未知节点和虚线不确定边是强制要求（Phase 0），不允许画出全部确定的图",
+    "脆弱点必须基于图结构分析（介数中心性/最小割），不允许用不画图也能得出的安全答案",
+    "所有边在 Phase 3 后必须标注时间方向（↑/↓/→），未标注边视为未完成",
+    "低置信度声明（[1][2]）中 ≥50% 必须附带反证标注，覆盖率不足则 Phase 4 不通过",
+    "扰动推演必须找到至少 1 个操作前未预料到的后果，否则换节点重做",
+    "图状态必须在每阶段结束后持久化到 runs/{run_id}/topology-state.json",
+    "topology-check.sh 仍作为最终自动验证运行，但本协议确保首次通过率——门禁变确认而非发现",
+    "【v3.7 Bridge Lemma 门禁】任何声称某路径'绕过/规避/跳出'已知屏障（如 Natural Proofs/Relativization/Algebrization）时，必须提供: (1)屏障的精确形式化条件 (2)该路径违反哪个具体前提 (3)可证伪的桥接引理(bridge lemma)。无法回答(2) → 判定为'领域映射≠逻辑绕过'范畴错误。Origin: 2026-07-13 P vs NP 多模型 TRIO 实验——8 个模型集体将'换数学工具'等同于'绕过逻辑屏障'"
+  ],
+
+  "relationship_to_topology_check": {
+    "topology_check_sh": "scripts/topology-check.sh 保留作为最终自动验证",
+    "role_change": "门禁从「发现问题→盲返工」变为「确认方法论已执行→放行」",
+    "expected_outcome": "加载本协议的 run，topology-check.sh 预期一次通过。如果未通过，说明方法论执行有问题——不是补节点，是回到对应阶段重做思考",
+    "violation_log": "违规日志持续记录，用于追踪方法论采纳率。预期违规数显著下降"
+  },
+
+  "compatibility": {
+    "scenarios_without_topology": "quick_assessment/explore/archive_distribute/content_delivery/audit_review 不产生结构性分析，不加拓扑思维",
+    "existing_runs": "已有的 topology-violations.log 记录保留作为改进基线",
+    "backward_compatible": "旧场景不引用本协议则行为完全不变"
+  }
+}

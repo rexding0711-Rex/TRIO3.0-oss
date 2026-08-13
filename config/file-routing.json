@@ -1,0 +1,132 @@
+{
+  "_layer": "infra",
+  "version": "1.1.0",
+  "description": "TRIO 3.0 文件路由表 — OS 内核的指针系统。定义每种非OS文件的目的地，记录所有搬移历史。",
+  "classification_standards": {
+    "_lesson_2026-07-01": "❌ 用子目录数量判断项目活跃度是错误的。猫砂除臭(0子目录/336MB)和玄武岩纤维(0子目录/362MB)被误判为空壳。",
+    "correct_standard": "判定项目是否活跃 → 看文件总数+总大小，不是子目录数量。阈值: 文件≥5 OR 大小≥10MB → 活跃项目，不应归档。",
+    "human_override": "任何自动分类结果都需要人工抽查确认。不确定时 → ask_user。",
+    "versioning_policy": {
+      "rule": "版本号不膨胀。破坏性变更（CLI接口/输出格式/退出码语义）才跳第一位。功能增量/检测改进只动第二位。",
+      "format": "v{破坏性变更}.{功能增量}",
+      "example": "加C5约束 = v3.0 → v3.1 (不是v4.0)。改CLI接口 = v3.x → v4.0。"
+    }
+  },
+  "routes": [
+    {
+      "id": "research_output",
+      "source_patterns": ["research/**/*", "research/"],
+      "dest": "D:\\工作\\TRIO\\Reports\\{name}",
+      "description": "研究报告、逆向工程、尽调产出",
+      "auto": true
+    },
+    {
+      "id": "run_artifact",
+      "source_patterns": ["runs/**/*", "runs/"],
+      "dest": "D:\\工作\\TRIO\\Reports\\runs\\{name}",
+      "description": "TRIO 命令跑批产物",
+      "auto": true
+    },
+    {
+      "id": "daily_log",
+      "source_patterns": ["DAILY.md", "metrics.md", "metrics/**/*", "metrics/"],
+      "dest": "D:\\工作\\TRIO\\日志\\{name}",
+      "description": "每日日志和指标追踪",
+      "auto": true
+    },
+    {
+      "id": "company_benchmark",
+      "source_patterns": ["knowledge/company-benchmark/**/*", "knowledge/company-library/**/*"],
+      "dest": "D:\\工作\\对标库\\company-benchmark\\{name}",
+      "description": "公司逆向工程、叙事分析、因果DAG——对标库核心资产",
+      "auto": true
+    },
+    {
+      "id": "person_benchmark",
+      "source_patterns": ["knowledge/person-benchmark/**/*"],
+      "dest": "D:\\工作\\对标库\\person-benchmark\\{name}",
+      "description": "人物画像、决策模式——对标库核心资产",
+      "auto": true
+    },
+    {
+      "id": "industry_benchmark",
+      "source_patterns": ["knowledge/industry/**/*", "knowledge/knowledge-benchmark/**/*"],
+      "dest": "D:\\工作\\对标库\\industry\\{name}",
+      "description": "行业研究、赛道分析——对标库核心资产",
+      "auto": true
+    },
+    {
+      "id": "tech_benchmark",
+      "source_patterns": ["knowledge/tech-benchmark/**/*"],
+      "dest": "D:\\工作\\对标库\\tech-benchmark\\{name}",
+      "description": "技术人物/项目的 GitHub 扫描、技术栈追踪、开源影响力——对标库第五维度",
+      "auto": true
+    },
+    {
+      "id": "methods_kb",
+      "source_patterns": ["knowledge/methods/**/*", "knowledge/sop/**/*", "knowledge/prompts/**/*", "knowledge/templates/**/*"],
+      "dest": "D:\\工作\\知识库\\{name}",
+      "description": "方法论、SOP、Prompt、模板——知识库（非对标数据）",
+      "auto": true
+    },
+    {
+      "id": "reference_doc",
+      "source_patterns": ["reference/**/*", "reference/"],
+      "dest": "D:\\工作\\知识库\\references\\{name}",
+      "description": "环境配置、装机参考文档",
+      "auto": true
+    },
+    {
+      "id": "training_data",
+      "source_patterns": ["training/**/*", "knowledge/TRIO-training/**/*"],
+      "dest": "D:\\工作\\TRIO\\training\\TRIO-training\\{name}",
+      "description": "M4训练日志、能力镜像——Rex核心资产",
+      "auto": true
+    },
+    {
+      "id": "project_archive",
+      "source_patterns": ["archive/*"],
+      "dest": "D:\\工作\\归档\\TRIO-backups\\{name}",
+      "description": "旧配置文件、过期归档",
+      "auto": true
+    },
+    {
+      "id": "client_data",
+      "source_patterns": ["knowledge/client-library/**/*", "knowledge/client-library/"],
+      "dest": "D:\\工作\\知识库\\client-data\\{name}",
+      "description": "客户档案（项目积累，非框架方法论）",
+      "auto": false,
+      "auto_false_reason": "客户数据含敏感信息，需用户确认"
+    },
+    {
+      "id": "forbidden_in_os",
+      "source_patterns": ["*.pptx", "*.docx", "*.pdf", "*.xlsx", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.mp4", "*.zip", "*.db"],
+      "dest": "ASK_USER",
+      "description": "OS 目录禁止的二进制格式——如出现必须搬走",
+      "auto": false,
+      "auto_false_reason": "需判断具体归属"
+    }
+  ],
+  "uncertain_rules": {
+    "description": "文件不匹配任何 route → 不自动搬移，输出列表让用户决定",
+    "action": "ask_user",
+    "fallback_question": "这个文件该放哪里？1) 知识库 2) 对标库 3) 项目/{name} 4) TRIO/ 5) 归档"
+  },
+  "move_history": [
+    {
+      "date": "2026-07-01",
+      "batch": "initial-cleanup",
+      "moves": [
+        {"from": "DAILY.md", "to": "D:\\工作\\TRIO\\日志\\DAILY.md"},
+        {"from": "metrics.md", "to": "D:\\工作\\TRIO\\日志\\metrics.md"},
+        {"from": "metrics/", "to": "D:\\工作\\TRIO\\日志\\metrics\\"},
+        {"from": "research/", "to": "D:\\工作\\TRIO\\Reports\\"},
+        {"from": "runs/", "to": "D:\\工作\\TRIO\\Reports\\runs\\"},
+        {"from": "reference/", "to": "D:\\工作\\知识库\\references\\"},
+        {"from": "archive/", "to": "D:\\工作\\归档\\TRIO-backups\\"},
+        {"from": "knowledge/client-library/", "to": "D:\\工作\\知识库\\client-data\\"}
+      ]
+    }
+  ],
+  "move_history_retention": "保留最近50条。达到上限时合并旧记录到 archive summary"
+}

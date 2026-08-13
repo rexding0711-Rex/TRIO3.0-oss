@@ -1,0 +1,19 @@
+/* Tailwind v4 @theme inline — Data Heavy */
+/* 用法: 复制到你的 index.css，放在 @import "tailwindcss" 之后 */
+
+@theme inline {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-card:       var(--bg-secondary);
+  --color-muted:      var(--bg-tertiary);
+  --color-border:     var(--border-default);
+  --color-primary:    var(--accent-primary);
+  --color-accent:     var(--accent-warm);
+  --color-success:    var(--color-success);
+  --color-danger:     var(--color-danger);
+  --color-info:       var(--color-info);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+}

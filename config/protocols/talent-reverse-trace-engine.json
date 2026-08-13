@@ -1,0 +1,190 @@
+{
+  "name": "talent-reverse-trace-engine",
+  "version": "1.0.0",
+  "created": "2026-07-08",
+  "type": "universal_engine",
+  "description": "人才反向追踪通用引擎——不搜'人才'，搜'公开痕迹'。领域无关。使用时加载领域配置文件。",
+
+  "architecture": {
+    "files": [
+      {
+        "path": "config/protocols/talent-reverse-trace-engine.json",
+        "role": "通用引擎（本文件）——5阶段流水线，领域无关",
+        "when_to_edit": "几乎不需要。只当追踪方法论本身进化时修改"
+      },
+      {
+        "path": "config/protocols/talent-domain-config-template.json",
+        "role": "领域配置模板——换领域=复制一份→填具体参数",
+        "when_to_edit": "每次开新领域时从这里复制"
+      },
+      {
+        "path": "config/protocols/talent-domain-{domain}.json",
+        "role": "具体领域配置——竞赛列表、会议名、搜索模板",
+        "when_to_edit": "每新增一个领域创建一份"
+      },
+      {
+        "path": "docs/talent-reverse-trace-checklist.md",
+        "role": "可打印执行清单——发给任何人直接照着跑",
+        "when_to_edit": "引擎更新时同步更新"
+      },
+      {
+        "path": "docs/talent-reverse-trace-sop-v1.md",
+        "role": "速查卡——快速回顾核心逻辑",
+        "when_to_edit": "引擎版本发布时更新"
+      }
+    ]
+  },
+
+  "engine": {
+    "core_principle": "不搜'人才'——搜'这个领域的高手在哪留下公开痕迹'，然后从作者/贡献者列表反推个人。",
+
+    "traces_universe": {
+      "description": "六类公开痕迹——覆盖所有领域。每个领域选 2-3 类组合。",
+      "types": {
+        "competitive": { "name": "竞赛/排行榜", "examples": ["Kaggle", "CASP", "DREAM", "ACM-ICPC", "红点设计奖"], "signal": "排名 = 相对能力定位" },
+        "academic": { "name": "论文/预印本", "examples": ["arXiv", "PubMed", "IEEE Xplore", "Google Scholar"], "signal": "作者列表 = 实验室人才树" },
+        "engineering": { "name": "开源/代码", "examples": ["GitHub repos", "PyPI packages", "npm", "Hugging Face"], "signal": "贡献者 = 工程能力+活跃度" },
+        "intellectual_property": { "name": "专利", "examples": ["USPTO", "WIPO", "Google Patents", "CNKI专利"], "signal": "发明人 = 创新能力+产业落地" },
+        "influence": { "name": "演讲/博客/内容", "examples": ["conference talks", "技术博客", "B站/YouTube教学", "知乎专栏"], "signal": "影响力 = 沟通能力+专业深度" },
+        "organizational": { "name": "组织变动信号", "examples": ["公司拆分/融资/裁员新闻", "核心人物离职", "新部门成立"], "signal": "窗口 = 批量人才流动性上升" }
+      },
+      "selection_rule": "对目标领域，选择 2-3 类痕迹。学术/科研型→竞赛+论文。工程/产品型→开源+演讲。工业界→专利+组织变动。"
+    },
+
+    "pipeline": {
+      "p0": {
+        "name": "锚定基准",
+        "universal": [
+          "读取客户提供的参考文档",
+          "如有竞品产出，作为对比基线",
+          "问客户三个锁定问题：方向？级别？地域限制？"
+        ],
+        "domain_specific": "加载 {domain} 配置文件——获得竞赛列表、会议名、搜索模板",
+        "output": "基准差距表 + 锁定后的搜索范围"
+      },
+      "l1": {
+        "name": "痕迹全景扫描",
+        "universal": [
+          "按领域配置的痕迹列表，并行搜索",
+          "每条痕迹记录：名称、周期、权威度、对客户的价值评级",
+          "覆盖 ≥5 个痕迹来源"
+        ],
+        "domain_specific": "搜索词从领域配置的 traces.competitive.competitions[].search_queries 读取。每条 competition 可能有多个 query——并行执行，结果合并去重",
+        "output": "痕迹全景表——每个痕迹标注'对客户意味着什么'"
+      },
+      "l2": {
+        "name": "作者/归属人提取",
+        "universal": [
+          "每条痕迹 → 获奖者/作者/贡献者 → 归属机构 → 导师/PI/团队负责人",
+          "对每条记录：机构名 + 部门 + 负责人名 + 排名 + 对客户的招聘价值评级"
+        ],
+        "domain_specific": "作者列表来源从领域配置的 traces.academic.paper_sources 读取。论文作者从 arXiv/PubMed/Google Scholar 提取。竞赛获奖者从 competition 官方结果页提取",
+        "output": "≥10 个可追踪的机构/导师"
+      },
+      "l3": {
+        "name": "个人级反向追踪",
+        "universal": [
+          "这是整个引擎的核心步骤——从'谁发表了这篇论文'反推具体人名",
+          "论文第一作者 = 最可能毕业/流动的人",
+          "论文通讯作者 = PI/导师——联系入口",
+          "论文中间作者 = 团队成员——各阶段可挖性不同",
+          "GitHub repo 主贡献者 = 核心技术持有者",
+          "搜索链: {导师姓名} {机构} 团队成员 博士 → 论文作者列表(arXiv/Google Scholar) → {学生姓名} LinkedIn 当前单位"
+        ],
+        "domain_specific": "搜索查询从领域配置的 l3_query_templates 字段读取",
+        "output": "≥5 位具体个人 + 每人的角色/阶段/流动信号",
+        "quality_gate": "所有姓名必须与至少一个独立来源交叉确认（论文作者列表/竞赛官网/官方报道）"
+      },
+      "l4": {
+        "name": "职业流动信号增强",
+        "universal": [
+          "交叉搜索工业界：'公司名 + 融资/拆分/裁员/离职/创业'",
+          "交叉搜索学术界：'博新计划结束' / '优青结题' / '博后出站'",
+          "标注每个流动信号的时效性：正在发生(7天内) / 近期(30天内) / 趋势(90天内)",
+          "标注受影响人才池的预估规模"
+        ],
+        "domain_specific": "公司名单从领域配置的 org_watchlist 字段读取",
+        "output": "组织变动事件列表 + 受影响人才池 + 招聘窗口有效期"
+      },
+      "l5": {
+        "name": "可挖性综合评分",
+        "universal": [
+          "评分维度（各领域通用）：",
+          "  - 流动窗口 (0-5): 毕业/出站/离职/公司动荡 = 5；稳定在职 = 1",
+          "  - 技能匹配 (0-5): 方向与客户需求的吻合度",
+          "  - 竞争热度 (0-5): 该人是否同时被多家公司盯上（热度高=难挖但值得）",
+          "  - 可接触性 (0-5): 是否有公开联系方式/是否在同一个地理区域。注意：可接触性低≠降级——标注'需猎头'即可",
+          "综合分 = 流动窗口×0.35 + 技能匹配×0.35 + 竞争热度×0.2 + 可接触性×0.1",
+          "≥3.8 → P0（立即接触）；2.8-3.7 → P1（本季接触）；<2.8 → P2（长期跟踪）",
+          "可接触性处理规则：可接触性≤2 但其他维度≥4 → 保留 P0 级别，标注 #需猎头渠道 #联系方式待确认"
+        ],
+        "output": "P0/P1/P2/工业界 四级排序清单"
+      }
+    },
+
+    "quality_gates": {
+      "l1_gate": "覆盖 ≥5 个痕迹来源 + 每条标注对客户的价值评级",
+      "l2_gate": "≥10 个可追踪机构/导师 + 每个标注可挖性评级",
+      "l3_gate": "≥5 位具体个人姓名 + ≥2 个工业界流动事件 + ≥1 个招聘窗口判断",
+      "l4_gate": "所有流动信号标注时效性 + 人才池规模预估",
+      "l5_gate": "P0 至少 2 人 + 所有 P0 标注了下一步操作建议"
+    },
+
+    "execution_enforcement": {
+      "description": "2026-07-09 Claude第三轮审计·硬阻断——人才引擎适配版",
+      "hard_blocks": {
+        "h1_scoring": {"detect": "L5可挖性评分缺少公式计算过程", "action": "🛑 阻断。必须展示 流动窗口(N)×0.35=X + 技能匹配(N)×0.35=Y + 竞争热度(N)×0.2=Z + 可接触性(N)×0.1=W = 综合分。缺→评分无效"},
+        "h2_signal_coverage": {"detect": "L3个人追踪未附论文/竞赛/开源等痕迹来源链接", "action": "🛑 每个追踪到的个人必须标注信息来源（论文arXiv链接/竞赛官网/Google Scholar/LinkedIn）。缺来源→该条追踪无效"},
+        "h3_context_bloat": {"detect": "单次Run加载规则 > 4,000 tokens", "action": "🛑 仅加载当前执行层。其余JIT按需加载"},
+        "h4_score_without_calc": {"detect": "任何评分数字无前文公式推导", "action": "🛑 替换为'⚠️ 评分待定·缺少计算过程'"},
+        "h5_domain_agnostic": {"detect": "引擎输出中出现'领域不匹配'类自伤判断", "action": "🛑 删除。引擎是领域无关的。领域是否匹配是用户决策——不是引擎该做的判断"}
+      },
+      "execution_rule": "Run结束前逐条检查h1-h5。任一条触发→阻断对应输出→不声称Run完成"
+    },
+
+    "differentiation_rules": {
+      "principle": "竞品停在哪个层级，就往下一层打。一级差距 = 降维打击。",
+      "when_competitor_at_L1": "直接跳 L2——给导师/机构名。竞品只有'领域概览'，我们给'具体谁在这个领域'",
+      "when_competitor_at_L2": "直接跳 L3——给学生/个人名+流动信号。竞品给'实验室'，我们给'实验室里谁要走'",
+      "when_no_competitor": "从 L1 开始，每层标注'下一步可深挖到哪'——展示能力栈深度"
+    },
+
+    "output_template": {
+      "must_include": [
+        "与竞品的层级对照表（三列：竞品产出 | 本报告 | 差异）",
+        "可操作人才清单（P0/P1/P2/工业界 四级——每级附可挖性分数）",
+        "招聘窗口判断（标注时效性+窗口关闭条件）",
+        "信息缺口（客户补充哪些信息→下一轮提升一个数量级）",
+        "Agent 能力边界（能做到的 / 需人工的 / 需客户提供信息的）"
+      ],
+      "format": "HTML 单文件——白底蓝金配色",
+      "template_ref": "memory/html-template-white-gold.md"
+    }
+  },
+
+  "meta": {
+    "related_files": [
+      "config/protocols/talent-domain-config-template.json",
+      "config/protocols/talent-domain-ai4s-biopharma.json",
+      "docs/talent-reverse-trace-checklist.md",
+      "docs/talent-reverse-trace-sop-v1.md",
+      "docs/talent-reverse-trace-INDEX.md",
+      "memory/html-template-white-gold.md",
+      "config/protocols/competitive-intel-engine.json"
+    ],
+    "next_domains_to_build": ["半导体/芯片", "自动驾驶", "量化金融", "游戏引擎"],
+    "evolution_notes": "引擎的核心逻辑（痕迹→作者→个人→流动→评分）预计稳定跨领域。唯一的变化是 L5 评分权重——积累 5+ 案例后可用真实招聘结果反校准权重。"
+    },
+    "protocol_relationship": {
+      "talent-reverse-trace-protocol.json": "AI4S 特化的原始协议——仅作历史参考。该文件是在 AI4S 竞赛场景下首次提炼的，包含领域特定的搜索词。自从引擎+配置分离后，该文件的通用逻辑已迁移至本引擎，AI4S 特定内容已迁移至 talent-domain-ai4s-biopharma.json。新项目请使用引擎+领域配置。"
+    },
+    "query_usage_rules": {
+      "description": "领域配置中的 search_queries 如何执行",
+      "rules": [
+        "同一条 competition/conference 下的多个 query → 并行执行 → 结果合并去重",
+        "不同痕迹来源的 query → 分批并行（每批 ≤ 6个，遵守 Agent 并发上限）",
+        "query 返回空结果 → 标注'⚠️ 数据不足'——不换关键词重试。改为从该痕迹的其他来源（如论文而非竞赛）切入",
+        "同一条 query 在多个搜索引擎返回相同结果 → 取最完整的 → 标注多源一致"
+      ]
+    }
+}

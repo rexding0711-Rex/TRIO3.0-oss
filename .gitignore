@@ -1,0 +1,30 @@
+state/behavior-log.jsonl
+state/errors.log
+state/depth-*.txt
+state/kb-refresh-status.json
+*.tar.gz
+config/kb-refresh/topics.tsv
+state.json
+state/4.0-milestones.json
+.env
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 敏感数据目录（净化版推送 2026-08-14——只推引擎代码）
+state/
+knowledge/
+sandbox/
+archive/
+.claude/
+
+# 备份/二进制（2026-08-14 卫生清理）
+*.bak
+*.bak-*
+templates/pptx/reference.pptx
+
+# 真实商业案例 + 融资材料（2026-08-14 公开仓库移出——名誉/法律风险）
+config/benchmark-case-*.md
+docs/TRIO3.0-*融资Deck*.md
+design/TRIO-3.0-Pitch-Deck-*.html

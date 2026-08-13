@@ -1,0 +1,20 @@
+{
+  "_说明": "复制此文件为 .claude/settings.local.json。不要提交到 git。",
+  "env": {
+    "NEO4J_PASSWORD": "你的Neo4j密码",
+    "DEEPSEEK_API_KEY": "sk-你的DeepSeek密钥",
+    "FIRECRAWL_API_KEY": "fc-你的Firecrawl密钥",
+    "ANTHROPIC_API_KEY": "sk-ant-你的Anthropic密钥"
+  },
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./.claude/settings.local.json)",
+      "Read(./secrets/**)",
+      "Bash(curl*neo4j*)",
+      "Bash(scp*)",
+      "Bash(rm*-rf*)"
+    ]
+  }
+}

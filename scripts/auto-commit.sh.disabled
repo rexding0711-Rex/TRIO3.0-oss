@@ -1,0 +1,24 @@
+#!/bin/bash
+# TRIO 3.0 · Git Auto-Save
+# 借鉴 Aider 的 auto-commit 模式：每次 /all 产出自动提交
+# 用法: ./scripts/auto-commit.sh <run_id> <描述>
+
+set -e
+RUN_ID="${1:-$(date +%Y%m%d-%H%M%S)}"
+DESC="${2:-TRIO /all 产出}"
+DATE=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')
+
+cd "/mnt/d/TRIO 3.0"
+
+# 检查是否有变更
+if git diff --quiet && git diff --cached --quiet; then
+    echo "📭 无变更，跳过提交"
+    exit 0
+fi
+
+git add -A
+git commit -m "run($RUN_ID): $DESC
+
+Co-Authored-By: Claude <noreply@anthropic.com>" 2>&1
+
+echo "✅ auto-commit: $RUN_ID — $DATE"

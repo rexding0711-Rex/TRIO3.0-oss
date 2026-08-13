@@ -1,0 +1,62 @@
+{
+  "name": "Consulting Light",
+  "version": "1.0",
+  "description": "麦肯锡白底风 — 高对比度、克制配色、适合投资人沟通和白皮书",
+  "useWhen": ["投资人BP", "企业白皮书", "行业报告", "正式提案"],
+
+  "fonts": {
+    "zh": "Microsoft YaHei",
+    "zhBold": "Microsoft YaHei Bold",
+    "en": "Segoe UI",
+    "enBold": "Segoe UI Bold",
+    "mono": "Cascadia Code"
+  },
+
+  "colors": {
+    "pageBg":   "FAFBFC",
+    "white":    "FFFFFF",
+    "cardBg":   "F4F6FA",
+    "dark":     "0A1628",
+
+    "textMain": "0F172A",
+    "textBody": "334155",
+    "textMuted":"64748B",
+
+    "blue":     "0066CC",
+    "amber":    "E87800",
+    "green":    "00A86B",
+    "red":      "DC3545",
+    "purple":   "6C5CE7",
+
+    "tblHead":  "0F172A",
+    "tblRow1":  "FFFFFF",
+    "tblRow2":  "F4F6FA",
+    "line":     "DDE1E7"
+  },
+
+  "usage": {
+    "blue":   "主强调色 — 顶部线、卡片左边条、超链接、关键数据",
+    "amber":  "数据高亮 — 重要数字、章节编号、金色装饰线",
+    "green":  "正向指标 — 已解决状态、增长率、优势标记",
+    "red":    "风险警告 — P0 风险、退出条件、截止日期",
+    "purple": "辅助强调 — 次要点、第二数据系列、变体卡片"
+  },
+
+  "spacing": {
+    "pageMargin": 0.6,
+    "titleY": 0.3,
+    "titleH": 0.6,
+    "subtitleY": 0.88,
+    "accentLineY": 1.22,
+    "contentStartY": 1.5
+  },
+
+  "cardShadow": {
+    "type": "outer",
+    "blur": 4,
+    "offset": 1,
+    "angle": 135,
+    "color": "000000",
+    "opacity": 0.06
+  }
+}

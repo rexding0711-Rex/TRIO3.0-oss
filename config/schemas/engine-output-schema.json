@@ -1,0 +1,38 @@
+{
+  "$schema": "TRIO 3.0 Engine Raw Output Schema",
+  "$version": "1.0",
+  "$description": "引擎输出必须符合此结构才能通过 validate-engine-output.sh",
+
+  "meta": {
+    "engine_name": "competitive-intel | talent-reverse-trace",
+    "engine_version": "1.0.0",
+    "run_id": "run-XXX",
+    "timestamp": "2026-07-09T00:00:00+08:00",
+    "domain_config": "domain-name"
+  },
+
+  "brake_check": {
+    "should_brake": false,
+    "reason": "信号密度 N/6 ≥ 阈值 3/6",
+    "signal_density": "N/6",
+    "missing_signals": [],
+    "data_quality_flags": []
+  },
+
+  "scoring": {
+    "signal_coverage": "N/6",
+    "formula_expansion": "威胁分 = 意图(X)×0.25 + 能力(X)×0.30 + 时间(X)×0.20 + 重叠(X)×0.25 = Z",
+    "calculation_process": "意图=X(来源) × 0.25 = Y; 能力=X(来源) × 0.30 = Y; ...",
+    "final_score": 0.0,
+    "confidence": "medium",
+    "confidence_reason": ""
+  },
+
+  "layers": {
+    "L1_signals": {},
+    "L2_extraction": {},
+    "L3_tracking": {},
+    "L4_enhancement": {},
+    "L5_synthesis": {}
+  }
+}

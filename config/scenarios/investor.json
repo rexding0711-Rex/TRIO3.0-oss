@@ -1,0 +1,101 @@
+{
+  "id": "investor",
+  "version": "1.0.0",
+  "description": "一级市场投资人工作流——管线管理·尽调自动化·投委会备忘录·退出复盘",
+  "type": "domain",
+  "domain": "investor",
+  "protocols": [
+    "context-isolation-protocol.json",
+    "self-verify-protocol.json",
+    "escalate-protocol.json",
+    "deconstruct-protocol.json",
+    "topology-thinking-protocol.json"
+  ],
+  "entry_commands": {
+    "管线入库": {
+      "description": "新项目信息提取 → Neo4j 入库 → 关联图谱",
+      "triggers": ["看项目", "新项目", "入库", "deal", "pipeline add"],
+      "roles": ["Claude"],
+      "output": ["Neo4j 图谱更新", "入库摘要"]
+    },
+    "深度尽调": {
+      "description": "5 层 OODA 解剖 + 三面具质控",
+      "triggers": ["尽调", "DD", "深挖", "扒光", "拆到底", "due diligence"],
+      "roles": ["Kimi", "DeepSeek", "Claude"],
+      "output": ["尽调报告 MD+PDF+HTML"],
+      "protocol": "deconstruct-protocol.json",
+      "depth": "deep"
+    },
+    "投委会备忘录": {
+      "description": "从图谱+尽调报告自动生成投资备忘录",
+      "triggers": ["memo", "备忘录", "IC", "投委会", "investment memo"],
+      "roles": ["Claude", "DeepSeek"],
+      "output": ["投资备忘录 MD+PDF"],
+      "template": "templates/investor/memo-template.md"
+    },
+    "管线查看": {
+      "description": "Neo4j 查询 → 管线仪表盘",
+      "triggers": ["管线", "pipeline", "portfolio", "组合", "看portfolio"],
+      "roles": ["Claude"],
+      "output": ["管线摘要", "可选: HTML 仪表盘"]
+    },
+    "退出复盘": {
+      "description": "退出案例分析 → 模式识别 → 决策框架改进",
+      "triggers": ["复盘", "退出", "exit", "track record", "教训"],
+      "roles": ["Kimi", "DeepSeek", "Claude"],
+      "output": ["退出复盘报告", "Lesson 节点更新"]
+    },
+    "赛道扫描": {
+      "description": "行业全量分析 + 投资热度 + 退出窗口",
+      "triggers": ["赛道", "行业", "mapping", "扫描", "sector deep dive"],
+      "roles": ["Kimi", "DeepSeek", "Claude"],
+      "output": ["赛道分析报告 MD+PDF+HTML"]
+    },
+    "创始人评估": {
+      "description": "人物尽调——履历核查+决策模式+市场出清",
+      "triggers": ["创始人", "团队", "founder", "人物评估"],
+      "roles": ["Kimi", "DeepSeek"],
+      "output": ["创始人评估报告"],
+      "protocol": "talent-reverse-trace-protocol.json"
+    },
+    "快速判断": {
+      "description": "跳过深度搜索，2 视角快速出结论",
+      "triggers": ["快判", "速判", "quick take"],
+      "roles": ["Kimi", "DeepSeek"],
+      "output": ["快速判断摘要"],
+      "speed": "quick"
+    }
+  },
+  "neo4j_schema": "config/schemas/investor-neo4j-schema.cypher",
+  "templates_dir": "templates/investor/",
+  "mcp_required": [
+    "neo4j",
+    "postgres",
+    "filesystem",
+    "firecrawl",
+    "playwright",
+    "exa"
+  ],
+  "mcp_optional": [
+    "context7",
+    "github",
+    "duckduckgo"
+  ],
+  "env_required": {
+    "DEEPSEEK_API_KEY": "DeepSeek API Key（用于审计+低成本搜索）",
+    "NEO4J_URI": "bolt://localhost:7687",
+    "NEO4J_USER": "neo4j",
+    "NEO4J_PASSWORD": "Neo4j 密码（本地实例）"
+  },
+  "env_optional": {
+    "FIRECRAWL_API_KEY": "Firecrawl API Key（网页抓取）",
+    "ANTHROPIC_API_KEY": "Anthropic API Key（Claude 面具）",
+    "EXA_API_KEY": "Exa API Key（深度搜索）"
+  },
+  "security_rules": {
+    "no_cloud_upload": "项目名称/创始人/财务数据禁止上传云端 LLM",
+    "search_anonymization": "搜索使用脱敏 query——不直接搜'XX公司 融资'",
+    "neo4j_auth": "Neo4j 必须开启本地认证",
+    "local_storage": "交付物默认保存在本地加密目录"
+  }
+}

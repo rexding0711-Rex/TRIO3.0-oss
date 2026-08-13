@@ -1,0 +1,109 @@
+{
+  "name": "competitive-domain-config-template",
+  "version": "1.0.0",
+  "type": "domain_config_template",
+  "engine_ref": "config/protocols/competitive-intel-engine.json",
+  "description": "竞品情报领域配置模板。换行业=复制此文件→填竞品名单+行业关键词→10分钟。",
+
+  "_instructions": "复制后删除所有 _ 开头的字段",
+
+  "domain": {
+    "name": "{行业名}",
+    "display_name": "{中文显示名}",
+    "client_position": "{我们/客户在行业中的位置——用于判断'谁是竞品'}",
+    "attention_dimensions": ["{关注维度1}", "{维度2}", "{维度3}"],
+    "_note": "attention_dimensions 影响 L3 威胁评估中各维度的权重"
+  },
+
+  "competitors": {
+    "direct": [
+      { "name": "{直接竞品1}", "why": "{为什么是竞品}", "known_signals": "{已知的动态(如'最近融了X亿')}" }
+    ],
+    "indirect": [
+      { "name": "{间接竞品1}", "why": "{不同赛道但可能跨界}", "known_signals": "" }
+    ],
+    "self": { "name": "{我们/客户名称}", "why": "自身定位——用于L5对比基准" }
+  },
+
+  "signals": {
+    "_note": "六类信号默认全启用。如果某类对你的行业没意义→disabled: true",
+
+    "talent": {
+      "enabled": true,
+      "sources": ["LinkedIn", "Boss直聘", "猎聘", "脉脉"],
+      "search_templates": [
+        "\"{竞品名}\" 招聘 {行业关键词} {年份}",
+        "\"{竞品名}\" hiring {英文关键词} expansion team"
+      ],
+      "key_roles_to_watch": ["{本行业关键职位1}", "{职位2}"]
+    },
+
+    "ip": {
+      "enabled": true,
+      "sources": ["Google Patents", "CNKI专利", "USPTO", "WIPO"],
+      "search_templates": [
+        "\"{竞品名}\" patent {行业技术关键词} {年份}",
+        "assignee:\"{竞品英文名}\" {技术领域}"
+      ]
+    },
+
+    "capital": {
+      "enabled": true,
+      "sources": ["36氪", "Crunchbase", "IT桔子", "企查查"],
+      "search_templates": [
+        "\"{竞品名}\" 融资 {年份} 估值",
+        "\"{竞品名}\" funding round valuation investors"
+      ]
+    },
+
+    "product": {
+      "enabled": true,
+      "sources": ["GitHub", "官网", "应用商店", "ProductHunt"],
+      "search_templates": [
+        "\"{竞品名}\" 发布 新品 {年份}",
+        "\"{竞品名}\" github repository open source"
+      ]
+    },
+
+    "org": {
+      "enabled": true,
+      "sources": ["企查查", "天眼查", "LinkedIn", "新闻报道"],
+      "search_templates": [
+        "\"{竞品名}\" 工商变更 组织架构 {年份}",
+        "\"{竞品名}\" 高管 离职 入职 事业部"
+      ]
+    },
+
+    "partnership": {
+      "enabled": true,
+      "sources": ["新闻", "官方公告", "招标网"],
+      "search_templates": [
+        "\"{竞品名}\" 合作 战略 {年份}",
+        "\"{竞品名}\" partnership customer win {年份}"
+      ]
+    }
+  },
+
+  "threat_weights": {
+    "_note": "L3 威胁评估的四个维度权重。默认值适配大多数场景。如果你的行业竞争强度特别高→提高时间紧迫度权重",
+    "intent_clarity": 0.25,
+    "execution_capability": 0.30,
+    "time_urgency": 0.20,
+    "business_overlap": 0.25
+  },
+
+  "ranking_weights": {
+    "_note": "L5 综合评分的六个维度权重。默认均匀分配。如果你特别看重技术→提高技术储备权重",
+    "tech_reserve": 0.17,
+    "market_share": 0.17,
+    "talent_density": 0.17,
+    "capital_abundance": 0.17,
+    "strategy_clarity": 0.16,
+    "ecosystem_layout": 0.16
+  },
+
+  "meta": {
+    "created": "{日期}",
+    "tested_on": "{首次使用项目}"
+  }
+}

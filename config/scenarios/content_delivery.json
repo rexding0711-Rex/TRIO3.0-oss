@@ -1,0 +1,47 @@
+{
+  "id": "content_delivery",
+  "name": "内容交付",
+  "version": "3.0.0",
+  "triggers": [
+    "内容",
+    "公众号",
+    "报告",
+    "GEO",
+    "白皮书"
+  ],
+  "mode": "content_only",
+  "steps": [
+    {
+      "order": 1,
+      "role": "内容生产工程师",
+      "mask": "kimi",
+      "action": "基于素材撰写内容初稿（技术文章/Pitch/报告/公众号）",
+      "output": "内容初稿（Markdown，含声明标记）",
+      "acceptance_criteria": "技术细节准确，语言符合目标受众，所有数据声明标注来源。叙事框架清晰（问题→方案→证据→行动）"
+    },
+    {
+      "order": 2,
+      "role": "事实核查工程师",
+      "mask": "deepseek",
+      "action": "核查内容中的事实声明和数据准确性",
+      "depends_on": [
+        1
+      ],
+      "acceptance_criteria": "所有可验证声明逐条标注置信度。对照 D:\\工作\\对标库\\knowledge-benchmark\\ 和 D:\\工作\\对标库\\industry\\ 已有数据"
+    },
+    {
+      "order": 3,
+      "role": "全栈交付工程师",
+      "mask": "claude",
+      "action": "格式包装+渠道适配+最终输出",
+      "depends_on": [
+        2
+      ],
+      "acceptance_criteria": "符合发布渠道格式要求（公众号/PDF/PPT/HTML），品牌视觉一致"
+    }
+  ],
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json"
+  },
+  "_layer": "scenario"
+}

@@ -1,0 +1,134 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "created": "2026-07-31",
+    "description": "TRIO 3.0 五级信源质量体系——控制信息源可靠性，防止垃圾进垃圾出",
+    "trigger": "PDF风险分析 R2(信源链断裂)+R7(信源循环污染) → 本文件落库",
+    "supersedes": "此前信源分级仅以注释形式散落在各 SKILL.md 中，无统一配置文件"
+  },
+
+  "tiers": {
+    "S": {
+      "label": "原始数据生产者",
+      "description": "直接从物理世界/业务系统产生的数据，未经中间人加工",
+      "examples": [
+        "上市公司年报/季报 (SEC/CSRC filings)",
+        "专利局原始专利文件 (USPTO/CNIPA/WIPO)",
+        "政府统计数据 (国家统计局/BLS/Eurostat)",
+        "学术论文 (经DOI解析验证)",
+        "企业工商登记信息 (天眼查/企查查一级源)",
+        "临床试验注册 (ClinicalTrials.gov/ChiCTR)",
+        "海关进出口提单",
+        "法院判决书/仲裁文书"
+      ],
+      "trust_anchor": "有法律后果——虚假即违法",
+      "degradation": "S级数据参与跨级混合计算时保持S级，但下游引用需标注原始S级来源",
+      "auto_flag": false
+    },
+    "A": {
+      "label": "一级引用",
+      "description": "直接引用S级数据做分析，未经过二手解读",
+      "examples": [
+        "权威行业研究机构报告 (Gartner Magic Quadrant/IDC Tracker)",
+        "四大会计师事务所审计报告/尽调报告",
+        "顶级咨询公司行业研究 (McKinsey Global Institute/BCG)",
+        "官方行业协会统计 (SEMI/WSTS/SIA)",
+        "央行/证监会/交易所正式公告",
+        "大型金融机构研究部报告 (Goldman Sachs Global Research/JPM)",
+        "知名学术机构技术路线图 (MIT Technology Review/Nature Reviews)"
+      ],
+      "trust_anchor": "有声誉后果——方法论公开可复现",
+      "degradation": "A级以下参与计算→整体降为A级",
+      "auto_flag": false
+    },
+    "B": {
+      "label": "二级转载/加工",
+      "description": "引用S/A级数据但增加了自身解读框架，或数据经过聚合/换算",
+      "examples": [
+        "券商研报 (中金/中信/华泰等国内券商)",
+        "知名财经媒体深度报道 (Bloomberg/Reuters/FT/财新)",
+        "行业会议演讲 (Keynote级别/有幻灯片存档)",
+        "企业官方新闻稿 (上市公司/大型企业)",
+        "第三方数据平台 (Wind/Bloomberg Terminal/Crunchbase)",
+        "知名科技媒体产品评测 (AnandTech/Tom's Hardware)"
+      ],
+      "trust_anchor": "有职业后果——不准确会丢客户/读者信任",
+      "degradation": "B级以下参与计算→整体降为B级",
+      "auto_flag": false
+    },
+    "C": {
+      "label": "行业媒体/自媒体",
+      "description": "有一定行业认知但缺乏系统验证流程的信息源",
+      "examples": [
+        "行业垂直媒体 (36氪/虎嗅/机器之心/半导体行业观察)",
+        "知名科技博客/Substack",
+        "微信公众号 (有明确作者+历史可验证记录)",
+        "知乎高赞回答 (有专业背景的作者)",
+        "YouTube行业分析频道 (有可验证track record)",
+        "行业论坛帖子 (有专业讨论/非匿名)"
+      ],
+      "trust_anchor": "有声誉风险——但验证流程弱于B级",
+      "degradation": "C级占单次分析信源比例 > 30% → 触发 SOURCE_QUALITY_WARNING",
+      "auto_flag": true,
+      "flag_threshold_pct": 30
+    },
+    "D": {
+      "label": "不可溯源",
+      "description": "无法追溯到可验证的原始数据或可信机构的信息",
+      "examples": [
+        "匿名社交媒体帖子",
+        "创始人PPT中的未标注来源数据",
+        "非公开路演材料",
+        "口头传闻/业内小道消息",
+        "AI生成的未验证内容",
+        "不明来源的截图/转发"
+      ],
+      "trust_anchor": "无——不可作为独立论据",
+      "degradation": "D级不出现在论据中。如必须引用→标注「⚠️ 不可溯源——仅供交叉验证参考」",
+      "auto_flag": true,
+      "block_in_argument": true
+    }
+  },
+
+  "cross_tier_rules": {
+    "mixed_computation": {
+      "rule": "多个信源等级参与同一计算时，结果信源等级 = 参与方中最低等级",
+      "example": "S级专利数据 + C级行业媒体估算 = 结果等级C",
+      "exception": "S级数据参与跨级计算保持S级，但需在结果中标注S级数据来源"
+    },
+    "source_chain": {
+      "rule": "关键事实声明的信源追溯链终点必须 ≥ B级",
+      "definition": "关键事实 = 直接影响核心结论的事实声明",
+      "fail_action": "追溯链终点 ≤ C级 → 标注「⚠️ 信源不足——不可用于决策」"
+    },
+    "pseudo_independence": {
+      "rule": "多个信源指向同一上游时，计为1个独立信源",
+      "detection": "检查信源之间的引用链——如果A引用X、B也引用X，则A和B非独立",
+      "fail_action": "标注「伪独立验证——实际独立信源数=N」"
+    },
+    "temporal_decay": {
+      "rule": "S级数据永久有效。A/B/C级数据超过24个月 → 自动降一级",
+      "exception": "历史对比分析中，旧数据保持原等级但标注时间戳"
+    }
+  },
+
+  "enforcement": {
+    "per_analysis_gate": {
+      "description": "每次分析完成后，自动统计信源等级分布",
+      "checks": [
+        "C级占比 > 30% → WARN + 标注在报告末尾",
+        "D级出现在论据中 → BLOCK + 移除或降级为参考注释",
+        "关键事实无 ≥B级追溯链 → BLOCK + 标注「不可用于决策」",
+        "信源总数 < 3 → WARN + 标注「信源不足」"
+      ]
+    },
+    "auto_check_script": "scripts/source-rating-check.py",
+    "manual_override": "用户可手动提升信源等级，但必须在报告中注明「[用户判定] 原等级X→现等级Y，理由：___」"
+  },
+
+  "integration": {
+    "claude_md_ref": "数据源分级写入 CLAUDE.md ← 本文件为权威定义，CLAUDE.md 只保留一句话索引",
+    "fact_check_py": "fact_check.py 读取本文件，验证每条三元组的信源等级",
+    "topology_check_py": "topology-check.py 读取本文件，C5反证覆盖率计算时按信源等级加权"
+  }
+}

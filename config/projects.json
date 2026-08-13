@@ -1,0 +1,177 @@
+{
+  "id": "project-registry",
+  "version": "1.0.0",
+  "description": "TRIO 项目状态唯一真相源。project-context.md 和 DAILY.md 从此文件自动生成。",
+  "last_updated": "2026-08-13T23:58:21+08:00",
+  "projects": {
+    "LobeHub": {
+      "name": "LobeHub逆向工程",
+      "path": "D:\\工作\\TRIO\\Reports\\LobeHub逆向工程",
+      "status": "completed",
+      "last_analysis": "2026-07-01",
+      "last_run": "20260701-lobehub",
+      "verdict": "🟢 AI Agent 操作系统——60+包/30+内置工具/异构Agent运行时，Community License限制衍生作品",
+      "milestones": [
+        {
+          "date": "2026-07-01",
+          "event": "TRIO /all 逆向工程完成——7页PDF（商业模式拆解+技术架构+竞品对标+护城河分析）",
+          "status": "done"
+        }
+      ]
+    },
+    "CMOS": {
+      "name": "启朴芯微 CMOS",
+      "path": "D:\\工作\\项目\\CMOS",
+      "status": "active",
+      "last_analysis": "2026-06-25",
+      "last_run": "DD-2026-0625-QIPU",
+      "verdict": "🟡 5.1/10 有条件推进",
+      "milestones": [
+        {
+          "date": "2026-06-25",
+          "event": "双层尽调完成",
+          "status": "done"
+        }
+      ]
+    },
+    "CRX": {
+      "name": "陶瓷3D打印液冷散热",
+      "path": "D:\\工作\\项目\\CRX",
+      "status": "active",
+      "last_analysis": "2026-06-24",
+      "last_run": "20260624-crx",
+      "verdict": "🟡 71/100 方向正确条件性推进",
+      "milestones": []
+    },
+    "Forge": {
+      "name": "Forge（CRX子项目）",
+      "path": "D:\\工作\\项目\\CRX\\Forge",
+      "status": "active",
+      "last_analysis": "2026-06-25",
+      "last_run": "20260625-forge",
+      "verdict": "进行中",
+      "milestones": []
+    },
+    "罗欣": {
+      "name": "罗欣药业组织诊断",
+      "path": "D:\\工作\\项目\\罗欣",
+      "status": "active",
+      "last_analysis": "2026-07-01",
+      "last_run": "20260701-frances-ai",
+      "verdict": "🟢 AI化转型推进中——数字员工项目HR侧切入+SSC 120人岗位诊断+法务裁员博弈。交付物：组织评估报告+行动里程碑+岗位清单。",
+      "milestones": [
+        {
+          "date": "2026-07-01",
+          "event": "AI组织评估报告(陈总汇报用)+行动里程碑v2(施自己用)+SSC岗位清单(找胡总/王晓磊用) 交付",
+          "status": "done"
+        },
+        {
+          "date": "2026-07-01",
+          "event": "M4训练#9完成——Ying全量深度复盘(7层)",
+          "status": "done"
+        },
+        {
+          "date": "2026-07-01",
+          "event": "CHO拓扑分析v4交付(门禁✅)",
+          "status": "done"
+        },
+        {
+          "date": "2026-07-07",
+          "event": "本周: 施找胡总→林宇亮→王晓磊→韩企晨→陈总 情报链路",
+          "status": "upcoming"
+        },
+        {
+          "date": "2026-07-14",
+          "event": "综合运营部48人岗位诊断完成",
+          "status": "upcoming"
+        }
+      ]
+    },
+    "北化新橡": {
+      "name": "北化新橡公众号运营",
+      "path": "D:\\工作\\项目\\北化新橡",
+      "status": "active",
+      "last_analysis": "2026-06-27",
+      "last_run": null,
+      "verdict": "明天(6/26)见张老师，方案准备中",
+      "milestones": [
+        {
+          "date": "2026-06-26",
+          "event": "见张老师",
+          "status": "done",
+          "_completed": "2026-06-26"
+        },
+        {
+          "date": "2026-07-03",
+          "event": "张老师面谈后续方案提交",
+          "status": "upcoming"
+        }
+      ]
+    },
+    "瑞燃": {
+      "name": "瑞燃环境",
+      "path": "D:\\工作\\项目\\瑞燃",
+      "status": "completed",
+      "last_analysis": "2026-06-24",
+      "last_run": "20260624-ruiran",
+      "verdict": "🔴 1.9/10 终止合作",
+      "milestones": []
+    },
+    "小象超市": {
+      "name": "小象超市商业分析",
+      "path": "D:\\工作\\TRIO\\Reports\\小象超市",
+      "status": "completed",
+      "last_analysis": "2026-07-01",
+      "last_run": "20260701-xiaoxiang-final",
+      "verdict": "🔴 5.3/10 高风险领头羊——三重危机叠加（财务崩塌+法务炸弹+供应链丑闻），但模式优势不可否认",
+      "milestones": [
+        {
+          "date": "2026-06-30",
+          "event": "初版全盘分析 + 深挖报告"
+        },
+        {
+          "date": "2026-07-01",
+          "event": "单仓UE模型 + 三城竞对格局 + 20城投资矩阵"
+        },
+        {
+          "date": "2026-07-01",
+          "event": "整合为单一终极报告：9页/470KB（含叮咚收购+三重危机+UE+投资矩阵）"
+        }
+      ]
+    },
+    "Facemind": {
+      "name": "脸谱心智 Facemind 逆向工程",
+      "path": "D:\\工作\\TRIO\\Reports\\脸谱心智逆向工程",
+      "status": "completed",
+      "last_analysis": "2026-07-01",
+      "verdict": "🟢 具身智能数据基础设施——Looped World Models + Ego-NeuroLoop 定义新数据范式"
+    },
+    "LLM-WIKI": {
+      "name": "Karpathy LLM-WIKI 逆向工程",
+      "path": "D:\\工作\\TRIO\\Reports\\Karpathy-LLM-WIKI逆向工程",
+      "status": "completed",
+      "last_analysis": "2026-07-01",
+      "verdict": "🟢 源码级逆向完成——135 TS文件/12条Lint规则/Schema引擎/Review管线/OKF标准"
+    },
+    "TRIO 3.14": {
+      "name": "TRIO 3.14(π) — Rex私人探索版",
+      "path": "D:\\TRIO 3.0",
+      "status": "active",
+      "last_analysis": "2026-06-27",
+      "verdict": "六层模块化单体——持续进化中",
+      "milestones": [
+        {
+          "date": "2026-07-15",
+          "event": "第50个run达成",
+          "status": "upcoming"
+        }
+      ]
+    }
+  },
+  "sync_rules": {
+    "on_project_analysis": "任何项目分析完成后，必须更新此文件中对应项目的 last_analysis 和 verdict",
+    "on_daily_evolution": "日进化从此文件读取项目状态，不再从 runs/ 目录名猜测",
+    "on_status_change": "项目 status 变化时（active↔stale↔completed）更新此文件并同步 project-context.md"
+  },
+  "_layer": "infra"
+}

@@ -1,0 +1,61 @@
+{
+  "id": "escalate-protocol",
+  "version": "1.0.0",
+  "description": "MAGI 一台反对→升级争议 的工程化。不是所有反对都升级——只升级不可逆的、根本性的、置信度崩塌的。",
+  "triggers": {
+    "irreversible": {
+      "name": "不可逆决策",
+      "condition": "最终产出将导致真实世界的不可逆行动（资金划转、合同签署、公开发布、人员决策）",
+      "action": "强制 ESCALATE，无论所有步骤是否 PASS",
+      "examples": [
+        "投资建议涉及实际金额",
+        "竞品报告将发给客户",
+        "尽调结论用于股权决策"
+      ]
+    },
+    "fundamental_disagreement": {
+      "name": "根本性分歧",
+      "condition": "两个面具在同一关键维度上得出相反结论（不是措辞差异，是方向相反）",
+      "detection": "Step N 的 verdict 与 Step N+1 的 audit 结论在核心判定上矛盾（如 🟢 vs 🔴）",
+      "action": "ESCALATE，输出两方论据对照表，等待人工裁决",
+      "not_escalate": "措辞修正、格式调整、同一结论的不同表达方式"
+    },
+    "confidence_collapse": {
+      "name": "置信度崩塌",
+      "condition": "最终结论依赖的关键声明中，有任意一条置信度 ≤2，且该声明不可绕过",
+      "action": "ESCALATE，标注 [置信度崩塌] + 该声明 + 如果它为假会怎样",
+      "not_escalate": "支持性证据置信度低但结论有独立验证路径"
+    },
+    "retry_exhaustion": {
+      "name": "修复耗尽",
+      "condition": "同一 FAIL 项经过 3 轮修复-重审循环仍未 PASS",
+      "action": "ESCALATE，输出 {FAIL项, 3轮修复尝试, 当前状态, 建议人工介入点}",
+      "note": "3 轮后不再自动重试——AI 已在绕圈"
+    }
+  },
+  "anti_triggers": {
+    "description": "以下情况不应触发 ESCALATE——Agent 自行处理",
+    "cases": [
+      "格式/措辞类 FAIL（Agent 自行修复，不计数）",
+      "单个 Agent 内部自检发现的非结构性 FAIL（自检→修正→重检，不升级）",
+      "信息缺失导致的 FAIL（Agent 自行 Read 补充，不升级）",
+      "同一结论的不同措辞（不是实质性分歧）"
+    ]
+  },
+  "output_format": {
+    "escalation_notice": "| 触发类型 | 涉及步骤 | 争议/风险描述 | 建议人工裁决点 |",
+    "disagreement_matrix": "| 维度 | 面具A结论(置信度) | 面具B结论(置信度) | 分歧本质 |",
+    "confidence_risk": "| 关键声明 | 置信度 | 对结论的影响 | 如果为假的后果 |"
+  },
+  "state_machine": {
+    "status": "paused_escalate",
+    "resume_action": "用户用 /trio-resume {run_id} 恢复，同时附带裁决意见。Runner 以用户裁决为约束继续执行。"
+  },
+  "hard_rules": [
+    "仅四级触发: (1)不可逆决策 (2)面具间根本性分歧 (3)置信度崩塌 (4)3轮修复未PASS",
+    "格式/措辞/信息缺失类 FAIL 不触发 ESCALATE——Agent 自行修复",
+    "ESCALATE 触发后 retry_counter 重置为 0",
+    "用户裁决'接受当前状态' → 等同全部 PASS → state = completed",
+    "ESCALATE 输出必须包含: 触发类型 + 争议对照表 + 建议人工裁决点"
+  ]
+}

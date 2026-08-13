@@ -1,0 +1,51 @@
+# ================================================================
+# TRIO 3.0 · Eisvogel 标准 YAML 头模板
+# ================================================================
+# 用途：作为 pandoc + Eisvogel 生成 PDF 的默认元数据
+# 文档级 YAML 头可覆盖此处任何字段
+# ================================================================
+
+# ── 文档信息（由脚本自动注入，此处为默认值）──
+# title: "文档标题"
+# author: [Rex]
+# date: "\\today"
+
+# ── 标题页 ──
+titlepage: true
+titlepage-color: "000000"
+titlepage-text-color: "FFFFFF"
+titlepage-rule-color: "FFFFFF"
+titlepage-rule-height: 2
+
+# ── 字体（覆盖 Eisvogel 默认 SourceSans3 → 系统可用 Noto）──
+mainfont: Noto Sans CJK SC
+sansfont: Noto Sans CJK SC
+monofont: Noto Sans Mono
+CJKmainfont: Noto Sans CJK SC
+
+# ── 正文排版 ──
+fontsize: 11pt
+papersize: a4
+geometry:
+  - top=25mm
+  - bottom=25mm
+  - left=22mm
+  - right=22mm
+
+# ── 章节编号 ──
+number-sections: true
+
+# ── 目录 ──
+toc: true
+toc-own-page: false
+toc-depth: 2
+
+# ── 代码块 ──
+listings: true
+highlight-style: monochrome
+
+# ── 表格 ──
+table-use-row-colors: false
+
+# ── 页脚（按项目覆盖：在文档 YAML 头中设置 footer-left）──
+footer-center: "\\thepage"

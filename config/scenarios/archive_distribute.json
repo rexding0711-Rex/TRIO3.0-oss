@@ -1,0 +1,26 @@
+{
+  "id": "archive_distribute",
+  "name": "归档分发",
+  "version": "3.0.0",
+  "triggers": [
+    "归档",
+    "保存",
+    "入库",
+    "沉淀"
+  ],
+  "mode": "solo",
+  "steps": [
+    {
+      "order": 1,
+      "role": "资产盘点工程师",
+      "mask": "claude",
+      "action": "扫描项目产出→分类归档→冲突检测→更新索引",
+      "output": "归档报告（新增资产清单+冲突标记+索引更新）",
+      "acceptance_criteria": "项目产出→D:\\工作\\项目\\{项目名}\\，方法论→D:\\工作\\知识库\\methods\\，公司数据→D:\\工作\\对标库\\knowledge-benchmark\\。同一实体同一字段差异>20%标记冲突，≤20%以新数据为准自动更新。索引 D:\\工作\\知识库\\index.md 同步更新"
+    }
+  ],
+  "protocols": {
+    "self_verify": "config/protocols/self-verify-protocol.json"
+  },
+  "_layer": "scenario"
+}
