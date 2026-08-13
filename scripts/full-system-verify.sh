@@ -37,8 +37,12 @@ python3 -c "import json; m=json.load(open('config/milestones.json')); assert 'ho
 [ -f architecture/adr/ADR-008-删除场景YAML.md ] && pass "ADR-008 已记录YAML决策" || warn "ADR-008 缺失"
 
 echo "═══ 4. 知识层 ═══"
-# Neo4j 已移除 (ADR-010)——改为校验全量备份存档存在
-ls state/archive/neo4j-full-dump-*.csv >/dev/null 2>&1 && pass "Neo4j 已移除·备份存档 (ADR-010)" || warn "Neo4j 备份存档缺失"
+# Neo4j 已移除 (ADR-010)——改为校验全量备份存档存在（OSS 模式跳过 state 断言，2026-08-14 修复）
+if [ "$OSS_MODE" = "true" ]; then
+  pass "知识层本机存档检查跳过（OSS 模式）"
+else
+  ls state/archive/neo4j-full-dump-*.csv >/dev/null 2>&1 && pass "Neo4j 已移除·备份存档 (ADR-010)" || warn "Neo4j 备份存档缺失"
+fi
 ! grep -rq "ORDER BY rand()" scripts/*.py 2>/dev/null && pass "KG 查询无 rand()" || fail "KG 查询仍有 rand()!"
 
 echo "═══ 5. 引擎 ═══"

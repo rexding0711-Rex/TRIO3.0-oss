@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """硬阻断回归测试——对 9 次引擎实跑输出逐条验证六条硬阻断规则。
-   2026-07-09 Claude第三轮审计·Gap 4 最简实现"""
+   2026-07-09 Claude第三轮审计·Gap 4 最简实现
+
+⚠️ LOCAL-ONLY：扫描 /mnt/d/工作/... 本机实跑产物，OSS clone 环境不可运行。
+   （2026-08-14 标注——避免 clone 后误以为系统缺文件）"""
 
 import json, os, re, glob
 

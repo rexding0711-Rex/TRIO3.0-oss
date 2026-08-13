@@ -46,6 +46,15 @@ def constitution_check(entry: dict) -> list[str]:
     return violations
 
 
+# Schema Gate：候选决策必须含核心字段（缺失 = 结构性无效，拒绝写入）
+REQUIRED_FIELDS = ("ts", "persona", "claim_type", "claim", "confidence", "id")
+
+
+def schema_check(entry: dict) -> list[str]:
+    """Schema 检查，返回违规列表（空 = 结构有效）。"""
+    return [f"Schema 缺必填字段: {f}" for f in REQUIRED_FIELDS if not entry.get(f)]
+
+
 def commit(entry: dict) -> bool:
     """原子追加到 ledger（append + flush）。"""
     try:
@@ -69,9 +78,10 @@ def main(argv: list[str]) -> int:
         print(f"❌ 候选读取失败: {exc}")
         return 1
 
-    violations = [] if args.force else constitution_check(entry)
+    # Commit Boundary：Schema → Constitution → COMMIT（原子，先过 gate 再写 ledger）
+    violations = [] if args.force else schema_check(entry) + constitution_check(entry)
     if violations:
-        print("🚫 宪法门禁阻断提交（未写入 ledger）：")
+        print("🚫 Commit Boundary 阻断提交（未写入 ledger）：")
         for v in violations:
             print(f"  · {v}")
         print(f"  提示: 补上反证/字段后重新提交；或改 confidence 至 ≤3（R1 仅 ≥4 强制）")

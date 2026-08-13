@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-"""TRIO 3.1 Decision Ledger v1 — SQLite 决策记忆账本
+"""TRIO 3.0 Decision Ledger v1 — SQLite 决策记忆账本
 设计: lifecycle_status(生命周期) × outcome_status(验证结果) 双轨状态机
 5种记忆类型: decision / assumption / hypothesis / constraint / lesson
+
+版本: 统一在 TRIO 3.0（曾标注 3.1，版本边界冻结于 3.0，2026-08-14 修复）
+路径: 动态推导，禁止硬编码绝对路径（曾指向 /mnt/d/Agent文件/...，违反 paths.conf 纪律）
+      可用环境变量 TRIO_LEDGER_DB 覆盖（如 TRIO-Stock 分支指向独立账本）
 """
+import os
 import sqlite3, json, uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
-DB_PATH = Path("/mnt/d/Agent文件/TRIO-Stock/state/decision-ledger.db")
+TRIO_ROOT = Path(__file__).resolve().parent.parent
+DB_PATH = Path(os.environ.get("TRIO_LEDGER_DB", str(TRIO_ROOT / "state" / "decision-ledger.db")))
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS memories (

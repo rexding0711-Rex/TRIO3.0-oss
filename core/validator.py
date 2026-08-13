@@ -57,7 +57,7 @@ L2_WEAK_SIGNALS = [
 # ═══ 核心类 ═══
 
 class ExtractionValidator:
-    """知识抽取验证器——LLM JSON 进入 Neo4j 前的最后一道闸门。"""
+    """知识抽取验证器——LLM JSON 进入 Decision Runtime 的知识抽取验证闸门。"""
 
     def __init__(self) -> None:
         self.schema: dict[str, Any] = {}
