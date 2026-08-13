@@ -26,5 +26,6 @@ templates/pptx/reference.pptx
 
 # 真实商业案例 + 融资材料（2026-08-14 公开仓库移出——名誉/法律风险）
 config/benchmark-case-*.md
+config/benchmark-c0-*.md
 docs/TRIO3.0-*融资Deck*.md
 design/TRIO-3.0-Pitch-Deck-*.html
